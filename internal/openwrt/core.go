@@ -31,8 +31,9 @@ var (
 )
 
 type Status struct {
-	Timestamp int64 `json:"timestamp"`
-	Connected bool  `json:"connected"`
+	Timestamp int64  `json:"timestamp"`
+	TimeLine  string `json:"timeline"`
+	Connected bool   `json:"connected"`
 	//MAC       string `json:"mac"`
 }
 
@@ -100,27 +101,27 @@ func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, 
 	}, "logread", args...)
 }
 
-func listenSysLog(fn func(int64, string, string, bool)) error {
+func listenSysLog(fn func(int64, string, string, int, string)) error {
 	//args := []string{"-f", "|", "grep", "hostapd.*"}
 	pattern := `hostapd.*`
 	re := regexp.MustCompile(pattern)
 	return command(func(s string) {
 		if re.MatchString(s) {
 			timestamp, macAddr, phy, status := parseSysLog(s)
-			//if fn != nil {
-			//	fn(timestamp, macAddr, status == 0)
-			//}
-			if status == 0 {
-				if fn != nil {
-					fn(timestamp, macAddr, phy, false)
-				}
-			} else if status == 1 {
-				if fn != nil {
-					fn(timestamp, macAddr, phy, true)
-				}
-			} else {
-				//fmt.Printf("未知类型 %s\n", s)
+			if fn != nil {
+				fn(timestamp, macAddr, phy, status, s)
 			}
+			//if status == 0 {
+			//	if fn != nil {
+			//		fn(timestamp, macAddr, phy, false)
+			//	}
+			//} else if status == 1 {
+			//	if fn != nil {
+			//		fn(timestamp, macAddr, phy, true)
+			//	}
+			//} else {
+			//	//fmt.Printf("未知类型 %s\n", s)
+			//}
 		}
 
 	}, "logread", "-f")
@@ -540,7 +541,7 @@ func command(fu func(string), name string, arg ...string) error {
 	return cmd.Wait() // 等待命令退出
 }
 
-func GetStatusByMac(mac string) []*Status {
+func getStatusByMac(mac string) []*Status {
 	if mac == "" {
 		return nil
 	}

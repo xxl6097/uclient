@@ -10,7 +10,6 @@ import (
 	"github.com/xxl6097/uclient/internal/sse"
 	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
-	"sort"
 	"sync"
 )
 
@@ -75,13 +74,10 @@ func (this *Api) GetStatus(w http.ResponseWriter, r *http.Request) {
 		res.Error("mac地址空～")
 		return
 	}
-	list := openwrt.GetStatusByMac(mac)
+	list := openwrt.GetInstance().GetStatusByMac(mac)
 	if list == nil {
 		res.Ok("暂无数据")
 	} else {
-		sort.Slice(list, func(i, j int) bool {
-			return list[i].Timestamp > list[j].Timestamp
-		})
 		res.Object("获取成功", list)
 	}
 }
@@ -108,7 +104,7 @@ func (this *Api) SetStaticIp(w http.ResponseWriter, r *http.Request) {
 		res.Err(err)
 		return
 	}
-	err = openwrt.GetInstance().SetStaticIp(body.MAC, body.IP, body.Hostname)
+	err = openwrt.SetStaticIpAddress(body.MAC, body.IP, body.Hostname)
 	if err != nil {
 		glog.Error(err)
 		res.Err(err)
@@ -125,7 +121,7 @@ func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 		res.Error("mac地址空～")
 		return
 	}
-	err := openwrt.GetInstance().DeleteStaticIp(mac)
+	err := openwrt.DeleteStaticIpAddress(mac)
 	if err != nil {
 		glog.Error(err)
 		res.Err(err)
@@ -138,7 +134,7 @@ func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 func (this *Api) GetStaticIps(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)
-	ips, err := openwrt.GetInstance().GetStaticIps()
+	ips, err := openwrt.GetUCIOutput()
 	if err != nil {
 		glog.Error(err)
 		res.Err(err)

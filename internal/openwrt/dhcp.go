@@ -83,7 +83,7 @@ func isStaticIpUsed(ipAddress, macAddress, name string) error {
 	return nil
 }
 
-func setStaticIpAddress(mac, ip, name string) error {
+func SetStaticIpAddress(mac, ip, name string) error {
 	if err := isStaticIpUsed(ip, mac, name); err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func setStaticIpAddress(mac, ip, name string) error {
 	return restartDNSMasq()
 }
 
-func deleteStaticIpAddress(mac string) error {
+func DeleteStaticIpAddress(mac string) error {
 	entries, err := GetUCIOutput()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)

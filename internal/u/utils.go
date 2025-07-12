@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func Error(code int, msg string) map[string]interface{} {
@@ -140,4 +141,8 @@ func CheckDirector(path string) error {
 		return nil
 	}
 	return os.MkdirAll(path, 0755)
+}
+
+func TimestampFormat(timestamp int64) string {
+	return time.Unix(timestamp, 0).Format(time.DateTime) // 0表示纳秒部分
 }

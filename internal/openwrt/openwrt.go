@@ -1,12 +1,10 @@
 package openwrt
 
 import (
-	"errors"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -49,9 +47,21 @@ func (this *openWRT) init() {
 }
 
 func (this *openWRT) initListenSysLog() {
-	err := listenSysLog(func(timestamp int64, macAddr string, phy string, status bool) {
-		glog.Printf("syslog %v【%s】%v %v\n", timestamp, macAddr, phy, status)
-		this.updateClientsBySysLog(timestamp, macAddr, phy, status)
+	err := listenSysLog(func(timestamp int64, macAddr string, phy string, status int, rawData string) {
+		switch status {
+		case 0:
+			glog.Debugf("设备【%s】连上了", macAddr)
+			this.updateClientsBySysLog(timestamp, macAddr, phy, false)
+			break
+		case 1:
+			glog.Debugf("设备【%s】断开了", macAddr)
+			this.updateClientsBySysLog(timestamp, macAddr, phy, false)
+			break
+		default:
+			//glog.Warnf("未知数据 %v", rawData)
+			break
+		}
+
 	})
 	if err != nil {
 		glog.Error(fmt.Errorf("listenSysLog Error:%v", err))
@@ -116,35 +126,6 @@ func (this *openWRT) initListenFsnotify() {
 	err = watcher.Add(dhcpLeasesFilePath)
 	if err != nil {
 		glog.Error(fmt.Errorf("watcher add err %v", err))
-	}
-}
-
-func (this *openWRT) Listen(fn func([]*DHCPLease)) {
-	this.fnWatcher = func() {
-		if fn != nil {
-			fn(this.GetClients())
-		}
-	}
-}
-
-func (this *openWRT) GetClients() []*DHCPLease {
-	data := make([]*DHCPLease, 0)
-	for _, cls := range this.clients {
-		data = append(data, cls)
-	}
-	sort.Slice(data, func(i, j int) bool {
-		// 在线状态优先：在线(true) > 离线(false)
-		if data[i].Online != data[j].Online {
-			return data[i].Online
-		}
-		return data[i].Hostname < data[j].Hostname
-	})
-	return data
-}
-func (this *openWRT) ResetClients() {
-	this.initClients()
-	if this.fnWatcher != nil {
-		this.fnWatcher()
 	}
 }
 
@@ -261,7 +242,7 @@ func (p *openWRT) updateClientsByDHCP() {
 func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	list := GetStatusByMac(macAddr)
+	list := getStatusByMac(macAddr)
 	if list == nil {
 		list = newList
 	} else {
@@ -347,39 +328,4 @@ func (this *openWRT) getClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DHC
 		return dataMap, nil
 	}
 	return nil, e1
-}
-
-func (this *openWRT) UpdateNickName(obj *DHCPLease) error {
-	if obj == nil {
-		return errors.New("DHCPLease obj is nill")
-	}
-	mac := obj.MAC
-	nick, ok := this.nickMap[mac]
-	if ok {
-		nick.Name = obj.NickName
-	} else {
-		nick = &NickEntry{
-			Hostname: obj.Hostname,
-			IP:       obj.IP,
-		}
-	}
-	if v, ok := this.clients[mac]; ok {
-		v.NickName = obj.NickName
-	}
-	if this.fnWatcher != nil {
-		this.fnWatcher()
-	}
-	return updateNickData(mac, nick)
-}
-
-func (this *openWRT) DeleteStaticIp(mac string) error {
-	return deleteStaticIpAddress(mac)
-}
-
-func (this *openWRT) GetStaticIps() ([]DHCPHost, error) {
-	return GetUCIOutput()
-}
-
-func (this *openWRT) SetStaticIp(mac, ip, name string) error {
-	return setStaticIpAddress(mac, ip, name)
 }
