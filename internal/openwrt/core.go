@@ -253,10 +253,10 @@ func parseSysLog(data string) (int64, string, string, int) {
 	macAddr := parseMacAddr(data)
 	// 1. 检查字符串是否包含目标字段
 	if strings.Contains(data, apStaDisConnectString) { //AP-STA-DISCONNECTED
-		//fmt.Printf("%s 设备【%s】连上了", timestamp, macAddr)
+		//glog.Printf("%s 设备【%s】连上了", timestamp, macAddr)
 		return timestamp, macAddr, phy, 0
 	} else if strings.Contains(data, apStaConnectString) { //AP-STA-CONNECTED
-		//fmt.Printf("%s 设备【%s】断开了", timestamp, macAddr)
+		//glog.Printf("%s 设备【%s】断开了", timestamp, macAddr)
 		return timestamp, macAddr, phy, 1
 	}
 	return timestamp, macAddr, phy, -1
