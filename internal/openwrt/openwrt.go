@@ -50,7 +50,7 @@ func (this *openWRT) init() {
 
 func (this *openWRT) initListenSysLog() {
 	err := listenSysLog(func(timestamp int64, macAddr string, phy string, status bool) {
-		glog.Printf("syslog %s【%s】%v %v\n", timestamp, macAddr, phy, status)
+		glog.Printf("syslog %v【%s】%v %v\n", timestamp, macAddr, phy, status)
 		this.updateClientsBySysLog(timestamp, macAddr, phy, status)
 	})
 	if err != nil {
