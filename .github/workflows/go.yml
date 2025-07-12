@@ -30,7 +30,7 @@ jobs:
       - name: 编译Web
         if: steps.changed-frps-files.outputs.any_changed == 'true'
         run: |
-          cd ./web/openwrt
+          cd ./web/uclient
           npm install
           npm run build
       - name: 设置Golang版本
