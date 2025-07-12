@@ -499,10 +499,15 @@ func autoParse(timeStr string) (time.Time, error) {
 		time.TimeOnly,
 	}
 	for _, layout := range layouts {
-		t, err := time.Parse(layout, timeStr)
+		//t, err := time.Parse(layout, timeStr)
+		loc, err := time.LoadLocation("Asia/Shanghai")
 		if err == nil {
-			return t, nil // 解析成功
+			t, e := time.ParseInLocation(layout, timeStr, loc) // 按北京时间解析
+			if e == nil {
+				return t, nil // 解析成功
+			}
 		}
+
 	}
 	return time.Time{}, fmt.Errorf("无法识别的格式")
 }

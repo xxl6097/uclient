@@ -258,23 +258,23 @@ export function markdownToHtml(markdown: string): string {
   return html
 }
 
-export function formatTimeStamp(timestamp: number): string {
-  const date = new Date(timestamp * 1000) // 秒转毫秒[3,5](@ref)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0') // 月份从0开始[1,7](@ref)
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  const seconds = String(date.getSeconds()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
-}
+// export function formatTimeStamp(timestamp: number): string {
+//   const date = new Date(timestamp * 1000) // 秒转毫秒[3,5](@ref)
+//   const year = date.getFullYear()
+//   const month = String(date.getMonth() + 1).padStart(2, '0') // 月份从0开始[1,7](@ref)
+//   const day = String(date.getDate()).padStart(2, '0')
+//   const hours = String(date.getHours()).padStart(2, '0')
+//   const minutes = String(date.getMinutes()).padStart(2, '0')
+//   const seconds = String(date.getSeconds()).padStart(2, '0')
+//   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+// }
 
 // /**
 //  * 将Unix时间戳格式化为东八区时间字符串
 //  * @param {number} timestamp - Unix时间戳（秒级）
 //  * @returns {string} 格式为 "YYYY-MM-DD HH:mm:ss" 的东八区时间字符串
 //  */
-export function formatToUTC8(timestamp: number): string {
+export function formatToUTC8001(timestamp: number): string {
   // 将秒级时间戳转换为毫秒
   const date = new Date(timestamp * 1000)
 
@@ -298,7 +298,7 @@ export function formatToUTC8(timestamp: number): string {
  * @param {number} timestamp - Unix时间戳（秒级）
  * @returns {string} 格式为 "YYYY-MM-DD HH:mm:ss" 的东八区时间字符串
  */
-export function formatToUTC81(timestamp: number): string {
+export function formatToUTC8(timestamp: number): string {
   // 创建UTC时间对象（时间戳本质是UTC时间）
   const utcDate = new Date(timestamp * 1000)
 
@@ -314,4 +314,8 @@ export function formatToUTC81(timestamp: number): string {
   const seconds = String(date.getSeconds()).padStart(2, '0')
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+export function formatTimeStamp(timestamp: number): string {
+  return formatToUTC8(timestamp)
 }
