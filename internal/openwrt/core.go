@@ -250,8 +250,9 @@ func parseMacAddr(logLine string) string {
 }
 func parseSysLog(data string) (int64, string, string, int) {
 	phy := parsePhy(data)
-	timestamp := parseTime(data)
+	//timestamp := parseTime(data)
 	macAddr := parseMacAddr(data)
+	timestamp := time.Now().UnixMilli()
 	// 1. 检查字符串是否包含目标字段
 	if strings.Contains(data, apStaDisConnectString) { //AP-STA-DISCONNECTED
 		//glog.Printf("%s 设备【%s】连上了", timestamp, macAddr)
