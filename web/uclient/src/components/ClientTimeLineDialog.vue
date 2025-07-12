@@ -3,7 +3,7 @@
     :modal="true"
     :close-on-click-modal="true"
     :close-on-press-escape="true"
-    :width="isMobile() ? '80%' : '40%'"
+    :width="isMobile() ? '80%' : '30%'"
     v-model="showClientDialog"
     :title="title"
   >

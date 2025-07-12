@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-wpv8wsM9.js"(exports, module) {
+  "index--CdHuQtu.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -29810,7 +29810,7 @@ var require_index_001 = __commonJS({
             modal: true,
             "close-on-click-modal": true,
             "close-on-press-escape": true,
-            width: unref(isMobile)() ? "80%" : "40%",
+            width: unref(isMobile)() ? "80%" : "30%",
             modelValue: showClientDialog.value,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => showClientDialog.value = $event),
             title: title.value
@@ -29851,7 +29851,7 @@ var require_index_001 = __commonJS({
       }
       return target;
     };
-    const ClientTimeLineDialog = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-72cbab42"]]);
+    const ClientTimeLineDialog = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-0cb1f3d2"]]);
     class SimpleSSEClient {
       constructor(url) {
         __publicField(this, "eventSource", null);
@@ -31073,4 +31073,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-wpv8wsM9.js.map
+//# sourceMappingURL=index--CdHuQtu.js.map
