@@ -21,7 +21,7 @@ jobs:
         id: changed-web-files         # 设置步骤ID，用于后续引用输出
         uses: tj-actions/changed-files@v45
         with:
-          files: "web/openwrt/**"         # 监控src目录下所有文件[1](@ref)
+          files: "web/uclient/**"         # 监控src目录下所有文件[1](@ref)
           json: true              # 输出JSON格式（用于矩阵任务）[4](@ref)
       - name: 设置 Node.js
         uses: actions/setup-node@v4
