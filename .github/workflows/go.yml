@@ -1,0 +1,50 @@
+#name: "Build for ${{ github.ref_name }}  by ${{ github.actor }}"
+run-name: "${{ github.ref_name }}"
+#on:
+#  workflow_dispatch:
+on:
+  push:
+    tags:
+      - 'v[0-99]*.[0-99]*.[0-99]*'  # 匹配所有以 v 开头的标签（如 v1.0.0）
+env:
+  DELETE_RELEASE: yes
+jobs:
+  goreleaser:
+    #if: contains(github.event.head_commit.message, 'DEPLOY')  echo echo"github：${{ toJson(github) }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: 导出源码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Web文件变动了
+        id: changed-web-files         # 设置步骤ID，用于后续引用输出
+        uses: tj-actions/changed-files@v45
+        with:
+          files: "web/openwrt/**"         # 监控src目录下所有文件[1](@ref)
+          json: true              # 输出JSON格式（用于矩阵任务）[4](@ref)
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: 编译Web
+        if: steps.changed-frps-files.outputs.any_changed == 'true'
+        run: |
+          cd ./web/openwrt
+          npm install
+          npm run build
+      - name: 设置Golang版本
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: 编译Golang程序
+        run: |
+          chmod +x ./build.sh
+          ./build.sh github ${{ github.ref_name }}
+      - name: 发布版本
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: release --clean --release-notes=./Release.md --skip=validate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
