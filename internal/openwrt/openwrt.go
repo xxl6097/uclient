@@ -50,12 +50,14 @@ func (this *openWRT) initListenSysLog() {
 	err := listenSysLog(func(timestamp int64, macAddr string, phy string, status int, rawData string) {
 		switch status {
 		case 0:
-			glog.Debugf("设备【%s】连上了", macAddr)
+			glog.Debugf("设备【%s】断开了", macAddr)
+			glog.Debug(rawData)
 			this.updateClientsBySysLog(timestamp, macAddr, phy, false)
 			break
 		case 1:
-			glog.Debugf("设备【%s】断开了", macAddr)
-			this.updateClientsBySysLog(timestamp, macAddr, phy, false)
+			glog.Debugf("设备【%s】连上了", macAddr)
+			glog.Debug(rawData)
+			this.updateClientsBySysLog(timestamp, macAddr, phy, true)
 			break
 		default:
 			//glog.Warnf("未知数据 %v", rawData)
