@@ -31,7 +31,7 @@
                   >重置网络
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleShowStaticIpListDialog"
-                  >查看静态IP列表
+                  >静态列表
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -58,6 +58,7 @@
           :data="paginatedTableData"
           style="width: 100%"
           :border="true"
+          :highlight-current-row="false"
           :preserve-expanded-content="true"
         >
           <el-table-column type="expand">
@@ -69,13 +70,15 @@
             prop="hostname"
             label="名称"
             sortable
-            v-if="!isMobile()"
+            min-width="130"
           >
             <template #default="scope">
-              {{ getClientName(scope.row) }}
+              <el-text :type="scope.row.online ? 'success' : 'none'">{{
+                getClientName(scope.row)
+              }}</el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="ip" label="IP" sortable />
+          <el-table-column prop="ip" label="IP" sortable min-width="135" />
           <el-table-column
             prop="mac"
             label="Mac地址"
@@ -92,16 +95,22 @@
               {{ formatTimeStamp(props.row.starTime) }}
             </template>
           </el-table-column>
-          <el-table-column prop="online" label="状态" sortable>
+          <el-table-column
+            prop="online"
+            label="状态"
+            sortable
+            min-width="80"
+            align="center"
+          >
             <template #default="scope">
               <el-tag v-if="scope.row.online" type="success">在线</el-tag>
               <el-tag v-else type="danger">离线</el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" max="80" fixed="right" align="center">
             <template #default="{ row }">
               <el-dropdown trigger="click">
-                <el-button size="small" type="text">操作</el-button>
+                <el-button type="text">菜单</el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item @click="handleShowStaitcIpDialog(row)"
@@ -368,45 +377,6 @@ const handleUpdate = () => {
   }
 }
 
-const testData = [
-  {
-    ip: '192.168.0.199',
-    mac: 'ea:e6:51:97:81:f6',
-    phy: 'phy1-ap0',
-    hostname: '*',
-    nickName: 'MacBookAirM4',
-    starTime: '2025-07-11 09:47:33',
-    online: true,
-  },
-  {
-    ip: '192.168.0.3',
-    mac: '8c:ec:4b:58:81:09',
-    phy: '',
-    hostname: 'DESKTOP-76N54N2',
-    nickName: '',
-    starTime: '2025-07-11 08:03:36',
-    online: true,
-  },
-  {
-    ip: '192.168.0.6',
-    mac: '7a:34:62:d5:a4:18',
-    phy: 'phy1-ap0',
-    hostname: 'Xiaomi-15',
-    nickName: '小米15',
-    starTime: '2025-07-11 09:47:27',
-    online: true,
-  },
-  {
-    ip: '192.168.0.231',
-    mac: 'f6:d8:9e:5c:9f:0a',
-    phy: 'phy0-ap0',
-    hostname: '',
-    nickName: '',
-    starTime: '',
-    online: false,
-  },
-]
-
 const fetchData = () => {
   const timestamp = 1752266198
 
@@ -617,7 +587,45 @@ const connectSSE = () => {
     console.error('connectSSE err', e)
   }
 }
-
+const testData = [] as Client[]
+// const testData = [
+//   {
+//     ip: '192.168.168.168',
+//     mac: '28:f0:76:39:85:88',
+//     phy: '',
+//     hostname: 'DESKTOP-QEHPF1Aaaaaaaaaaaaaaaa',
+//     nickName: 'beckaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+//     starTime: 1752280898,
+//     online: true,
+//   },
+//   {
+//     ip: '192.168.1.154',
+//     mac: '36:11:f0:10:7e:91',
+//     phy: '',
+//     hostname: 'Mac',
+//     nickName: 'MacBookAirM4',
+//     starTime: 1752284884,
+//     online: true,
+//   },
+//   {
+//     ip: '192.168.1.111',
+//     mac: '50:a0:09:cf:62:6d',
+//     phy: '',
+//     hostname: 'MiAiSoundbox',
+//     nickName: '小米Ai音箱',
+//     starTime: 1752279097,
+//     online: false,
+//   },
+//   {
+//     ip: '192.168.1.115',
+//     mac: '30:95:87:37:e2:82',
+//     phy: '',
+//     hostname: 'MiBOX4-338afcfcce69b1c4',
+//     nickName: '小米盒子',
+//     starTime: 1752276830,
+//     online: false,
+//   },
+// ]
 // 初始化监听
 onMounted(() => {
   window.addEventListener('resize', updateDialogWidth)
@@ -648,7 +656,7 @@ header {
 }
 
 .header-color {
-  background: #58b7ff;
+  background: #4d83ac;
 }
 
 html.dark .header-color {

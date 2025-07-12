@@ -27,5 +27,7 @@ export default defineConfig({
     assetsDir: '',
     outDir: '../../assets/openwrt/static', // 默认打包路径
     emptyOutDir: true,
+    minify: false, // ✅ 关闭代码压缩和混淆（默认值可为 'esbuild' 或 'terser'）
+    sourcemap: true, // 可选：生成 SourceMap 便于调试
   },
 })

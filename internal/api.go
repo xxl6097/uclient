@@ -10,6 +10,7 @@ import (
 	"github.com/xxl6097/uclient/internal/sse"
 	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
+	"sort"
 	"sync"
 )
 
@@ -74,7 +75,15 @@ func (this *Api) GetStatus(w http.ResponseWriter, r *http.Request) {
 		res.Error("mac地址空～")
 		return
 	}
-	res.Sucess("获取成功", openwrt.GetInstance().GetDeviceStatusList(mac))
+	list := openwrt.GetStatusByMac(mac)
+	if list == nil {
+		res.Ok("暂无数据")
+	} else {
+		sort.Slice(list, func(i, j int) bool {
+			return list[i].Timestamp > list[j].Timestamp
+		})
+		res.Object("获取成功", list)
+	}
 }
 
 func (this *Api) Clear(w http.ResponseWriter, r *http.Request) {

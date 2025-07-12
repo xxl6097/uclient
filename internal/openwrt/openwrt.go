@@ -261,14 +261,17 @@ func (p *openWRT) updateClientsByDHCP() {
 func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	list := getStatusByMac(macAddr)
+	list := GetStatusByMac(macAddr)
 	if list == nil {
 		list = newList
 	} else {
 		element := list[len(list)-1]
 		if element != nil {
 			for i, n := range newList {
-				if n.Timestamp > element.Timestamp {
+				if n.Timestamp >= element.Timestamp {
+					if n.Timestamp == element.Timestamp && n.Connected == element.Connected {
+						continue
+					}
 					list = append(list, newList[i:]...)
 					break
 				}
@@ -369,9 +372,6 @@ func (this *openWRT) UpdateNickName(obj *DHCPLease) error {
 	return updateNickData(mac, nick)
 }
 
-func (this *openWRT) GetDeviceStatusList(mac string) []*Status {
-	return getStatusByMac(mac)
-}
 func (this *openWRT) DeleteStaticIp(mac string) error {
 	return deleteStaticIpAddress(mac)
 }

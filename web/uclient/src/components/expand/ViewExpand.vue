@@ -1,25 +1,20 @@
 <template>
   <div class="main">
-    <el-form
-      label-position="left"
-      label-width="auto"
-      inline
-      class="proxy-table-expand"
-    >
-      <el-form-item label="名称">
-        <span>{{ row.hostname }}</span>
-      </el-form-item>
+    <el-form label-position="left" label-width="auto">
       <el-form-item label="昵称">
         <span>{{ row.nickName }}</span>
       </el-form-item>
-      <el-form-item label="连接时间" v-if="isMobile()">
-        <span>{{ formatTimeStamp(row.starTime) }}</span>
+      <el-form-item label="名称">
+        <span>{{ row.hostname }}</span>
       </el-form-item>
       <el-form-item label="Mac地址" v-if="isMobile()">
         <span>{{ row.mac }}</span>
       </el-form-item>
-      <el-form-item label="网络接口">
+      <el-form-item label="网络接口" v-if="row.phy !== ''">
         <span>{{ row.phy }}</span>
+      </el-form-item>
+      <el-form-item label="连接时间" v-if="isMobile()">
+        <span>{{ formatTimeStamp(row.starTime) }}</span>
       </el-form-item>
     </el-form>
 
@@ -68,15 +63,13 @@ ul .annotation-key {
   color: #99a9bf;
 }
 
-@media screen and (max-width: 1180px) {
-  .main {
-    margin-left: 100px;
-  }
+.main {
+  margin-left: 60px;
 }
 
 @media screen and (max-width: 968px) {
   .main {
-    margin-left: 1px;
+    margin-left: 60px;
   }
 }
 </style>

@@ -540,7 +540,7 @@ func command(fu func(string), name string, arg ...string) error {
 	return cmd.Wait() // 等待命令退出
 }
 
-func getStatusByMac(mac string) []*Status {
+func GetStatusByMac(mac string) []*Status {
 	if mac == "" {
 		return nil
 	}

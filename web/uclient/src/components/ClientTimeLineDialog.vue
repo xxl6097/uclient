@@ -3,7 +3,7 @@
     :modal="true"
     :close-on-click-modal="true"
     :close-on-press-escape="true"
-    :width="isMobile() ? '80%' : '30%'"
+    :width="isMobile() ? '80%' : '40%'"
     v-model="showClientDialog"
     :title="title"
   >
@@ -17,7 +17,7 @@
           :timestamp="formatToUTC8(activity.timestamp)"
         >
           <span :style="{ color: activity.connected ? '#55f604' : 'red' }">
-            {{ activity.connected ? '在线' : '离线' }}
+            {{ activity.connected ? '在线' : '离线' }}-{{ activities.length - index }}
           </span>
         </el-timeline-item>
       </el-timeline>
@@ -61,9 +61,17 @@ function fetchData(mac: string) {
     })
 }
 
+function getTitle(row: Client): string {
+  if (row.nickName != '') {
+    return row.nickName
+  } else {
+    return row.hostname
+  }
+}
+
 const openClientDetailDialog = (row: Client) => {
   console.log('打开对话框，row:', row)
-  title.value = `客户端【${row.hostname}】状态时间表`
+  title.value = `${getTitle(row)}状态时间表`
   // showClientDialog.value = true
   // activities.value = row.statusList
   fetchData(row.mac)
