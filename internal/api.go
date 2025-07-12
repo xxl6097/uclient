@@ -5,10 +5,10 @@ import (
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/github"
 	"github.com/xxl6097/go-service/pkg/gs/igs"
-	"github.com/xxl6097/openwrt-client-manager/internal/iface"
-	"github.com/xxl6097/openwrt-client-manager/internal/openwrt"
-	"github.com/xxl6097/openwrt-client-manager/internal/sse"
-	"github.com/xxl6097/openwrt-client-manager/internal/u"
+	"github.com/xxl6097/uclient/internal/iface"
+	"github.com/xxl6097/uclient/internal/openwrt"
+	"github.com/xxl6097/uclient/internal/sse"
+	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
 	"sync"
 )
@@ -162,7 +162,7 @@ func (this *Api) SetNick(w http.ResponseWriter, r *http.Request) {
 		u.Respond(w, u.Error(-1, err.Error()))
 		return
 	}
-	err = openwrt.GetInstance().Nick(body)
+	err = openwrt.GetInstance().UpdateNickName(body)
 	if err != nil {
 		glog.Error(err)
 		u.Respond(w, u.Error(-2, err.Error()))
