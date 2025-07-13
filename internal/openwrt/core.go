@@ -390,7 +390,7 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 
 	lines := strings.Split(string(data), "\n")
 	//entries := make([]*ARPEntry, 0)
-	entries := make(map[string]*ARPEntry)
+	entries := make(map[string][]*ARPEntry)
 	for i, line := range lines {
 		if i == 0 || strings.TrimSpace(line) == "" {
 			continue // 跳过标题行和空行
@@ -404,9 +404,30 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 			glog.Error("parseARPLine error", e, line)
 			continue
 		}
-		entries[entry.MAC.String()] = entry
+		mac := entry.MAC.String()
+		if _, ok := entries[mac]; !ok {
+			entries[mac] = []*ARPEntry{entry}
+		} else {
+			temp := entries[mac]
+			entries[mac] = append(temp, entry)
+			entries[mac] = temp
+		}
 	}
-	return entries, nil
+
+	arpMap := make(map[string]*ARPEntry)
+	for mac, v := range entries {
+		if v != nil && len(v) > 0 {
+			temp := v[0]
+			for _, item := range v {
+				if item.Flags == 2 {
+					temp = item
+				}
+			}
+			arpMap[mac] = temp
+		}
+
+	}
+	return arpMap, nil
 }
 
 func parsePhy(logLine string) string {

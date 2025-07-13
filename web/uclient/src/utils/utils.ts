@@ -318,9 +318,8 @@ export function formatToUTC80002(timestamp: number): string {
 
 function formatTime(timestamp: number): string {
   // 判断时间戳类型（秒级或毫秒级）
-  const date = timestamp.toString().length > 10
-      ? new Date(timestamp)
-      : new Date(timestamp * 1000); // 秒级需转为毫秒
+  const isMilli = timestamp.toString().length > 10
+  const date = isMilli ? new Date(timestamp) : new Date(timestamp * 1000); // 秒级需转为毫秒
 
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -329,6 +328,10 @@ function formatTime(timestamp: number): string {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
 
+  if (isMilli){
+    const milli = String(date.getMilliseconds()).padStart(3, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milli}`;
+  }
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
