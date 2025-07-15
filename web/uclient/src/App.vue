@@ -27,9 +27,9 @@
                 <el-dropdown-item @click="handleResetClients"
                   >重置列表
                 </el-dropdown-item>
-                <el-dropdown-item @click="handleAResetNetwork"
-                  >重置网络
-                </el-dropdown-item>
+                <!--                <el-dropdown-item @click="handleAResetNetwork"-->
+                <!--                  >重置网络-->
+                <!--                </el-dropdown-item>-->
                 <el-dropdown-item @click="handleShowStaticIpListDialog"
                   >静态列表
                 </el-dropdown-item>
@@ -496,25 +496,25 @@ function handleResetClients() {
     })
 }
 
-function handleAResetNetwork() {
-  showWarmDialog(
-    `确定重置网络吗？`,
-    () => {
-      fetch('../api/network/reset', { credentials: 'include', method: 'POST' })
-        .then((res) => {
-          return res.json()
-        })
-        .then((json) => {
-          showTips(json.code, json.msg)
-        })
-        .catch((error) => {
-          console.log('error', error)
-          showErrorTips(`重置网络失败${JSON.stringify(error)}`)
-        })
-    },
-    () => {},
-  )
-}
+// function handleAResetNetwork() {
+//   showWarmDialog(
+//     `确定重置网络吗？`,
+//     () => {
+//       fetch('../api/network/reset', { credentials: 'include', method: 'POST' })
+//         .then((res) => {
+//           return res.json()
+//         })
+//         .then((json) => {
+//           showTips(json.code, json.msg)
+//         })
+//         .catch((error) => {
+//           console.log('error', error)
+//           showErrorTips(`重置网络失败${JSON.stringify(error)}`)
+//         })
+//     },
+//     () => {},
+//   )
+// }
 
 function handleShowStaticIpListDialog() {
   console.log('查看静态IP列表')
