@@ -27,25 +27,31 @@ var (
 	apStaConnectString    = "AP-STA-CONNECTED"
 	statusDir             = "/usr/local/openwrt/status"
 	nickFilePath          = "/usr/local/openwrt/nick"
+	webhookFilePath       = "/usr/local/openwrt/webhook"
 	MAX_SIZE              = 1000
 )
 
 type Status struct {
-	Timestamp int64  `json:"timestamp"`
-	TimeLine  string `json:"timeline"`
-	Connected bool   `json:"connected"`
-	//MAC       string `json:"mac"`
+	Timestamp int64 `json:"timestamp"`
+	Connected bool  `json:"connected"`
 }
-
+type NickEntry struct {
+	Name      string `json:"name"`
+	IsPush    bool   `json:"isPush"`
+	MAC       string `json:"mac"`
+	IP        string `json:"ip"`
+	StartTime int64  `json:"starTime"`
+	Hostname  string `json:"hostname"`
+}
 type DHCPLease struct {
-	IP        string `json:"ip"`  //DHCP 服务器分配给客户端的 IP
-	MAC       string `json:"mac"` //设备的物理地址，格式为 xx:xx:xx:xx:xx:xx
-	Phy       string `json:"phy"`
-	Hostname  string `json:"hostname"` //客户端上报的主机名（可能为空或 *）
-	NickName  string `json:"nickName"` //
-	StartTime int64  `json:"starTime"` //租约失效的精确时间（秒级精度）
-	Online    bool   `json:"online"`
-	//StatusList []*Status `json:"statusList"`
+	IP        string     `json:"ip"`  //DHCP 服务器分配给客户端的 IP
+	MAC       string     `json:"mac"` //设备的物理地址，格式为 xx:xx:xx:xx:xx:xx
+	Phy       string     `json:"phy"`
+	Hostname  string     `json:"hostname"` //客户端上报的主机名（可能为空或 *）
+	StartTime int64      `json:"starTime"` //租约失效的精确时间（秒级精度）
+	Online    bool       `json:"online"`
+	Nick      *NickEntry `json:"nick"` //
+	Static    *DHCPHost  `json:"static"`
 }
 type ARPEntry struct {
 	IP        net.IP           //设备的 IPv4 地址
@@ -54,13 +60,6 @@ type ARPEntry struct {
 	MAC       net.HardwareAddr //设备的 MAC 地址
 	Mask      string           // 子网掩码（通常为 *，表示未使用）
 	Interface string           // 关联的网络接口（如 br-lan、eth0）
-}
-type NickEntry struct {
-	Name      string `json:"name"`
-	StartTime int64  `json:"starTime"`
-	MAC       string `json:"mac"`
-	IP        string `json:"ip"`
-	Hostname  string `json:"hostname"`
 }
 
 func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, error) {

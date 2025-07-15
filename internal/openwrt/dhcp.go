@@ -94,7 +94,7 @@ func SetStaticIpAddress(mac, ip, name string) error {
 	return restartDNSMasq()
 }
 
-func DeleteStaticIpAddress(mac string) error {
+func deleteStaticIpAddress(mac string) error {
 	entries, err := GetUCIOutput()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
@@ -182,4 +182,17 @@ func GetUCIOutput() ([]DHCPHost, error) {
 			host.Index, host.MAC, host.IP, host.Hostname)
 	}
 	return hosts, nil
+}
+
+func getStaticIpMap() (map[string]*DHCPHost, error) {
+	arr, err := GetUCIOutput()
+	if err != nil {
+		glog.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	dataMap := make(map[string]*DHCPHost)
+	for _, entry := range arr {
+		dataMap[entry.MAC] = &entry
+	}
+	return dataMap, nil
 }

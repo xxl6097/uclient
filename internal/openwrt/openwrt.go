@@ -16,18 +16,19 @@ var (
 )
 
 type openWRT struct {
-	nickMap            map[string]*NickEntry
+	//nickMap            map[string]*NickEntry
 	clients            map[string]*DHCPLease
 	sysLogClientStatus map[string]bool
 	mu                 sync.RWMutex
 	fnWatcher          func()
+	webhookUrl         string
 }
 
 // GetInstance 返回单例实例
 func GetInstance() *openWRT {
 	once.Do(func() {
 		instance = &openWRT{
-			nickMap:            make(map[string]*NickEntry),
+			//nickMap:            make(map[string]*NickEntry),
 			sysLogClientStatus: make(map[string]bool),
 		}
 		instance.init()
@@ -40,6 +41,7 @@ func (this *openWRT) init() {
 	if u.IsMacOs() {
 		return
 	}
+	this.webhookUrl = this.GetWebHook()
 	this.initClients()
 	time.Sleep(time.Second)
 	go this.initListenSysLog()
@@ -132,7 +134,7 @@ func (this *openWRT) initListenFsnotify() {
 }
 
 func (this *openWRT) initClients() {
-	dataMap, err := this.getClientsFromDHCPAndArpAndSysLogAndNick()
+	dataMap, err := this.initClientsFromDHCPAndArpAndSysLogAndNick()
 	if err != nil {
 		glog.Errorf("initClients Error:%v", err)
 		time.Sleep(5 * time.Second)
@@ -148,6 +150,7 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 		cls.Phy = phy
 		this.sysLogClientStatus[macAddr] = status
 		glog.Infof("updateClientsBySysLog:%v", cls)
+		this.notifyWebhookMessage(cls)
 		if this.fnWatcher != nil {
 			this.fnWatcher()
 		}
@@ -179,15 +182,20 @@ func (p *openWRT) updateClientsByDHCP() {
 					}
 				}
 			}
-			//读取/tmp/dhcp.leases列表，获取名称和昵称
-			if p.nickMap != nil {
-				if nick, ok := p.nickMap[mac]; ok {
-					client.NickName = nick.Name
-					if nick.Hostname != "" && nick.Hostname != "*" {
-						client.Hostname = nick.Hostname
-					}
-				}
+			var nick *NickEntry
+			if v, ok := p.clients[mac]; ok && v != nil && v.Nick != nil {
+				nick = v.Nick
 			}
+
+			//读取/tmp/dhcp.leases列表，获取名称和昵称
+			//if p.clients != nil && p.clients.nickMap != nil {
+			//	if nick, ok := p.nickMap[mac]; ok {
+			//		client.NickName = nick.Name
+			//		if nick.Hostname != "" && nick.Hostname != "*" {
+			//			client.Hostname = nick.Hostname
+			//		}
+			//	}
+			//}
 			//缓存列表，存在就更新状态，不存在就添加
 			if v, ok := p.clients[mac]; ok {
 				if client.Hostname != "" && client.Hostname != "*" {
@@ -195,7 +203,8 @@ func (p *openWRT) updateClientsByDHCP() {
 				}
 				v.IP = client.IP
 				v.StartTime = client.StartTime
-				v.NickName = client.NickName
+				//v.NickName = client.NickName
+				v.Nick = nick
 				v.Online = client.Online
 
 			} else {
@@ -272,18 +281,19 @@ func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
 	_ = setStatusByMac(macAddr, list)
 }
 
-func (this *openWRT) getClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DHCPLease, error) {
+func (this *openWRT) initClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DHCPLease, error) {
 	entries, e1 := getClientsByArp(brLanString)
 	if e1 == nil {
 		leases, e2 := getClientsByDhcp()
 		status, e3 := getStatusFromSysLog()
 		nicks, e4 := getNickData()
-		this.nickMap = nicks
+		ips, e5 := getStaticIpMap()
+		//this.nickMap = nicks
 		glog.Errorf("getNickData Error:%v", e4)
 		if e4 != nil {
 			nicks = map[string]*NickEntry{}
 		} else {
-			for _, nick := range this.nickMap {
+			for _, nick := range nicks {
 				glog.Debugf("NickData:%+v", nick)
 			}
 		}
@@ -309,14 +319,22 @@ func (this *openWRT) getClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DHC
 			}
 			if e4 == nil {
 				if nick, ok := nicks[mac]; ok {
-					item.NickName = nick.Name
+					//item.NickName = nick.Name
+					item.Nick = nick
 				}
 			} else {
-				nicks[mac] = &NickEntry{
+				nick := &NickEntry{
 					StartTime: item.StartTime,
 					Hostname:  item.Hostname,
 					IP:        item.IP,
 					MAC:       mac,
+				}
+				nicks[mac] = nick
+			}
+
+			if e5 == nil {
+				if ip, ok := ips[mac]; ok {
+					item.Static = ip
 				}
 			}
 			dataMap[mac] = item

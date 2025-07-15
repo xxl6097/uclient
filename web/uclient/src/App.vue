@@ -33,6 +33,9 @@
                 <el-dropdown-item @click="handleShowStaticIpListDialog"
                   >静态列表
                 </el-dropdown-item>
+                <el-dropdown-item @click="handleWebhookSetting"
+                  >webhook设置
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -72,10 +75,10 @@
             sortable
             min-width="130"
           >
-            <template #default="scope">
-              <el-text :type="scope.row.online ? 'success' : 'none'">{{
-                getClientName(scope.row)
-              }}</el-text>
+            <template #default="props">
+              <el-text :type="props.row.online ? 'success' : 'none'"
+                >{{ getClientName(props.row) }}
+              </el-text>
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
@@ -113,14 +116,11 @@
                 <el-button type="text">菜单</el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item @click="handleShowStaitcIpDialog(row)"
-                      >设置静态IP
-                    </el-dropdown-item>
-                    <el-dropdown-item @click="handleDeleteStaticIp(row)"
-                      >删除静态IP
-                    </el-dropdown-item>
-                    <el-dropdown-item @click="handleChangeNickName(row)"
-                      >修改名称
+                    <!--                    <el-dropdown-item @click="handleShowStaitcIpDialog(row)"-->
+                    <!--                      >静态IP-->
+                    <!--                    </el-dropdown-item>-->
+                    <el-dropdown-item @click="handleShowDeviceSetting(row)"
+                      >设备设置
                     </el-dropdown-item>
                     <el-dropdown-item @click="handleGoToTimeLineDialog(row)"
                       >时间表
@@ -183,7 +183,8 @@
   </el-dialog>
 
   <StaticIpListDialog ref="staticIpListDialogRef" />
-  <ClientStaticIpSettingDialog ref="clientStaticIpDialogRef" />
+  <!--  <ClientStaticIpSettingDialog ref="clientStaticIpDialogRef" />-->
+  <ClientSettingDialog ref="deviceSettingDialogRef" />
   <UpgradeDialog ref="upgradeRef" />
   <ClientTimeLineDialog ref="clientTimeLineDialogRef" />
 </template>
@@ -204,20 +205,23 @@ import {
   formatTimeStamp,
   xhrPromise,
   formatToUTC8,
+  Prompt,
 } from './utils/utils.ts'
 import { EventAwareSSEClient } from './utils/sseclient.ts'
-import { ElMessageBox } from 'element-plus'
 import ViewExpand from './components/expand/ViewExpand.vue'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
-import ClientStaticIpSettingDialog from './components/ClientStaticIpSettingDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
+import ClientSettingDialog from './components/ClientSettingDialog.vue'
 
 const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<
   typeof ClientTimeLineDialog
 > | null>(null)
-const clientStaticIpDialogRef = ref<InstanceType<
-  typeof ClientStaticIpSettingDialog
+// const clientStaticIpDialogRef = ref<InstanceType<
+//   typeof ClientStaticIpSettingDialog
+// > | null>(null)
+const deviceSettingDialogRef = ref<InstanceType<
+  typeof ClientSettingDialog
 > | null>(null)
 const staticIpListDialogRef = ref<InstanceType<
   typeof StaticIpListDialog
@@ -266,10 +270,14 @@ function getClientName(row: Client): string {
   //   : row.hostname === '*'
   //     ? row.nickName
   //     : `${row.hostname}(${row.nickName})`
-  if (row.nickName === '') {
-    return row.hostname
+  if (row.nick) {
+    if (row.nick?.name === '') {
+      return row.hostname
+    } else {
+      return row.nick?.name
+    }
   } else {
-    return row.nickName
+    return row.hostname
   }
 }
 
@@ -290,6 +298,31 @@ const getVersion = () => {
     .catch(() => {
       showErrorTips('失败')
     })
+}
+
+const handleWebhookSetting = () => {
+  Prompt('请输入WebHook地址', 'webhook设置', '').then((result) => {
+    console.log('handleWebhookSetting', result.value)
+    const body = {
+      webhookUrl: result.value,
+    }
+    fetch('../api/webhook/set', {
+      credentials: 'include',
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        return res.json()
+      })
+      .then((json) => {
+        if (json) {
+          showTips(json.code, json.msg)
+        }
+      })
+      .catch((error) => {
+        showErrorTips(`失败:${JSON.stringify(error)}`)
+      })
+  })
 }
 
 const upgradeRef = ref<InstanceType<typeof UpgradeDialog> | null>(null)
@@ -396,7 +429,7 @@ const fetchData = () => {
     .catch((error) => {
       console.error(error)
       showErrorTips(`${JSON.stringify(error)}`)
-      renderTable(testData)
+      // renderTable(testData)
     })
 }
 
@@ -419,63 +452,32 @@ const handleClearData = () => {
   )
 }
 
-const handleDeleteStaticIp = (row: Client) => {
-  console.log('handleDeleteStaticIp', row)
-  ElMessageBox.confirm(`确定删除【${row.hostname}】静态IP吗?`, 'Warning', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  })
-    .then(() => {
-      const loader = showLoading('删除中...')
-      fetch(`../api/staticip/delete?mac=${row.mac}`, {
-        credentials: 'include',
-        method: 'DELETE',
-      })
-        .then((res) => {
-          return res.json()
-        })
-        .then((json) => {
-          console.log('handleDeleteStaticIp', json)
-          showTips(json.code, json.msg)
-        })
-        .catch((error) => {
-          console.log('error', error)
-          showErrorTips('删除失败')
-        })
-        .finally(() => {
-          loader.close()
-        })
-    })
-    .catch(() => {})
-}
-
-const handleChangeNickName = (row: Client) => {
-  console.log('handleChangeNickName', row)
-  ElMessageBox.prompt('请输入设备昵称', '修改昵称', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    inputValue: row.nickName,
-  }).then(({ value }) => {
-    row.nickName = value
-    fetch('../api/nick/set', {
-      credentials: 'include',
-      method: 'POST',
-      body: JSON.stringify(row),
-    })
-      .then((res) => {
-        return res.json()
-      })
-      .then((json) => {
-        console.log('handleChangeNickName', json)
-        showTips(json.code, json.msg)
-      })
-      .catch((error) => {
-        console.log('error', error)
-        showErrorTips('修改昵称失败')
-      })
-  })
-}
+// const handleChangeNickName = (row: Client) => {
+//   console.log('handleChangeNickName', row)
+//   ElMessageBox.prompt('请输入设备昵称', '修改昵称', {
+//     confirmButtonText: '确定',
+//     cancelButtonText: '取消',
+//     inputValue: row.nickName,
+//   }).then(({ value }) => {
+//     row.nickName = value
+//     fetch('../api/nick/set', {
+//       credentials: 'include',
+//       method: 'POST',
+//       body: JSON.stringify(row),
+//     })
+//       .then((res) => {
+//         return res.json()
+//       })
+//       .then((json) => {
+//         console.log('handleChangeNickName', json)
+//         showTips(json.code, json.msg)
+//       })
+//       .catch((error) => {
+//         console.log('error', error)
+//         showErrorTips('修改昵称失败')
+//       })
+//   })
+// }
 
 function handleResetClients() {
   console.log('handleResetClients')
@@ -541,12 +543,19 @@ function handleShowStaticIpListDialog() {
     })
 }
 
-const handleShowStaitcIpDialog = (row: Client) => {
-  console.log('handleShowStaitcIpDialog', row)
-  if (clientStaticIpDialogRef.value) {
-    clientStaticIpDialogRef.value.showDialogForm(row)
+const handleShowDeviceSetting = (row: Client) => {
+  console.log('handleShowDeviceSetting', row)
+  if (deviceSettingDialogRef.value) {
+    deviceSettingDialogRef.value.showDialogForm(row)
   }
 }
+
+// const handleShowStaitcIpDialog = (row: Client) => {
+//   console.log('handleShowStaitcIpDialog', row)
+//   if (clientStaticIpDialogRef.value) {
+//     clientStaticIpDialogRef.value.showDialogForm(row)
+//   }
+// }
 
 // 调整详情
 const handleGoToTimeLineDialog = (row: Client) => {
@@ -587,45 +596,67 @@ const connectSSE = () => {
     console.error('connectSSE err', e)
   }
 }
-const testData = [] as Client[]
+// const testData = [] as Client[]
 // const testData = [
 //   {
-//     ip: '192.168.168.168',
-//     mac: '28:f0:76:39:85:88',
+//     ip: '192.168.1.2',
+//     mac: '7e:c7:f1:25:63:f5',
 //     phy: '',
-//     hostname: 'DESKTOP-QEHPF1Aaaaaaaaaaaaaaaa',
-//     nickName: 'beckaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-//     starTime: 1752280898,
+//     hostname: 'MacBookAirM4',
+//     starTime: 1752496016,
 //     online: true,
+//     nick: {
+//       name: 'M4',
+//       isPush: false,
+//       mac: '7e:c7:f1:25:63:f5',
+//       ip: '192.168.1.2',
+//       starTime: 1752440017,
+//       hostname: 'MacBookAirM4',
+//     },
 //   },
 //   {
-//     ip: '192.168.1.154',
-//     mac: '36:11:f0:10:7e:91',
+//     ip: '192.168.1.4',
+//     mac: '5a:a7:22:62:3d:26',
 //     phy: '',
-//     hostname: 'Mac',
-//     nickName: 'MacBookAirM4',
-//     starTime: 1752284884,
+//     hostname: 'Xiaomi-15',
+//     starTime: 1752494170,
 //     online: true,
+//     nick: {
+//       name: '',
+//       isPush: false,
+//       mac: '5a:a7:22:62:3d:26',
+//       ip: '192.168.1.4',
+//       starTime: 1752452822,
+//       hostname: 'Xiaomi-15',
+//     },
 //   },
 //   {
-//     ip: '192.168.1.111',
-//     mac: '50:a0:09:cf:62:6d',
+//     ip: '192.168.1.3',
+//     mac: '8c:ec:4b:58:81:09',
 //     phy: '',
-//     hostname: 'MiAiSoundbox',
-//     nickName: '小米Ai音箱',
-//     starTime: 1752279097,
-//     online: false,
+//     hostname: 'clife-fnos',
+//     starTime: 1752477876,
+//     online: true,
+//     nick: {
+//       name: '',
+//       isPush: false,
+//       mac: '8c:ec:4b:58:81:09',
+//       ip: '192.168.1.3',
+//       starTime: 1752457945,
+//       hostname: 'clife-fnos',
+//     },
 //   },
 //   {
-//     ip: '192.168.1.115',
-//     mac: '30:95:87:37:e2:82',
+//     ip: '192.168.1.100',
+//     mac: '2c:cf:67:1d:27:ac',
 //     phy: '',
-//     hostname: 'MiBOX4-338afcfcce69b1c4',
-//     nickName: '小米盒子',
-//     starTime: 1752276830,
+//     hostname: '',
+//     starTime: 0,
 //     online: false,
+//     nick: null,
 //   },
 // ]
+
 // 初始化监听
 onMounted(() => {
   window.addEventListener('resize', updateDialogWidth)

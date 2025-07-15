@@ -3,7 +3,7 @@
     :modal="true"
     :close-on-click-modal="true"
     :close-on-press-escape="true"
-    :width="isMobile() ? '80%' : '30%'"
+    :width="isMobile() ? '80%' : '20%'"
     v-model="showClientDialog"
     :title="title"
   >
@@ -17,7 +17,9 @@
           :timestamp="formatToUTC8(activity.timestamp)"
         >
           <span :style="{ color: activity.connected ? '#55f604' : 'red' }">
-            {{ activity.connected ? '在线' : '离线' }}-{{ activities.length - index }}
+            {{ activity.connected ? '在线' : '离线' }}-{{
+              activities.length - index
+            }}
           </span>
         </el-timeline-item>
       </el-timeline>
@@ -58,12 +60,14 @@ function fetchData(mac: string) {
     })
     .catch(() => {
       showErrorTips('获取失败')
+      // showClientDialog.value = true
+      // activities.value = testData
     })
 }
 
 function getTitle(row: Client): string {
-  if (row.nickName != '') {
-    return row.nickName
+  if (row.nick && row.nick.name != '') {
+    return row.nick.name
   } else {
     return row.hostname
   }
@@ -77,6 +81,88 @@ const openClientDetailDialog = (row: Client) => {
   fetchData(row.mac)
 }
 
+// const testData = [
+//   {
+//     timestamp: 1752496014739,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752496013636,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752481034289,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752481032218,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752481018359,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752481018010,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752480934839,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752480923056,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752480907559,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752480905838,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752479583858,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752479583421,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752471812870,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752471803144,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752460403098,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752460329154,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752329802,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752303218,
+//     connected: false,
+//   },
+//   {
+//     timestamp: 1752270729,
+//     connected: true,
+//   },
+//   {
+//     timestamp: 1752265674,
+//     connected: true,
+//   },
+// ]
 // 暴露方法供父组件调用
 defineExpose({
   openClientDialog: openClientDetailDialog,
@@ -88,9 +174,12 @@ defineExpose({
   margin: 0;
 }
 
+//border: #07aaff 1px solid;
 .upgrade-popup-content {
   padding-left: 20px;
   padding-right: 20px;
+  display: grid;
+  place-items: center; /* 水平与垂直居中 */
 }
 
 .upgrade-popup-footer button {

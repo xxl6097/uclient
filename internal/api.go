@@ -113,6 +113,27 @@ func (this *Api) SetStaticIp(w http.ResponseWriter, r *http.Request) {
 		res.Ok("设置成功")
 	}
 }
+
+func (this *Api) SetWebhook(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[struct {
+		WebHookUrl string `json:"webhookUrl"`
+	}](r)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	}
+	err = openwrt.GetInstance().SetWebHook(body.WebHookUrl)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	} else {
+		res.Ok("设置成功")
+	}
+}
 func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)
@@ -121,7 +142,7 @@ func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 		res.Error("mac地址空～")
 		return
 	}
-	err := openwrt.DeleteStaticIpAddress(mac)
+	err := openwrt.GetInstance().DeleteStaticIp(mac)
 	if err != nil {
 		glog.Error(err)
 		res.Err(err)
@@ -134,7 +155,7 @@ func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 func (this *Api) GetStaticIps(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)
-	ips, err := openwrt.GetUCIOutput()
+	ips, err := openwrt.GetInstance().GetStaticIpMap()
 	if err != nil {
 		glog.Error(err)
 		res.Err(err)
@@ -161,7 +182,7 @@ func (this *Api) ResetNetwork(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *Api) SetNick(w http.ResponseWriter, r *http.Request) {
-	body, err := u.GetDataByJson[openwrt.DHCPLease](r)
+	body, err := u.GetDataByJson[openwrt.NickEntry](r)
 	if err != nil {
 		glog.Error(err)
 		u.Respond(w, u.Error(-1, err.Error()))

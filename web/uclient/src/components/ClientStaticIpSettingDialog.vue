@@ -28,6 +28,13 @@
     </div>
     <template #footer>
       <el-button
+        type="danger"
+        :loading="formData.loading"
+        :loading-icon="Eleme"
+        @click="handleDeleteStaticIp"
+        >{{ formData.loading ? '静态地址删除中...' : '删除' }}
+      </el-button>
+      <el-button
         type="primary"
         :loading="formData.loading"
         :loading-icon="Eleme"
@@ -45,9 +52,11 @@ import { Client } from '../utils/type.ts'
 import {
   isMobile,
   showErrorTips,
+  showLoading,
   showSucessTips,
   showTips,
 } from '../utils/utils.ts'
+import { ElMessageBox } from 'element-plus'
 
 const formData = ref({
   show: false,
@@ -59,6 +68,37 @@ const formData = ref({
     mac: '',
   } as Client,
 })
+
+const handleDeleteStaticIp = (row: Client) => {
+  console.log('handleDeleteStaticIp', row)
+  ElMessageBox.confirm(`确定删除【${row.hostname}】静态IP吗?`, 'Warning', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      const loader = showLoading('删除中...')
+      fetch(`../api/staticip/delete?mac=${row.mac}`, {
+        credentials: 'include',
+        method: 'DELETE',
+      })
+        .then((res) => {
+          return res.json()
+        })
+        .then((json) => {
+          console.log('handleDeleteStaticIp', json)
+          showTips(json.code, json.msg)
+        })
+        .catch((error) => {
+          console.log('error', error)
+          showErrorTips('删除失败')
+        })
+        .finally(() => {
+          loader.close()
+        })
+    })
+    .catch(() => {})
+}
 
 function handleConfirm() {
   formData.value.loading = true
@@ -90,7 +130,7 @@ function handleConfirm() {
 
 const showDialogForm = (row: Client) => {
   console.log('打开对话框，row:', row)
-  formData.value.title = `客户端【${row.hostname}】设置静态IP`
+  formData.value.title = `设置静态IP`
   formData.value.client = JSON.parse(JSON.stringify(row))
   formData.value.show = true
 }

@@ -20,6 +20,7 @@ export function showErrorTips(message: string) {
     message: message,
     type: 'error',
   })
+  // ElMessage.error(message)
 }
 
 export function showTips(code: any, message: string) {
@@ -279,7 +280,7 @@ export function formatToUTC8001(timestamp: number): string {
   const date = new Date(timestamp * 1000)
 
   // 调整到东八区时间
-  date.setHours(date.getHours() -8)
+  date.setHours(date.getHours() - 8)
 
   // 提取时间分量并补零
   const year = date.getFullYear()
@@ -319,20 +320,20 @@ export function formatToUTC80002(timestamp: number): string {
 function formatTime(timestamp: number): string {
   // 判断时间戳类型（秒级或毫秒级）
   const isMilli = timestamp.toString().length > 10
-  const date = isMilli ? new Date(timestamp) : new Date(timestamp * 1000); // 秒级需转为毫秒
+  const date = isMilli ? new Date(timestamp) : new Date(timestamp * 1000) // 秒级需转为毫秒
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
 
-  if (isMilli){
-    const milli = String(date.getMilliseconds()).padStart(3, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milli}`;
+  if (isMilli) {
+    const milli = String(date.getMilliseconds()).padStart(3, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milli}`
   }
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
 export function formatTimeStamp(timestamp: number): string {
@@ -341,4 +342,12 @@ export function formatTimeStamp(timestamp: number): string {
 
 export function formatToUTC8(timestamp: number): string {
   return formatTime(timestamp)
+}
+
+export function Prompt(message: string, title: string, inputValue: string) {
+  return ElMessageBox.prompt(message, title, {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputValue: inputValue,
+  })
 }

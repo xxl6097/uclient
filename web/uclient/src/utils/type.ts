@@ -1,7 +1,6 @@
 export interface Status {
   timestamp: number
   connected: boolean
-  mac: string
 }
 
 export interface DHCPHost {
@@ -11,12 +10,23 @@ export interface DHCPHost {
   ip: string
 }
 
+export interface NickEntry {
+  Name: string
+  name: string
+  isPush: boolean
+  mac: string
+  ip: string
+  starTime: string
+  hostname: string
+}
+
 export interface Client {
   ip: string
   mac: string
   phy: string
   hostname: string
-  nickName: string
+  nick: NickEntry
+  static: DHCPHost
   starTime: number
   online: boolean
   statusList: Status[]

@@ -2,7 +2,7 @@
   <div class="main">
     <el-form label-position="left" label-width="auto">
       <el-form-item label="昵称">
-        <span>{{ row.nickName }}</span>
+        <span>{{ row.nick.name }}</span>
       </el-form-item>
       <el-form-item label="名称">
         <span>{{ row.hostname }}</span>
@@ -36,9 +36,10 @@
 
 <script setup lang="ts">
 import { isMobile, formatTimeStamp } from '../../utils/utils.ts'
+import { Client } from '../../utils/type.ts'
 
 defineProps<{
-  row: any
+  row: Client
 }>()
 </script>
 

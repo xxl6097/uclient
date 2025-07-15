@@ -144,5 +144,5 @@ func CheckDirector(path string) error {
 }
 
 func TimestampFormat(timestamp int64) string {
-	return time.Unix(timestamp, 0).Format(time.DateTime) // 0表示纳秒部分
+	return time.UnixMilli(timestamp).Format(time.DateTime) // 0表示纳秒部分
 }
