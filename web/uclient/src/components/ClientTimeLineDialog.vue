@@ -174,7 +174,6 @@ defineExpose({
   margin: 0;
 }
 
-//border: #07aaff 1px solid;
 .upgrade-popup-content {
   padding-left: 20px;
   padding-right: 20px;

@@ -148,6 +148,7 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 	if cls, ok := this.clients[macAddr]; ok {
 		cls.Online = status
 		cls.Phy = phy
+		cls.StartTime = timestamp
 		this.sysLogClientStatus[macAddr] = status
 		glog.Infof("updateClientsBySysLog:%v", cls)
 		this.notifyWebhookMessage(cls)

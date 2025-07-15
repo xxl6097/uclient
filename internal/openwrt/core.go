@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/ukey"
 	"github.com/xxl6097/uclient/internal/u"
 	"log"
@@ -400,7 +399,7 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 		entry, e := parseARPLine(line)
 		if e != nil {
 			//return nil, err
-			glog.Error("parseARPLine error", e, line)
+			//glog.Error("parseARPLine error", e, line)
 			continue
 		}
 		mac := entry.MAC.String()

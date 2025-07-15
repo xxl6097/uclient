@@ -143,6 +143,14 @@ func CheckDirector(path string) error {
 	return os.MkdirAll(path, 0755)
 }
 
+func isMillisecondTimestamp(ts int64) bool {
+	// 毫秒级：13位（≥1e12），秒级：10位（<1e12）
+	return ts >= 1_000_000_000_000
+}
+
 func TimestampFormat(timestamp int64) string {
-	return time.UnixMilli(timestamp).Format(time.DateTime) // 0表示纳秒部分
+	if isMillisecondTimestamp(timestamp) {
+		return time.UnixMilli(timestamp).Format(time.DateTime) // 0表示纳秒部分
+	}
+	return time.Unix(timestamp, 0).Format(time.DateTime) // 0表示纳秒部分
 }

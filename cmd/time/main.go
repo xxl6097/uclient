@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/xxl6097/uclient/internal/u"
 	"time"
 )
 
@@ -47,4 +48,6 @@ func main() {
 		beijingTime := utcTime.In(loc)                         // UTC→UTC+8
 		fmt.Println(beijingTime.Format("2006-01-02 15:04:05")) // 输出：2025-07-13 05:24:08
 	}
+
+	fmt.Println(u.TimestampFormat(1752546345))
 }
