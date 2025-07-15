@@ -155,9 +155,9 @@ func TimestampFormat(timestamp int64) string {
 	}
 	if isMillisecondTimestamp(timestamp) {
 		if loc != nil {
-			return time.UnixMilli(timestamp).In(loc).Format(time.DateTime) // 0表示纳秒部分
+			return time.UnixMilli(timestamp).In(loc).Format(fmt.Sprintf("%s.000", time.DateTime)) // 0表示纳秒部分
 		}
-		return time.UnixMilli(timestamp).Format(time.DateTime) // 0表示纳秒部分
+		return time.UnixMilli(timestamp).Format(fmt.Sprintf("%s.000", time.DateTime)) // 0表示纳秒部分
 	}
 	if loc != nil {
 		return time.Unix(timestamp, 0).In(loc).Format(time.DateTime) // 0表示纳秒部分
