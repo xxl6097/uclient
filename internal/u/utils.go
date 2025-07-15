@@ -149,8 +149,18 @@ func isMillisecondTimestamp(ts int64) bool {
 }
 
 func TimestampFormat(timestamp int64) string {
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
 	if isMillisecondTimestamp(timestamp) {
+		if loc != nil {
+			return time.UnixMilli(timestamp).In(loc).Format(time.DateTime) // 0表示纳秒部分
+		}
 		return time.UnixMilli(timestamp).Format(time.DateTime) // 0表示纳秒部分
+	}
+	if loc != nil {
+		return time.Unix(timestamp, 0).In(loc).Format(time.DateTime) // 0表示纳秒部分
 	}
 	return time.Unix(timestamp, 0).Format(time.DateTime) // 0表示纳秒部分
 }

@@ -36,18 +36,21 @@ func main() {
 	//	fmt.Println(formatted) // "2025-07-12 21:10:15"
 	//}
 
-	timeStr := "Sat Jul 12 21:24:08 2025"
-	//t, err := time.Parse(time.ANSIC, timeStr) // 解析为 UTC 时间
-	loc, _ := time.LoadLocation("Asia/Shanghai")
-	t, err := time.ParseInLocation(time.ANSIC, timeStr, loc) // 按北京时间解析
-	if err == nil {
-		fmt.Println(t.Format(time.DateTime)) // 输出：2025-07-12 21:24:08（UTC）
-		timestamp := t.Unix()
-		utcTime := time.Unix(timestamp, 0) // 仍是 UTC 时间
-		loc, _ := time.LoadLocation("Asia/Shanghai")
-		beijingTime := utcTime.In(loc)                         // UTC→UTC+8
-		fmt.Println(beijingTime.Format("2006-01-02 15:04:05")) // 输出：2025-07-13 05:24:08
-	}
+	//timeStr := "Sat Jul 12 21:24:08 2025"
+	////t, err := time.Parse(time.ANSIC, timeStr) // 解析为 UTC 时间
+	//loc, _ := time.LoadLocation("Asia/Shanghai")
+	//t, err := time.ParseInLocation(time.ANSIC, timeStr, loc) // 按北京时间解析
+	//if err == nil {
+	//	fmt.Println(t.Format(time.DateTime)) // 输出：2025-07-12 21:24:08（UTC）
+	//	timestamp := t.Unix()
+	//	utcTime := time.Unix(timestamp, 0) // 仍是 UTC 时间
+	//	loc, _ := time.LoadLocation("Asia/Shanghai")
+	//	beijingTime := utcTime.In(loc)                         // UTC→UTC+8
+	//	fmt.Println(beijingTime.Format("2006-01-02 15:04:05")) // 输出：2025-07-13 05:24:08
+	//}
 
-	fmt.Println(u.TimestampFormat(1752546345))
+	fmt.Println(u.TimestampFormat(1752553006670))
+
+	t1 := time.Now().UnixMilli()
+	fmt.Println("t1", u.TimestampFormat(t1))
 }
