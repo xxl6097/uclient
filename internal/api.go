@@ -197,6 +197,59 @@ func (this *Api) SetNick(w http.ResponseWriter, r *http.Request) {
 	u.OKK(w)
 }
 
+func (this *Api) AddWorkTime(w http.ResponseWriter, r *http.Request) {
+	body, err := u.GetDataByJson[struct {
+		Mac string `json:"mac"`
+	}](r)
+	if err != nil {
+		glog.Error(err)
+		u.Respond(w, u.Error(-1, err.Error()))
+		return
+	}
+	if body.Mac == "" {
+		glog.Error(err)
+		u.Respond(w, u.Error(-1, "mac is empty"))
+		return
+	}
+	err = openwrt.GetInstance().AddWorkTime(body.Mac, body.Timestamp)
+	if err != nil {
+		glog.Error(err)
+		u.Respond(w, u.Error(-2, err.Error()))
+		return
+	}
+	u.OKK(w)
+}
+
+func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
+	body, err := u.GetDataByJson[struct {
+		Mac  string                 `json:"mac"`
+		Day  string                 `json:"day"`
+		Data map[string]interface{} `json:"data"`
+	}](r)
+	if err != nil {
+		glog.Error(err)
+		u.Respond(w, u.Error(-1, err.Error()))
+		return
+	}
+	if body.Mac == "" {
+		glog.Error(err)
+		u.Respond(w, u.Error(-1, "mac is empty"))
+		return
+	}
+	if body.Day == "" {
+		glog.Error(err)
+		u.Respond(w, u.Error(-1, "Day is empty"))
+		return
+	}
+	err = openwrt.UpdatetWorkTime(body.Mac, body.Day, body.Data)
+	if err != nil {
+		glog.Error(err)
+		u.Respond(w, u.Error(-2, err.Error()))
+		return
+	}
+	u.OKK(w)
+}
+
 func (this *Api) GetSSE() iface.ISSE {
 	return this.sseApi
 }

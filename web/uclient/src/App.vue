@@ -16,25 +16,25 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="handleShowCheckVersionDialog"
-                  >版本检测
+                >版本检测
                 </el-dropdown-item>
                 <el-dropdown-item @click="manusForm.show = true"
-                  >手动升级
+                >手动升级
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleClearData"
-                  >清空数据
+                >清空数据
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleResetClients"
-                  >重置列表
+                >重置列表
                 </el-dropdown-item>
                 <!--                <el-dropdown-item @click="handleAResetNetwork"-->
                 <!--                  >重置网络-->
                 <!--                </el-dropdown-item>-->
                 <el-dropdown-item @click="handleShowStaticIpListDialog"
-                  >静态列表
+                >静态列表
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleWebhookSetting"
-                  >webhook设置
+                >webhook设置
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -77,7 +77,7 @@
           >
             <template #default="props">
               <el-text :type="props.row.online ? 'success' : 'none'"
-                >{{ getClientName(props.row) }}
+              >{{ getClientName(props.row) }}
               </el-text>
             </template>
           </el-table-column>
@@ -120,10 +120,10 @@
                     <!--                      >静态IP-->
                     <!--                    </el-dropdown-item>-->
                     <el-dropdown-item @click="handleShowDeviceSetting(row)"
-                      >设备设置
+                    >设备设置
                     </el-dropdown-item>
                     <el-dropdown-item @click="handleGoToTimeLineDialog(row)"
-                      >时间表
+                    >时间表
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
@@ -166,7 +166,7 @@
         >
           <template #trigger>
             <el-button type="primary" :disabled="manusForm.binUrl.length > 0"
-              >上传文件升级
+            >上传文件升级
             </el-button>
           </template>
           <!-- 添加额外按钮 -->
@@ -429,7 +429,7 @@ const fetchData = () => {
     .catch((error) => {
       console.error(error)
       showErrorTips(`${JSON.stringify(error)}`)
-      // renderTable(testData)
+      renderTable(testData)
     })
 }
 
@@ -596,66 +596,65 @@ const connectSSE = () => {
     console.error('connectSSE err', e)
   }
 }
-// const testData = [] as Client[]
-// const testData = [
-//   {
-//     ip: '192.168.1.2',
-//     mac: '7e:c7:f1:25:63:f5',
-//     phy: '',
-//     hostname: 'MacBookAirM4',
-//     starTime: 1752496016,
-//     online: true,
-//     nick: {
-//       name: 'M4',
-//       isPush: false,
-//       mac: '7e:c7:f1:25:63:f5',
-//       ip: '192.168.1.2',
-//       starTime: 1752440017,
-//       hostname: 'MacBookAirM4',
-//     },
-//   },
-//   {
-//     ip: '192.168.1.4',
-//     mac: '5a:a7:22:62:3d:26',
-//     phy: '',
-//     hostname: 'Xiaomi-15',
-//     starTime: 1752494170,
-//     online: true,
-//     nick: {
-//       name: '',
-//       isPush: false,
-//       mac: '5a:a7:22:62:3d:26',
-//       ip: '192.168.1.4',
-//       starTime: 1752452822,
-//       hostname: 'Xiaomi-15',
-//     },
-//   },
-//   {
-//     ip: '192.168.1.3',
-//     mac: '8c:ec:4b:58:81:09',
-//     phy: '',
-//     hostname: 'clife-fnos',
-//     starTime: 1752477876,
-//     online: true,
-//     nick: {
-//       name: '',
-//       isPush: false,
-//       mac: '8c:ec:4b:58:81:09',
-//       ip: '192.168.1.3',
-//       starTime: 1752457945,
-//       hostname: 'clife-fnos',
-//     },
-//   },
-//   {
-//     ip: '192.168.1.100',
-//     mac: '2c:cf:67:1d:27:ac',
-//     phy: '',
-//     hostname: '',
-//     starTime: 0,
-//     online: false,
-//     nick: null,
-//   },
-// ]
+const testData = [
+  {
+    ip: '192.168.1.2',
+    mac: '7e:c7:f1:25:63:f5',
+    phy: '',
+    hostname: 'MacBookAirM4',
+    starTime: 1752496016,
+    online: true,
+    nick: {
+      name: 'M4',
+      isPush: false,
+      mac: '7e:c7:f1:25:63:f5',
+      ip: '192.168.1.2',
+      starTime: 1752440017,
+      hostname: 'MacBookAirM4',
+    },
+  },
+  {
+    ip: '192.168.1.4',
+    mac: '5a:a7:22:62:3d:26',
+    phy: '',
+    hostname: 'Xiaomi-15',
+    starTime: 1752494170,
+    online: true,
+    nick: {
+      name: '',
+      isPush: false,
+      mac: '5a:a7:22:62:3d:26',
+      ip: '192.168.1.4',
+      starTime: 1752452822,
+      hostname: 'Xiaomi-15',
+    },
+  },
+  {
+    ip: '192.168.1.3',
+    mac: '8c:ec:4b:58:81:09',
+    phy: '',
+    hostname: 'clife-fnos',
+    starTime: 1752477876,
+    online: true,
+    nick: {
+      name: '',
+      isPush: false,
+      mac: '8c:ec:4b:58:81:09',
+      ip: '192.168.1.3',
+      starTime: 1752457945,
+      hostname: 'clife-fnos',
+    },
+  },
+  {
+    ip: '192.168.1.100',
+    mac: '2c:cf:67:1d:27:ac',
+    phy: '',
+    hostname: '',
+    starTime: 0,
+    online: false,
+    nick: null,
+  },
+]
 
 // 初始化监听
 onMounted(() => {

@@ -1,3 +1,24 @@
+
+export interface WorkType {
+  onWorkTime: string
+  offWorkTime: string
+}
+
+export interface WorkTime {
+  date: string
+  workTime1: string
+  workTime2: string
+  isWeekDay: boolean
+  weekday: number
+  overWorkTimes: string
+}
+
+export interface WorkStatics {
+  month: string
+  overtime: string
+  workTime: WorkTime[]
+}
+
 export interface Status {
   timestamp: number
   connected: boolean
@@ -18,6 +39,7 @@ export interface NickEntry {
   ip: string
   starTime: string
   hostname: string
+  workType: WorkType
 }
 
 export interface Client {

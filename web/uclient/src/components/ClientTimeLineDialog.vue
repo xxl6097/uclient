@@ -8,39 +8,90 @@
     :title="title"
   >
     <div class="upgrade-popup-content">
-      <el-timeline style="max-width: 200px">
-        <el-timeline-item
-          v-for="(activity, index) in activities"
-          :key="index"
-          :color="activity.connected ? '#55f604' : 'red'"
-          :hollow="false"
-          :timestamp="formatToUTC8(activity.timestamp)"
-        >
-          <span :style="{ color: activity.connected ? '#55f604' : 'red' }">
-            {{ activity.connected ? '在线' : '离线' }}-{{
-              activities.length - index
-            }}
-          </span>
-        </el-timeline-item>
-      </el-timeline>
+      <!--      <el-timeline style="max-width: 200px">-->
+      <!--        <el-timeline-item-->
+      <!--          v-for="(activity, index) in activities"-->
+      <!--          :key="index"-->
+      <!--          :color="activity.connected ? '#55f604' : 'red'"-->
+      <!--          :hollow="false"-->
+      <!--          :timestamp="formatToUTC8(activity.timestamp)"-->
+      <!--        >-->
+      <!--          <span :style="{ color: activity.connected ? '#55f604' : 'red' }">-->
+      <!--            {{ activity.connected ? '在线' : '离线' }}-{{-->
+      <!--              activities.length - index-->
+      <!--            }}-->
+      <!--          </span>-->
+      <!--        </el-timeline-item>-->
+      <!--      </el-timeline>-->
+
+      <el-table :data="paginatedTableData" style="width: 90%" border>
+        <el-table-column type="index" align="center" :index="indexMethod" />
+        <el-table-column prop="timestamp" label="时间" width="200">
+          <template #default="props">
+            {{ formatTimeStamp(props.row.timestamp) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="connected" label="状态" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.connected" type="success">在线</el-tag>
+            <el-tag v-else type="danger">离线</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 分页 -->
+      <el-pagination
+        style="margin-top: 20px"
+        v-model:page-size="pageSize"
+        v-model:current-page="currentPage"
+        :page-sizes="[10, 20, 50, 100, 1000]"
+        layout="sizes,prev, pager, next"
+        background
+        :size="size"
+        :total="activities.length"
+        @size-change="handleSizeChange"
+        @current-change="handlePageChange"
+      />
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose } from 'vue'
+import { ref, defineExpose, computed } from 'vue'
 import { Client, Status } from '../utils/type.ts'
 import {
-  formatToUTC8,
+  formatTimeStamp,
   isMobile,
   showErrorTips,
   showTips,
 } from '../utils/utils.ts'
+import { ComponentSize } from 'element-plus'
 
 const showClientDialog = ref(false)
 const title = ref<string>()
 
 const activities = ref<Status[]>([])
+const currentPage = ref<number>(1)
+const pageSize = ref<number>(10)
+const size = ref<ComponentSize>('default')
+const indexMethod = (index: number) => {
+  return (
+    activities.value.length - (index + (currentPage.value - 1) * pageSize.value)
+  )
+}
+// 分页后的表格数
+const paginatedTableData = computed<Status[]>(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return activities.value.slice(start, end)
+})
+// // 分页切换
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+}
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+  pageSize.value = val
+}
 
 function fetchData(mac: string) {
   fetch(`../api/get/status?mac=${mac}`, {
@@ -58,7 +109,8 @@ function fetchData(mac: string) {
         showTips(json.code, json.msg)
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.log('获取失败', error)
       showErrorTips('获取失败')
       // showClientDialog.value = true
       // activities.value = testData
@@ -80,7 +132,7 @@ const openClientDetailDialog = (row: Client) => {
   // activities.value = row.statusList
   fetchData(row.mac)
 }
-
+//
 // const testData = [
 //   {
 //     timestamp: 1752496014739,
@@ -177,6 +229,7 @@ defineExpose({
 .upgrade-popup-content {
   padding-left: 20px;
   padding-right: 20px;
+  padding-bottom: 20px;
   display: grid;
   place-items: center; /* 水平与垂直居中 */
 }

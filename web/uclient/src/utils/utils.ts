@@ -21,6 +21,7 @@ export function showErrorTips(message: string) {
     type: 'error',
   })
   // ElMessage.error(message)
+  console.log(message)
 }
 
 export function showTips(code: any, message: string) {
@@ -350,4 +351,24 @@ export function Prompt(message: string, title: string, inputValue: string) {
     cancelButtonText: '取消',
     inputValue: inputValue,
   })
+}
+
+export function getWeekDay(index: number): string {
+  switch (index) {
+    case 0:
+      return '星期日'
+    case 1:
+      return '星期一'
+    case 2:
+      return '星期二'
+    case 3:
+      return '星期三'
+    case 4:
+      return '星期四'
+    case 5:
+      return '星期五'
+    case 6:
+      return '星期六'
+  }
+  return ''
 }

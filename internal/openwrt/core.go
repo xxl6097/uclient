@@ -25,6 +25,7 @@ var (
 	apStaDisConnectString = "AP-STA-DISCONNECTED"
 	apStaConnectString    = "AP-STA-CONNECTED"
 	statusDir             = "/usr/local/openwrt/status"
+	workDir               = "/usr/local/openwrt/work"
 	nickFilePath          = "/usr/local/openwrt/nick"
 	webhookFilePath       = "/usr/local/openwrt/webhook"
 	MAX_SIZE              = 1000
@@ -33,14 +34,16 @@ var (
 type Status struct {
 	Timestamp int64 `json:"timestamp"`
 	Connected bool  `json:"connected"`
+	IsWeekDay bool  `json:"isWeekDay"`
 }
 type NickEntry struct {
-	Name      string `json:"name"`
-	IsPush    bool   `json:"isPush"`
-	MAC       string `json:"mac"`
-	IP        string `json:"ip"`
-	StartTime int64  `json:"starTime"`
-	Hostname  string `json:"hostname"`
+	Name      string    `json:"name"`
+	IsPush    bool      `json:"isPush"`
+	MAC       string    `json:"mac"`
+	IP        string    `json:"ip"`
+	StartTime int64     `json:"starTime"`
+	Hostname  string    `json:"hostname"`
+	WorkType  *WorkType `json:"workType"`
 }
 type DHCPLease struct {
 	IP        string     `json:"ip"`  //DHCP 服务器分配给客户端的 IP
@@ -490,46 +493,10 @@ func parseTimer(logLine string) (*time.Time, error) {
 	matches := re.FindStringSubmatch(logLine)
 	if len(matches) > 1 {
 		timeStr := matches[1]
-		t, err := autoParse(timeStr)
-		return &t, err
+		t, err := u.AutoParse(timeStr)
+		return t, err
 	}
 	return nil, nil
-}
-
-func autoParse(timeStr string) (time.Time, error) {
-	var layouts = []string{
-		time.Layout,
-		time.ANSIC,
-		time.UnixDate,
-		time.RubyDate,
-		time.RFC822,
-		time.RFC822Z,
-		time.RFC850,
-		time.RFC1123,
-		time.RFC1123Z,
-		time.RFC3339,
-		time.RFC3339Nano,
-		time.Kitchen,
-		time.Stamp,
-		time.StampMilli,
-		time.StampMicro,
-		time.StampNano,
-		time.DateTime,
-		time.DateOnly,
-		time.TimeOnly,
-	}
-	for _, layout := range layouts {
-		//t, err := time.Parse(layout, timeStr)
-		loc, err := time.LoadLocation("Asia/Shanghai")
-		if err == nil {
-			t, e := time.ParseInLocation(layout, timeStr, loc) // 按北京时间解析
-			if e == nil {
-				return t, nil // 解析成功
-			}
-		}
-
-	}
-	return time.Time{}, fmt.Errorf("无法识别的格式")
 }
 
 func command(fu func(string), name string, arg ...string) error {
@@ -572,6 +539,22 @@ func getStatusByMac(mac string) []*Status {
 	}
 	_ = u.CheckDirector(statusDir)
 	tempFilePath := filepath.Join(statusDir, mac)
+	//byteArray, err := os.ReadFile(tempFilePath)
+	//if err != nil {
+	//	return nil
+	//}
+	//var cfg []*Status
+	//err = ukey.GobToStruct(byteArray, &cfg)
+	//if err != nil {
+	//	return nil
+	//}
+	return readStatusByMac(tempFilePath)
+}
+
+func readStatusByMac(tempFilePath string) []*Status {
+	if tempFilePath == "" {
+		return nil
+	}
 	byteArray, err := os.ReadFile(tempFilePath)
 	if err != nil {
 		return nil

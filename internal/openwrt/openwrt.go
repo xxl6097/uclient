@@ -145,6 +145,11 @@ func (this *openWRT) initClients() {
 }
 
 func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy string, status bool) {
+	s := Status{
+		Timestamp: timestamp,
+		Connected: status,
+	}
+
 	if cls, ok := this.clients[macAddr]; ok {
 		cls.Online = status
 		cls.Phy = phy
@@ -155,12 +160,16 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 		if this.fnWatcher != nil {
 			this.fnWatcher()
 		}
-	}
-	s := Status{
-		Timestamp: timestamp,
-		Connected: status,
+		if cls.Nick != nil {
+			err := sysLogUpdateWorkTime(macAddr, timestamp, cls.Nick.WorkType)
+			if err != nil {
+				glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
+			}
+		}
+
 	}
 	this.updateStatusList(macAddr, []*Status{&s})
+
 }
 
 func (p *openWRT) updateClientsByDHCP() {

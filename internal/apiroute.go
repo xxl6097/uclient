@@ -23,6 +23,10 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 	router.HandleFunc("/api/clear", this.restApi.Clear).Methods(http.MethodDelete)
 	router.HandleFunc("/api/nick/set", this.restApi.SetNick).Methods(http.MethodPost)
 
+	router.HandleFunc("/api/work/update", this.restApi.UpdatetWorkTime).Methods(http.MethodPost)
+	router.HandleFunc("/api/work/add", this.restApi.AddWorkTime).Methods(http.MethodPost)
+	router.HandleFunc("/api/work/get", this.restApi.AddWorkTime).Methods(http.MethodPost)
+
 	router.HandleFunc("/api/network/reset", this.restApi.ResetNetwork).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/clients/get", this.restApi.GetClients).Methods(http.MethodGet)

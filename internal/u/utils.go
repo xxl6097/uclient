@@ -143,7 +143,7 @@ func CheckDirector(path string) error {
 	return os.MkdirAll(path, 0755)
 }
 
-func isMillisecondTimestamp(ts int64) bool {
+func IsMillisecondTimestamp(ts int64) bool {
 	// 毫秒级：13位（≥1e12），秒级：10位（<1e12）
 	return ts >= 1_000_000_000_000
 }
@@ -153,7 +153,7 @@ func TimestampFormat(timestamp int64) string {
 	if err != nil {
 		loc = time.FixedZone("CST", 8*3600) // 东八区
 	}
-	if isMillisecondTimestamp(timestamp) {
+	if IsMillisecondTimestamp(timestamp) {
 		if loc != nil {
 			return time.UnixMilli(timestamp).In(loc).Format(fmt.Sprintf("%s.000", time.DateTime)) // 0表示纳秒部分
 		}
@@ -163,4 +163,79 @@ func TimestampFormat(timestamp int64) string {
 		return time.Unix(timestamp, 0).In(loc).Format(time.DateTime) // 0表示纳秒部分
 	}
 	return time.Unix(timestamp, 0).Format(time.DateTime) // 0表示纳秒部分
+}
+func TimestampFormatToMonth(timestamp int64) string {
+	monthFormat := "2006-01"
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
+	if IsMillisecondTimestamp(timestamp) {
+		if loc != nil {
+			return time.UnixMilli(timestamp).In(loc).Format(monthFormat) // 0表示纳秒部分
+		}
+		return time.UnixMilli(timestamp).Format(monthFormat) // 0表示纳秒部分
+	}
+	if loc != nil {
+		return time.Unix(timestamp, 0).In(loc).Format(monthFormat) // 0表示纳秒部分
+	}
+	return time.Unix(timestamp, 0).Format(monthFormat) // 0表示纳秒部分
+}
+
+func GetLocation() *time.Location {
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
+	return loc
+}
+
+func GetTime(timeString string, loc *time.Location) *time.Time {
+	t, e := time.ParseInLocation(time.TimeOnly, timeString, loc) // 按北京时间解析
+	if e == nil {
+		return &t
+	}
+	return nil
+}
+
+func GetDay(timestamp int64) string {
+	if !IsMillisecondTimestamp(timestamp) {
+		timestamp *= 1000
+	}
+	return time.UnixMilli(timestamp * 1000).Format(time.DateOnly)
+}
+
+func AutoParse(timeStr string) (*time.Time, error) {
+	var layouts = []string{
+		time.Layout,
+		time.ANSIC,
+		time.UnixDate,
+		time.RubyDate,
+		time.RFC822,
+		time.RFC822Z,
+		time.RFC850,
+		time.RFC1123,
+		time.RFC1123Z,
+		time.RFC3339,
+		time.RFC3339Nano,
+		time.Kitchen,
+		time.Stamp,
+		time.StampMilli,
+		time.StampMicro,
+		time.StampNano,
+		time.DateTime,
+		time.DateOnly,
+		time.TimeOnly,
+	}
+	for _, layout := range layouts {
+		loc, err := time.LoadLocation("Asia/Shanghai")
+		if err == nil {
+			t, e := time.ParseInLocation(layout, timeStr, loc) // 按北京时间解析
+			if e == nil {
+				return &t, nil // 解析成功
+			}
+		}
+
+	}
+	return nil, fmt.Errorf("无法识别的格式")
 }

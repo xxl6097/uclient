@@ -62,6 +62,7 @@ func (this *openWRT) UpdateNickName(obj *NickEntry) error {
 	}
 	nick.Name = obj.Name
 	nick.IsPush = obj.IsPush
+	nick.WorkType = obj.WorkType
 	nick.Hostname = obj.Hostname
 	nick.IP = obj.IP
 	nick.MAC = obj.MAC
@@ -156,4 +157,19 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) {
 	markdown["text"] = fmt.Sprintf(format, title, name, client.IP, client.MAC, u.TimestampFormat(client.StartTime))
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
 	_ = WebHookMessage(this.webhookUrl, payload)
+}
+
+func (this *openWRT) AddWorkTime(mac string, timestamp int64) error {
+	if timestamp == 0 {
+		return fmt.Errorf("timestamp is zero")
+	}
+	if mac == "" {
+		return fmt.Errorf("mac is empty")
+	}
+	if v, ok := this.clients[mac]; ok {
+		if v.Nick != nil {
+			return sysLogUpdateWorkTime(mac, timestamp, v.Nick.WorkType)
+		}
+	}
+	return fmt.Errorf("client not found mac")
 }
