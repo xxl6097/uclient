@@ -1,6 +1,5 @@
 import { WorkStatics } from './type.ts'
 
-
 export const testTableData = [
   {
     ip: '192.168.1.2',
@@ -48,6 +47,8 @@ export const testSettingData: WorkStatics[] = [
         workTime2: '19:43:49',
         overWorkTimes: '1h44m40s',
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-02',
@@ -56,6 +57,8 @@ export const testSettingData: WorkStatics[] = [
         workTime2: '19:55:33',
         overWorkTimes: '2h4m17s',
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-03',
@@ -63,7 +66,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:27:08',
         workTime2: '19:47:56',
         overWorkTimes: '1h50m48s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-04',
@@ -71,7 +77,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:23:34',
         workTime2: '19:24:29',
         overWorkTimes: '1h30m55s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-05',
@@ -79,7 +88,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:50:04',
         workTime2: '19:04:51',
         overWorkTimes: '44m47s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-06',
@@ -87,7 +99,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:12:33',
         workTime2: '19:01:29',
         overWorkTimes: '1h18m56s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-07',
@@ -95,7 +110,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:22:55',
         workTime2: '19:23:51',
         overWorkTimes: '1h30m56s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-08',
@@ -103,7 +121,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:43:36',
         workTime2: '19:43:24',
         overWorkTimes: '1h29m48s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-09',
@@ -111,7 +132,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:30:59',
         workTime2: '19:20:44',
         overWorkTimes: '1h19m45s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-10',
@@ -119,7 +143,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:43:05',
         workTime2: '19:12:51',
         overWorkTimes: '59m46s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-11',
@@ -127,7 +154,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:25:48',
         workTime2: '19:06:11',
         overWorkTimes: '1h10m23s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-12',
@@ -135,7 +165,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:03:04',
         workTime2: '19:18:37',
         overWorkTimes: '1h45m33s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-13',
@@ -143,7 +176,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:32:26',
         workTime2: '19:33:02',
         overWorkTimes: '1h30m36s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-14',
@@ -151,7 +187,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:26:45',
         workTime2: '19:26:58',
         overWorkTimes: '1h30m13s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-15',
@@ -159,7 +198,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:45:07',
         workTime2: '19:32:00',
         overWorkTimes: '1h16m53s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-16',
@@ -167,7 +209,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:24:21',
         workTime2: '19:03:28',
         overWorkTimes: '1h9m7s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-17',
@@ -175,7 +220,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:03:44',
         workTime2: '19:50:57',
         overWorkTimes: '2h17m13s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-18',
@@ -183,7 +231,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:49:08',
         workTime2: '19:32:10',
         overWorkTimes: '1h13m2s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-19',
@@ -191,7 +242,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:04:03',
         workTime2: '19:03:22',
         overWorkTimes: '1h29m19s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-20',
@@ -199,7 +253,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:23:19',
         workTime2: '19:51:30',
         overWorkTimes: '1h58m11s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-21',
@@ -207,7 +264,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:08:21',
         workTime2: '19:37:37',
         overWorkTimes: '1h59m16s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-22',
@@ -215,7 +275,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:02:39',
         workTime2: '19:46:34',
         overWorkTimes: '2h13m55s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-23',
@@ -223,7 +286,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:56:04',
         workTime2: '19:03:22',
         overWorkTimes: '37m18s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-24',
@@ -231,7 +297,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:10:18',
         workTime2: '19:02:58',
         overWorkTimes: '1h22m40s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-25',
@@ -239,7 +308,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:20:23',
         workTime2: '19:06:29',
         overWorkTimes: '1h16m6s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-26',
@@ -247,7 +319,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:46:21',
         workTime2: '19:49:16',
         overWorkTimes: '1h32m55s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-27',
@@ -255,7 +330,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:28:35',
         workTime2: '19:04:02',
         overWorkTimes: '1h5m27s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-28',
@@ -263,7 +341,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:19:49',
         workTime2: '19:33:24',
         overWorkTimes: '1h43m35s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-29',
@@ -271,7 +352,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:04:03',
         workTime2: '19:30:00',
         overWorkTimes: '1h55m57s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-30',
@@ -279,7 +363,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:55:33',
         workTime2: '19:27:39',
         overWorkTimes: '1h2m6s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
       {
         date: '2025-07-31',
@@ -287,7 +374,10 @@ export const testSettingData: WorkStatics[] = [
         workTime1: '08:34:19',
         workTime2: '19:55:27',
         overWorkTimes: '1h51m8s',
+
         isWeekDay: false,
+        showSelect: false,
+        dayType: 0,
       },
     ],
   },

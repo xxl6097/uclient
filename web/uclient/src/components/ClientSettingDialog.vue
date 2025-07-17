@@ -56,7 +56,11 @@
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="静态IP设置" name="second">
+            <el-tab-pane
+              label="静态IP设置"
+              name="second"
+              v-if="formData.client.nick.workType.onWorkTime != ''"
+            >
               <el-form label-width="90">
                 <el-form-item label="设备名称：">
                   <el-input
@@ -93,10 +97,10 @@
 
                   <el-popconfirm
                     title="确定补签上班吗?"
-                    @confirm="handleChangeWorkTime(true)"
+                    @confirm="handleAddWorkTime(true)"
                   >
                     <template #reference>
-                      <el-button type="primary" style="margin-left: 10px"
+                      <el-button type="primary" style="margin-left: 10px" plain
                         >补签上班
                       </el-button>
                     </template>
@@ -104,23 +108,67 @@
 
                   <el-popconfirm
                     title="确定补签下班吗?"
-                    @confirm="handleChangeWorkTime(false)"
+                    @confirm="handleAddWorkTime(false)"
                   >
                     <template #reference>
-                      <el-button type="primary" style="margin-left: 10px"
+                      <el-button type="primary" style="margin-left: 10px" plain
                         >补签下班
                       </el-button>
                     </template>
                   </el-popconfirm>
+
+                  <el-button
+                    type="warning"
+                    style="margin-left: 10px"
+                    plain
+                    @click="fetchWorkData"
+                    >刷新
+                  </el-button>
+
+                  <el-button
+                    type="warning"
+                    style="margin-left: 10px"
+                    plain
+                    @click="fetchWorkEvent"
+                    >触发统计
+                  </el-button>
                 </div>
-                <el-table :data="paginatedTableData" border>
+                <el-table
+                  :data="paginatedTableData"
+                  border
+                  row-key="id"
+                  :expand-row-keys="defaultExpandedKeys"
+                  @expand-change="handleExpandChange"
+                >
                   <el-table-column type="expand">
                     <template #default="props">
                       <div m="4">
-                        <el-table :data="props.row.workTime" border>
+                        <el-table
+                          :data="props.row.workTime"
+                          border
+                          row-key="id"
+                        >
                           <el-table-column label="日期" prop="date" />
-                          <el-table-column label="上班" prop="workTime1" />
-                          <el-table-column label="下班" prop="workTime2" />
+                          <el-table-column label="上班" prop="workTime1">
+                            <template #default="scope">
+                              <el-time-picker
+                                v-model="scope.row.workTime1"
+                                style="width: 100px"
+                                arrow-control
+                                value-format="HH:mm:ss"
+                              />
+                            </template>
+                          </el-table-column>
+                          <el-table-column label="下班" prop="workTime2">
+                            <template #default="scope">
+                              <el-time-picker
+                                v-model="scope.row.workTime2"
+                                style="width: 100px"
+                                arrow-control
+                                value-format="HH:mm:ss"
+                              />
+                            </template>
+                          </el-table-column>
                           <el-table-column
                             label="加班时长"
                             prop="overWorkTimes"
@@ -132,10 +180,53 @@
                           </el-table-column>
                           <el-table-column label="类型" prop="isWeekDay">
                             <template #default="scope">
-                              <el-tag v-if="scope.row.isWeekDay" type="danger"
-                                >节假日
+                              <el-tag
+                                v-if="!scope.row.showSelect"
+                                :type="getTagType(scope.row.dayType)"
+                                @dblclick="handleShowSelect(scope.row)"
+                                >{{ getTagName(scope.row.dayType) }}
                               </el-tag>
-                              <el-tag v-else type="success">工作日</el-tag>
+                              <el-select
+                                v-else
+                                v-model="scope.row.dayType"
+                                @change="handleSelectChange(scope.row)"
+                              >
+                                <el-option
+                                  v-for="item in options"
+                                  :label="item.label"
+                                  :key="item.label"
+                                  :value="item.value"
+                                />
+                              </el-select>
+                            </template>
+                          </el-table-column>
+                          <el-table-column
+                            label="操作"
+                            max="80"
+                            fixed="right"
+                            align="center"
+                          >
+                            <template #default="{ row }">
+                              <el-dropdown
+                                size="small"
+                                split-button
+                                type="primary"
+                              >
+                                <el-popconfirm
+                                  title="确定修改吗"
+                                  @confirm="handleChangeWorkTime(row)"
+                                >
+                                  <template #reference> 修改</template>
+                                </el-popconfirm>
+                                <template #dropdown>
+                                  <el-dropdown-menu>
+                                    <el-dropdown-item
+                                      @click="handleDeleteWorkTime(row)"
+                                      >删除</el-dropdown-item
+                                    >
+                                  </el-dropdown-menu>
+                                </template>
+                              </el-dropdown>
                             </template>
                           </el-table-column>
                         </el-table>
@@ -148,6 +239,11 @@
                     label="累计时长"
                     align="center"
                   >
+                    <template #default="scope">
+                      <el-tag type="danger" size="large"
+                        >{{ scope.row.overtime }}
+                      </el-tag>
+                    </template>
                   </el-table-column>
                 </el-table>
                 <!-- 分页 -->
@@ -192,7 +288,13 @@
 <script setup lang="ts">
 import { Eleme } from '@element-plus/icons-vue'
 import { ref, defineExpose, computed } from 'vue'
-import { Client, NickEntry, WorkStatics, WorkType } from '../utils/type.ts'
+import {
+  Client,
+  NickEntry,
+  WorkStatics,
+  WorkTime,
+  WorkType,
+} from '../utils/type.ts'
 import {
   getWeekDay,
   isMobile,
@@ -202,7 +304,6 @@ import {
   showTips,
 } from '../utils/utils.ts'
 import { ComponentSize, ElMessageBox, TabsPaneContext } from 'element-plus'
-import { testSettingData } from "../utils/data.ts";
 // import { testSettingData } from '../utils/data.ts'
 
 const formData = ref({
@@ -231,7 +332,53 @@ const formData = ref({
     } as NickEntry,
   } as Client,
 })
+const handleShowSelect = (row: WorkTime) => {
+  row.showSelect = !row.showSelect
+}
+const handleSelectChange = (row: WorkTime) => {
+  row.showSelect = false
+  // showWarmDialog(`${JSON.stringify(row)}`, {}, {})
+}
 
+const getTagType = (value: number) => {
+  switch (value) {
+    case 0:
+      return 'success'
+    case 1:
+      return 'danger'
+    case 2:
+      return 'warning'
+    default:
+      return 'primary'
+  }
+}
+
+const getTagName = (value: number) => {
+  switch (value) {
+    case 0:
+      return '工作日'
+    case 1:
+      return '休息日'
+    case 2:
+      return '补班日'
+    default:
+      return '未知'
+  }
+}
+const options = [
+  {
+    value: 0,
+    label: '工作日',
+  },
+  {
+    value: 1,
+    label: '节假日',
+  },
+  {
+    value: 2,
+    label: '补班日',
+  },
+]
 const value3 = ref<number>(0)
 const width = ref<string>('30%')
 const activities = ref<WorkStatics[]>([])
@@ -271,6 +418,75 @@ const handleClick = (tab: TabsPaneContext) => {
   }
 }
 
+const handleChangeWorkTime = (row: WorkTime) => {
+  const loadings = showLoading('修改中...')
+  const body = {
+    mac: formData.value.client.mac,
+    day: row.date,
+    data: row,
+  }
+  console.log('handleChangeWorkTime', body)
+  fetch('../api/work/update', {
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      console.log('handleChangeWorkTime', json)
+      showTips(json.code, json.msg)
+    })
+    .catch((error) => {
+      console.log('error', error)
+      showErrorTips('修改失败')
+    })
+    .finally(() => {
+      loadings.close()
+    })
+}
+
+const handleDeleteWorkTime = (row: WorkTime) => {
+  const loadings = showLoading('修改中...')
+  const body = {
+    mac: formData.value.client.mac,
+    day: row.date,
+  }
+  console.log('handleChangeWorkTime', body)
+  fetch('../api/work/del', {
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      console.log('handleChangeWorkTime', json)
+      showTips(json.code, json.msg)
+    })
+    .catch((error) => {
+      console.log('error', error)
+      showErrorTips('修改失败')
+    })
+    .finally(() => {
+      loadings.close()
+    })
+}
+// 默认展开的行
+const defaultExpandedKeys = ref(['1001'])
+
+// 处理展开/折叠事件
+const handleExpandChange = (row: any, expanded: any) => {
+  console.log('展开状态变化:', row, '是否展开:', expanded)
+  // 可以在这里处理展开/折叠时的额外逻辑
+  if (expanded) {
+    // 展开时的操作，如加载子表格数据
+    // loadChildrenData(row.id)
+  }
+}
+
 function initOnWorkTime() {
   if (!formData.value.client) {
     formData.value.client = {} as Client
@@ -283,8 +499,8 @@ function initOnWorkTime() {
   }
 }
 
-function handleChangeWorkTime(isOnWork: boolean) {
-  console.log('handleChangeWorkTime', value3.value, formData.value.client.mac)
+function handleAddWorkTime(isOnWork: boolean) {
+  console.log('handleAddWorkTime', value3.value, formData.value.client.mac)
   const loadings = showLoading('补签申请中...')
   const row = {
     timestamp: value3.value,
@@ -300,7 +516,7 @@ function handleChangeWorkTime(isOnWork: boolean) {
       return res.json()
     })
     .then((json) => {
-      console.log('handleChangeWorkTime', json)
+      console.log('handleAddWorkTime', json)
       showTips(json.code, json.msg)
     })
     .catch((error) => {
@@ -310,6 +526,28 @@ function handleChangeWorkTime(isOnWork: boolean) {
     .finally(() => {
       loadings.close()
     })
+}
+
+function fetchWorkEvent() {
+  const row = {
+    mac: formData.value.client.mac,
+  }
+  fetch('../api/work/tigger', {
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(row),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      console.log('fetchWorkEvent', json)
+      showTips(json.code, json.msg)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+    .finally(() => {})
 }
 
 function fetchWorkData() {
@@ -325,10 +563,11 @@ function fetchWorkData() {
       return res.json()
     })
     .then((json) => {
-      console.log('handleChangeWorkTime', json)
-      showTips(json.code, json.msg)
+      console.log('fetchWorkData', json)
       if (json.code === 0 && json.data) {
         activities.value = json.data
+      } else {
+        //showTips(json.code, json.msg)
       }
     })
     .catch((error) => {
@@ -462,7 +701,7 @@ const showDialogForm = (row: Client) => {
     formData.value.second.ip = row.static.ip
     formData.value.second.mac = row.static.mac
   }
-  activities.value = testSettingData
+  // activities.value = testSettingData
 
   initOnWorkTime()
   fetchWorkData()

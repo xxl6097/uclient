@@ -10,7 +10,9 @@ export interface WorkTime {
   workTime1: string
   workTime2: string
   isWeekDay: boolean
+  showSelect: boolean
   weekday: number
+  dayType: number //0工作日，1休息日，2补班日
   overWorkTimes: string
 }
 

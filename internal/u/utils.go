@@ -303,10 +303,45 @@ func IsWorkingTime(time1, time2 string) (int, error) {
 	}
 }
 
+func DateParse(timestr string) (*time.Time, error) {
+	t, e1 := time.Parse(time.DateOnly, timestr)
+	if e1 == nil {
+		return &t, e1
+	}
+	return nil, nil
+}
+
+func TimeParse(timestr string) (*time.Time, error) {
+	t, e1 := time.Parse(time.TimeOnly, timestr)
+	if e1 == nil {
+		return &t, e1
+	}
+	return nil, nil
+}
 func TestTimeParse(timestr string) error {
 	_, e1 := time.Parse(time.TimeOnly, timestr)
 	if e1 != nil {
 		return e1
 	}
 	return nil
+}
+
+func GetWeekName(weekday time.Weekday) string {
+	switch weekday {
+	case time.Monday:
+		return "星期一"
+	case time.Tuesday:
+		return "星期二"
+	case time.Wednesday:
+		return "星期三"
+	case time.Thursday:
+		return "星期四"
+	case time.Friday:
+		return "星期五"
+	case time.Saturday:
+		return "星期六"
+	case time.Sunday:
+		return "星期日"
+	}
+	return ""
 }

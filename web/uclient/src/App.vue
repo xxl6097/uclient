@@ -212,7 +212,6 @@ import ViewExpand from './components/expand/ViewExpand.vue'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
-import { testTableData } from "./utils/data.ts";
 
 const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<
@@ -430,7 +429,7 @@ const fetchData = () => {
     .catch((error) => {
       console.error(error)
       showErrorTips(`${JSON.stringify(error)}`)
-      renderTable(testTableData)
+      // renderTable(testTableData)
     })
 }
 

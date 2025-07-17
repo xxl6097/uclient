@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-4H0GXWwj.js"(exports, module) {
+  "index-uWsvhS5Z.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -7206,7 +7206,7 @@ var require_index_001 = __commonJS({
     const isDef = (val) => typeof val !== "undefined";
     const isFunction$1 = (val) => typeof val === "function";
     const isString = (val) => typeof val === "string";
-    const noop = () => {
+    const noop$1 = () => {
     };
     const isIOS = isClient && ((_a = window == null ? void 0 : window.navigator) == null ? void 0 : _a.userAgent) && /iP(ad|hone|od)/.test(window.navigator.userAgent);
     function resolveUnref(r) {
@@ -7226,11 +7226,11 @@ var require_index_001 = __commonJS({
     function debounceFilter(ms, options = {}) {
       let timer;
       let maxTimer;
-      let lastRejector = noop;
+      let lastRejector = noop$1;
       const _clearTimeout = (timer2) => {
         clearTimeout(timer2);
         lastRejector();
-        lastRejector = noop;
+        lastRejector = noop$1;
       };
       const filter = (invoke) => {
         const duration = resolveUnref(ms);
@@ -7454,7 +7454,7 @@ var require_index_001 = __commonJS({
         [target, events, listeners, options] = args;
       }
       if (!target)
-        return noop;
+        return noop$1;
       if (!Array.isArray(events))
         events = [events];
       if (!Array.isArray(listeners))
@@ -7490,7 +7490,7 @@ var require_index_001 = __commonJS({
         return;
       if (isIOS && !_iOSWorkaround) {
         _iOSWorkaround = true;
-        Array.from(window2.document.body.children).forEach((el) => el.addEventListener("click", noop));
+        Array.from(window2.document.body.children).forEach((el) => el.addEventListener("click", noop$1));
       }
       let shouldListen = true;
       const shouldIgnore = (event) => {
@@ -8122,7 +8122,7 @@ var require_index_001 = __commonJS({
       return result;
     }
     var isArray = Array.isArray;
-    var INFINITY$2 = 1 / 0;
+    var INFINITY$3 = 1 / 0;
     var symbolProto$2 = Symbol$1 ? Symbol$1.prototype : void 0, symbolToString = symbolProto$2 ? symbolProto$2.toString : void 0;
     function baseToString(value) {
       if (typeof value == "string") {
@@ -8135,7 +8135,7 @@ var require_index_001 = __commonJS({
         return symbolToString ? symbolToString.call(value) : "";
       }
       var result = value + "";
-      return result == "0" && 1 / value == -INFINITY$2 ? "-0" : result;
+      return result == "0" && 1 / value == -INFINITY$3 ? "-0" : result;
     }
     var reWhitespace = /\s/;
     function trimmedEndIndex(string2) {
@@ -8175,13 +8175,13 @@ var require_index_001 = __commonJS({
       var isBinary = reIsBinary.test(value);
       return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
     }
-    var INFINITY$1 = 1 / 0, MAX_INTEGER = 17976931348623157e292;
+    var INFINITY$2 = 1 / 0, MAX_INTEGER = 17976931348623157e292;
     function toFinite(value) {
       if (!value) {
         return value === 0 ? value : 0;
       }
       value = toNumber(value);
-      if (value === INFINITY$1 || value === -INFINITY$1) {
+      if (value === INFINITY$2 || value === -INFINITY$2) {
         var sign = value < 0 ? -1 : 1;
         return sign * MAX_INTEGER;
       }
@@ -8278,6 +8278,8 @@ var require_index_001 = __commonJS({
       }
       return func.apply(thisArg, args);
     }
+    function noop() {
+    }
     function copyArray(source, array) {
       var index = -1, length = source.length;
       array || (array = Array(length));
@@ -8343,6 +8345,25 @@ var require_index_001 = __commonJS({
         }
       }
       return -1;
+    }
+    function baseIsNaN(value) {
+      return value !== value;
+    }
+    function strictIndexOf(array, value, fromIndex) {
+      var index = fromIndex - 1, length = array.length;
+      while (++index < length) {
+        if (array[index] === value) {
+          return index;
+        }
+      }
+      return -1;
+    }
+    function baseIndexOf(array, value, fromIndex) {
+      return value === value ? strictIndexOf(array, value, fromIndex) : baseFindIndex(array, baseIsNaN, fromIndex);
+    }
+    function arrayIncludes(array, value) {
+      var length = array == null ? 0 : array.length;
+      return !!length && baseIndexOf(array, value, 0) > -1;
     }
     var MAX_SAFE_INTEGER$1 = 9007199254740991;
     var reIsUint = /^(?:0|[1-9]\d*)$/;
@@ -8787,13 +8808,13 @@ var require_index_001 = __commonJS({
       }
       return isKey(value, object) ? [value] : stringToPath(toString(value));
     }
-    var INFINITY = 1 / 0;
+    var INFINITY$1 = 1 / 0;
     function toKey(value) {
       if (typeof value == "string" || isSymbol(value)) {
         return value;
       }
       var result = value + "";
-      return result == "0" && 1 / value == -INFINITY ? "-0" : result;
+      return result == "0" && 1 / value == -INFINITY$1 ? "-0" : result;
     }
     function baseGet(object, path) {
       path = castPath(path, object);
@@ -8883,12 +8904,12 @@ var require_index_001 = __commonJS({
     function stackHas(key) {
       return this.__data__.has(key);
     }
-    var LARGE_ARRAY_SIZE = 200;
+    var LARGE_ARRAY_SIZE$1 = 200;
     function stackSet(key, value) {
       var data = this.__data__;
       if (data instanceof ListCache) {
         var pairs = data.__data__;
-        if (!Map$1 || pairs.length < LARGE_ARRAY_SIZE - 1) {
+        if (!Map$1 || pairs.length < LARGE_ARRAY_SIZE$1 - 1) {
           pairs.push([key, value]);
           this.size = ++data.size;
           return this;
@@ -9705,6 +9726,15 @@ var require_index_001 = __commonJS({
         }
       }, keysIn);
     }
+    function arrayIncludesWith(array, value, comparator2) {
+      var index = -1, length = array == null ? 0 : array.length;
+      while (++index < length) {
+        if (comparator2(value, array[index])) {
+          return true;
+        }
+      }
+      return false;
+    }
     var nativeMax = Math.max, nativeMin = Math.min;
     function findLastIndex(array, predicate, fromIndex) {
       var length = array == null ? 0 : array.length;
@@ -9797,6 +9827,54 @@ var require_index_001 = __commonJS({
     function set(object, path, value) {
       return object == null ? object : baseSet(object, path, value);
     }
+    var INFINITY = 1 / 0;
+    var createSet = !(Set$1 && 1 / setToArray(new Set$1([, -0]))[1] == INFINITY) ? noop : function(values) {
+      return new Set$1(values);
+    };
+    var LARGE_ARRAY_SIZE = 200;
+    function baseUniq(array, iteratee, comparator2) {
+      var index = -1, includes = arrayIncludes, length = array.length, isCommon = true, result = [], seen = result;
+      if (comparator2) {
+        isCommon = false;
+        includes = arrayIncludesWith;
+      } else if (length >= LARGE_ARRAY_SIZE) {
+        var set2 = iteratee ? null : createSet(array);
+        if (set2) {
+          return setToArray(set2);
+        }
+        isCommon = false;
+        includes = cacheHas;
+        seen = new SetCache();
+      } else {
+        seen = iteratee ? [] : result;
+      }
+      outer:
+        while (++index < length) {
+          var value = array[index], computed2 = iteratee ? iteratee(value) : value;
+          value = comparator2 || value !== 0 ? value : 0;
+          if (isCommon && computed2 === computed2) {
+            var seenIndex = seen.length;
+            while (seenIndex--) {
+              if (seen[seenIndex] === computed2) {
+                continue outer;
+              }
+            }
+            if (iteratee) {
+              seen.push(computed2);
+            }
+            result.push(value);
+          } else if (!includes(seen, computed2, comparator2)) {
+            if (seen !== result) {
+              seen.push(computed2);
+            }
+            result.push(value);
+          }
+        }
+      return result;
+    }
+    var union = baseRest(function(arrays) {
+      return baseUniq(baseFlatten(arrays, 1, isArrayLikeObject, true));
+    });
     const isUndefined = (val) => val === void 0;
     const isBoolean = (val) => typeof val === "boolean";
     const isNumber = (val) => typeof val === "number";
@@ -12091,7 +12169,7 @@ var require_index_001 = __commonJS({
       name: "ElIcon",
       inheritAttrs: false
     });
-    const _sfc_main$1d = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1e = /* @__PURE__ */ defineComponent({
       ...__default__$J,
       props: iconProps,
       setup(__props) {
@@ -12116,7 +12194,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Icon = /* @__PURE__ */ _export_sfc$1(_sfc_main$1d, [["__file", "icon.vue"]]);
+    var Icon = /* @__PURE__ */ _export_sfc$1(_sfc_main$1e, [["__file", "icon.vue"]]);
     const ElIcon = withInstall(Icon);
     const formContextKey = Symbol("formContextKey");
     const formItemContextKey = Symbol("formItemContextKey");
@@ -12276,7 +12354,7 @@ var require_index_001 = __commonJS({
     const __default__$I = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$9
     });
-    const _sfc_main$1c = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1d = /* @__PURE__ */ defineComponent({
       ...__default__$I,
       props: formProps,
       emits: formEmits,
@@ -12409,7 +12487,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Form = /* @__PURE__ */ _export_sfc$1(_sfc_main$1c, [["__file", "form.vue"]]);
+    var Form = /* @__PURE__ */ _export_sfc$1(_sfc_main$1d, [["__file", "form.vue"]]);
     var define_process_env_default = {};
     function _extends() {
       _extends = Object.assign ? Object.assign.bind() : function(target) {
@@ -13590,11 +13668,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const _hoisted_1$E = ["role", "aria-labelledby"];
+    const _hoisted_1$F = ["role", "aria-labelledby"];
     const __default__$H = /* @__PURE__ */ defineComponent({
       name: "ElFormItem"
     });
-    const _sfc_main$1b = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1c = /* @__PURE__ */ defineComponent({
       ...__default__$H,
       props: formItemProps,
       setup(__props, { expose }) {
@@ -13887,11 +13965,11 @@ var require_index_001 = __commonJS({
                 _: 3
               }, 8, ["name"])
             ], 6)
-          ], 10, _hoisted_1$E);
+          ], 10, _hoisted_1$F);
         };
       }
     });
-    var FormItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$1b, [["__file", "form-item.vue"]]);
+    var FormItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$1c, [["__file", "form-item.vue"]]);
     const ElForm = withInstall(Form, {
       FormItem
     });
@@ -14079,14 +14157,14 @@ var require_index_001 = __commonJS({
       compositionupdate: (evt) => evt instanceof CompositionEvent,
       compositionend: (evt) => evt instanceof CompositionEvent
     };
-    const _hoisted_1$D = ["role"];
+    const _hoisted_1$E = ["role"];
     const _hoisted_2$r = ["id", "minlength", "maxlength", "type", "disabled", "readonly", "autocomplete", "tabindex", "aria-label", "placeholder", "form", "autofocus"];
     const _hoisted_3$g = ["id", "minlength", "maxlength", "tabindex", "disabled", "readonly", "autocomplete", "aria-label", "placeholder", "form", "autofocus"];
     const __default__$G = /* @__PURE__ */ defineComponent({
       name: "ElInput",
       inheritAttrs: false
     });
-    const _sfc_main$1a = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1b = /* @__PURE__ */ defineComponent({
       ...__default__$G,
       props: inputProps,
       emits: inputEmits,
@@ -14506,13 +14584,13 @@ var require_index_001 = __commonJS({
                 class: normalizeClass(unref(nsInput).e("count"))
               }, toDisplayString(unref(textLength)) + " / " + toDisplayString(_ctx.maxlength), 7)) : createCommentVNode("v-if", true)
             ], 64))
-          ], 16, _hoisted_1$D)), [
+          ], 16, _hoisted_1$E)), [
             [vShow, _ctx.type !== "hidden"]
           ]);
         };
       }
     });
-    var Input = /* @__PURE__ */ _export_sfc$1(_sfc_main$1a, [["__file", "input.vue"]]);
+    var Input = /* @__PURE__ */ _export_sfc$1(_sfc_main$1b, [["__file", "input.vue"]]);
     const ElInput = withInstall(Input);
     const GAP = 4;
     const BAR_MAP = {
@@ -14557,7 +14635,7 @@ var require_index_001 = __commonJS({
       always: Boolean
     });
     const COMPONENT_NAME$7 = "Thumb";
-    const _sfc_main$19 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1a = /* @__PURE__ */ defineComponent({
       __name: "thumb",
       props: thumbProps,
       setup(__props) {
@@ -14676,7 +14754,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Thumb = /* @__PURE__ */ _export_sfc$1(_sfc_main$19, [["__file", "thumb.vue"]]);
+    var Thumb = /* @__PURE__ */ _export_sfc$1(_sfc_main$1a, [["__file", "thumb.vue"]]);
     const barProps = buildProps({
       always: {
         type: Boolean,
@@ -14693,7 +14771,7 @@ var require_index_001 = __commonJS({
         default: 1
       }
     });
-    const _sfc_main$18 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$19 = /* @__PURE__ */ defineComponent({
       __name: "bar",
       props: barProps,
       setup(__props, { expose }) {
@@ -14730,7 +14808,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Bar = /* @__PURE__ */ _export_sfc$1(_sfc_main$18, [["__file", "bar.vue"]]);
+    var Bar = /* @__PURE__ */ _export_sfc$1(_sfc_main$19, [["__file", "bar.vue"]]);
     const scrollbarProps = buildProps({
       height: {
         type: [String, Number],
@@ -14788,7 +14866,7 @@ var require_index_001 = __commonJS({
     const __default__$F = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$6
     });
-    const _sfc_main$17 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$18 = /* @__PURE__ */ defineComponent({
       ...__default__$F,
       props: scrollbarProps,
       emits: scrollbarEmits,
@@ -14947,7 +15025,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Scrollbar = /* @__PURE__ */ _export_sfc$1(_sfc_main$17, [["__file", "scrollbar.vue"]]);
+    var Scrollbar = /* @__PURE__ */ _export_sfc$1(_sfc_main$18, [["__file", "scrollbar.vue"]]);
     const ElScrollbar = withInstall(Scrollbar);
     const POPPER_INJECTION_KEY = Symbol("popper");
     const POPPER_CONTENT_INJECTION_KEY = Symbol("popperContent");
@@ -14972,7 +15050,7 @@ var require_index_001 = __commonJS({
       name: "ElPopper",
       inheritAttrs: false
     });
-    const _sfc_main$16 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$17 = /* @__PURE__ */ defineComponent({
       ...__default__$E,
       props: popperProps,
       setup(__props, { expose }) {
@@ -14996,7 +15074,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Popper = /* @__PURE__ */ _export_sfc$1(_sfc_main$16, [["__file", "popper.vue"]]);
+    var Popper = /* @__PURE__ */ _export_sfc$1(_sfc_main$17, [["__file", "popper.vue"]]);
     const popperArrowProps = buildProps({
       arrowOffset: {
         type: Number,
@@ -15007,7 +15085,7 @@ var require_index_001 = __commonJS({
       name: "ElPopperArrow",
       inheritAttrs: false
     });
-    const _sfc_main$15 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$16 = /* @__PURE__ */ defineComponent({
       ...__default__$D,
       props: popperArrowProps,
       setup(__props, { expose }) {
@@ -15034,7 +15112,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElPopperArrow = /* @__PURE__ */ _export_sfc$1(_sfc_main$15, [["__file", "arrow.vue"]]);
+    var ElPopperArrow = /* @__PURE__ */ _export_sfc$1(_sfc_main$16, [["__file", "arrow.vue"]]);
     const NAME = "ElOnlyChild";
     const OnlyChild = /* @__PURE__ */ defineComponent({
       name: NAME,
@@ -15122,7 +15200,7 @@ var require_index_001 = __commonJS({
       name: "ElPopperTrigger",
       inheritAttrs: false
     });
-    const _sfc_main$14 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$15 = /* @__PURE__ */ defineComponent({
       ...__default__$C,
       props: popperTriggerProps,
       setup(__props, { expose }) {
@@ -15221,7 +15299,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElPopperTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$14, [["__file", "trigger.vue"]]);
+    var ElPopperTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$15, [["__file", "trigger.vue"]]);
     const FOCUS_AFTER_TRAPPED = "focus-trap.focus-after-trapped";
     const FOCUS_AFTER_RELEASED = "focus-trap.focus-after-released";
     const FOCUSOUT_PREVENTED = "focus-trap.focusout-prevented";
@@ -15368,7 +15446,7 @@ var require_index_001 = __commonJS({
         detail
       });
     };
-    const _sfc_main$13 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$14 = /* @__PURE__ */ defineComponent({
       name: "ElFocusTrap",
       inheritAttrs: false,
       props: {
@@ -15607,7 +15685,7 @@ var require_index_001 = __commonJS({
     function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
       return renderSlot(_ctx.$slots, "default", { handleKeydown: _ctx.onKeydown });
     }
-    var ElFocusTrap = /* @__PURE__ */ _export_sfc$1(_sfc_main$13, [["render", _sfc_render$g], ["__file", "focus-trap.vue"]]);
+    var ElFocusTrap = /* @__PURE__ */ _export_sfc$1(_sfc_main$14, [["render", _sfc_render$g], ["__file", "focus-trap.vue"]]);
     const POSITIONING_STRATEGIES = ["fixed", "absolute"];
     const popperCoreConfigProps = buildProps({
       boundariesPadding: {
@@ -15895,7 +15973,7 @@ var require_index_001 = __commonJS({
     const __default__$B = /* @__PURE__ */ defineComponent({
       name: "ElPopperContent"
     });
-    const _sfc_main$12 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$13 = /* @__PURE__ */ defineComponent({
       ...__default__$B,
       props: popperContentProps,
       emits: popperContentEmits,
@@ -16012,7 +16090,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElPopperContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$12, [["__file", "content.vue"]]);
+    var ElPopperContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$13, [["__file", "content.vue"]]);
     const ElPopper = withInstall(Popper);
     const TOOLTIP_INJECTION_KEY = Symbol("elTooltip");
     const useTooltipContentProps = buildProps({
@@ -16093,7 +16171,7 @@ var require_index_001 = __commonJS({
     const __default__$A = /* @__PURE__ */ defineComponent({
       name: "ElTooltipTrigger"
     });
-    const _sfc_main$11 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$12 = /* @__PURE__ */ defineComponent({
       ...__default__$A,
       props: useTooltipTriggerProps,
       setup(__props, { expose }) {
@@ -16153,12 +16231,12 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElTooltipTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$11, [["__file", "trigger.vue"]]);
+    var ElTooltipTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$12, [["__file", "trigger.vue"]]);
     const __default__$z = /* @__PURE__ */ defineComponent({
       name: "ElTooltipContent",
       inheritAttrs: false
     });
-    const _sfc_main$10 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$11 = /* @__PURE__ */ defineComponent({
       ...__default__$z,
       props: useTooltipContentProps,
       setup(__props, { expose }) {
@@ -16317,13 +16395,13 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElTooltipContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$10, [["__file", "content.vue"]]);
-    const _hoisted_1$C = ["innerHTML"];
+    var ElTooltipContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$11, [["__file", "content.vue"]]);
+    const _hoisted_1$D = ["innerHTML"];
     const _hoisted_2$q = { key: 1 };
     const __default__$y = /* @__PURE__ */ defineComponent({
       name: "ElTooltip"
     });
-    const _sfc_main$$ = /* @__PURE__ */ defineComponent({
+    const _sfc_main$10 = /* @__PURE__ */ defineComponent({
       ...__default__$y,
       props: useTooltipProps,
       emits: tooltipEmits,
@@ -16461,7 +16539,7 @@ var require_index_001 = __commonJS({
                     _ctx.rawContent ? (openBlock(), createElementBlock("span", {
                       key: 0,
                       innerHTML: _ctx.content
-                    }, null, 8, _hoisted_1$C)) : (openBlock(), createElementBlock("span", _hoisted_2$q, toDisplayString(_ctx.content), 1))
+                    }, null, 8, _hoisted_1$D)) : (openBlock(), createElementBlock("span", _hoisted_2$q, toDisplayString(_ctx.content), 1))
                   ]),
                   _ctx.showArrow ? (openBlock(), createBlock(unref(ElPopperArrow), {
                     key: 0,
@@ -16476,7 +16554,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Tooltip = /* @__PURE__ */ _export_sfc$1(_sfc_main$$, [["__file", "tooltip.vue"]]);
+    var Tooltip = /* @__PURE__ */ _export_sfc$1(_sfc_main$10, [["__file", "tooltip.vue"]]);
     const ElTooltip = withInstall(Tooltip);
     const badgeProps = buildProps({
       value: {
@@ -16495,11 +16573,11 @@ var require_index_001 = __commonJS({
         default: "danger"
       }
     });
-    const _hoisted_1$B = ["textContent"];
+    const _hoisted_1$C = ["textContent"];
     const __default__$x = /* @__PURE__ */ defineComponent({
       name: "ElBadge"
     });
-    const _sfc_main$_ = /* @__PURE__ */ defineComponent({
+    const _sfc_main$$ = /* @__PURE__ */ defineComponent({
       ...__default__$x,
       props: badgeProps,
       setup(__props, { expose }) {
@@ -16534,7 +16612,7 @@ var require_index_001 = __commonJS({
                     unref(ns).is("dot", _ctx.isDot)
                   ]),
                   textContent: toDisplayString(unref(content))
-                }, null, 10, _hoisted_1$B), [
+                }, null, 10, _hoisted_1$C), [
                   [vShow, !_ctx.hidden && (unref(content) || _ctx.isDot)]
                 ])
               ]),
@@ -16544,7 +16622,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Badge = /* @__PURE__ */ _export_sfc$1(_sfc_main$_, [["__file", "badge.vue"]]);
+    var Badge = /* @__PURE__ */ _export_sfc$1(_sfc_main$$, [["__file", "badge.vue"]]);
     const ElBadge = withInstall(Badge);
     const buttonGroupContextKey = Symbol("buttonGroupContextKey");
     const useButton = (props, emit2) => {
@@ -17598,7 +17676,7 @@ var require_index_001 = __commonJS({
     const __default__$w = /* @__PURE__ */ defineComponent({
       name: "ElButton"
     });
-    const _sfc_main$Z = /* @__PURE__ */ defineComponent({
+    const _sfc_main$_ = /* @__PURE__ */ defineComponent({
       ...__default__$w,
       props: buttonProps,
       emits: buttonEmits,
@@ -17664,7 +17742,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Button = /* @__PURE__ */ _export_sfc$1(_sfc_main$Z, [["__file", "button.vue"]]);
+    var Button = /* @__PURE__ */ _export_sfc$1(_sfc_main$_, [["__file", "button.vue"]]);
     const buttonGroupProps = {
       size: buttonProps.size,
       type: buttonProps.type
@@ -17672,7 +17750,7 @@ var require_index_001 = __commonJS({
     const __default__$v = /* @__PURE__ */ defineComponent({
       name: "ElButtonGroup"
     });
-    const _sfc_main$Y = /* @__PURE__ */ defineComponent({
+    const _sfc_main$Z = /* @__PURE__ */ defineComponent({
       ...__default__$v,
       props: buttonGroupProps,
       setup(__props) {
@@ -17691,7 +17769,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ButtonGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$Y, [["__file", "button-group.vue"]]);
+    var ButtonGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$Z, [["__file", "button-group.vue"]]);
     const ElButton = withInstall(Button, {
       ButtonGroup
     });
@@ -18230,12 +18308,12 @@ var require_index_001 = __commonJS({
       },
       unlinkPanels: Boolean
     });
-    const _hoisted_1$A = ["id", "name", "placeholder", "value", "disabled", "readonly"];
+    const _hoisted_1$B = ["id", "name", "placeholder", "value", "disabled", "readonly"];
     const _hoisted_2$p = ["id", "name", "placeholder", "value", "disabled", "readonly"];
     const __default__$u = /* @__PURE__ */ defineComponent({
       name: "Picker"
     });
-    const _sfc_main$X = /* @__PURE__ */ defineComponent({
+    const _sfc_main$Y = /* @__PURE__ */ defineComponent({
       ...__default__$u,
       props: timePickerDefaultProps,
       emits: [
@@ -18804,7 +18882,7 @@ var require_index_001 = __commonJS({
                   onChange: handleStartChange,
                   onFocus: handleFocusInput,
                   onBlur: handleBlurInput
-                }, null, 42, _hoisted_1$A),
+                }, null, 42, _hoisted_1$B),
                 renderSlot(_ctx.$slots, "range-separator", {}, () => [
                   createBaseVNode("span", {
                     class: normalizeClass(unref(nsRange).b("separator"))
@@ -18863,7 +18941,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var CommonPicker = /* @__PURE__ */ _export_sfc$1(_sfc_main$X, [["__file", "picker.vue"]]);
+    var CommonPicker = /* @__PURE__ */ _export_sfc$1(_sfc_main$Y, [["__file", "picker.vue"]]);
     const panelTimePickerProps = buildProps({
       ...timePanelSharedProps,
       datetimeRole: String,
@@ -19239,9 +19317,9 @@ var require_index_001 = __commonJS({
       },
       ...disabledTimeListsProps
     });
-    const _hoisted_1$z = ["onClick"];
+    const _hoisted_1$A = ["onClick"];
     const _hoisted_2$o = ["onMouseenter"];
-    const _sfc_main$W = /* @__PURE__ */ defineComponent({
+    const _sfc_main$X = /* @__PURE__ */ defineComponent({
       __name: "basic-time-spinner",
       props: basicTimeSpinnerProps,
       emits: ["change", "select-range", "set-option"],
@@ -19467,7 +19545,7 @@ var require_index_001 = __commonJS({
                       ], 64)) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
                         createTextVNode(toDisplayString(("0" + key).slice(-2)), 1)
                       ], 64))
-                    ], 10, _hoisted_1$z);
+                    ], 10, _hoisted_1$A);
                   }), 128))
                 ]),
                 _: 2
@@ -19527,8 +19605,8 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TimeSpinner = /* @__PURE__ */ _export_sfc$1(_sfc_main$W, [["__file", "basic-time-spinner.vue"]]);
-    const _sfc_main$V = /* @__PURE__ */ defineComponent({
+    var TimeSpinner = /* @__PURE__ */ _export_sfc$1(_sfc_main$X, [["__file", "basic-time-spinner.vue"]]);
+    const _sfc_main$W = /* @__PURE__ */ defineComponent({
       __name: "panel-time-pick",
       props: panelTimePickerProps,
       emits: ["pick", "select-range", "set-picker-option"],
@@ -19680,7 +19758,337 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TimePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$V, [["__file", "panel-time-pick.vue"]]);
+    var TimePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$W, [["__file", "panel-time-pick.vue"]]);
+    const panelTimeRangeProps = buildProps({
+      ...timePanelSharedProps,
+      parsedValue: {
+        type: definePropType(Array)
+      }
+    });
+    const _hoisted_1$z = ["disabled"];
+    const _sfc_main$V = /* @__PURE__ */ defineComponent({
+      __name: "panel-time-range",
+      props: panelTimeRangeProps,
+      emits: ["pick", "select-range", "set-picker-option"],
+      setup(__props, { emit: emit2 }) {
+        const props = __props;
+        const makeSelectRange = (start, end) => {
+          const result = [];
+          for (let i = start; i <= end; i++) {
+            result.push(i);
+          }
+          return result;
+        };
+        const { t, lang } = useLocale();
+        const nsTime = useNamespace("time");
+        const nsPicker = useNamespace("picker");
+        const pickerBase = inject("EP_PICKER_BASE");
+        const {
+          arrowControl,
+          disabledHours,
+          disabledMinutes,
+          disabledSeconds,
+          defaultValue
+        } = pickerBase.props;
+        const startContainerKls = computed(() => [
+          nsTime.be("range-picker", "body"),
+          nsTime.be("panel", "content"),
+          nsTime.is("arrow", arrowControl),
+          showSeconds.value ? "has-seconds" : ""
+        ]);
+        const endContainerKls = computed(() => [
+          nsTime.be("range-picker", "body"),
+          nsTime.be("panel", "content"),
+          nsTime.is("arrow", arrowControl),
+          showSeconds.value ? "has-seconds" : ""
+        ]);
+        const startTime = computed(() => props.parsedValue[0]);
+        const endTime = computed(() => props.parsedValue[1]);
+        const oldValue = useOldValue(props);
+        const handleCancel = () => {
+          emit2("pick", oldValue.value, false);
+        };
+        const showSeconds = computed(() => {
+          return props.format.includes("ss");
+        });
+        const amPmMode = computed(() => {
+          if (props.format.includes("A"))
+            return "A";
+          if (props.format.includes("a"))
+            return "a";
+          return "";
+        });
+        const handleConfirm = (visible = false) => {
+          emit2("pick", [startTime.value, endTime.value], visible);
+        };
+        const handleMinChange = (date3) => {
+          handleChange(date3.millisecond(0), endTime.value);
+        };
+        const handleMaxChange = (date3) => {
+          handleChange(startTime.value, date3.millisecond(0));
+        };
+        const isValidValue = (_date) => {
+          const parsedDate = _date.map((_2) => dayjs(_2).locale(lang.value));
+          const result = getRangeAvailableTime(parsedDate);
+          return parsedDate[0].isSame(result[0]) && parsedDate[1].isSame(result[1]);
+        };
+        const handleChange = (start, end) => {
+          emit2("pick", [start, end], true);
+        };
+        const btnConfirmDisabled = computed(() => {
+          return startTime.value > endTime.value;
+        });
+        const selectionRange = ref([0, 2]);
+        const setMinSelectionRange = (start, end) => {
+          emit2("select-range", start, end, "min");
+          selectionRange.value = [start, end];
+        };
+        const offset = computed(() => showSeconds.value ? 11 : 8);
+        const setMaxSelectionRange = (start, end) => {
+          emit2("select-range", start, end, "max");
+          const _offset = unref(offset);
+          selectionRange.value = [start + _offset, end + _offset];
+        };
+        const changeSelectionRange = (step) => {
+          const list = showSeconds.value ? [0, 3, 6, 11, 14, 17] : [0, 3, 8, 11];
+          const mapping = ["hours", "minutes"].concat(showSeconds.value ? ["seconds"] : []);
+          const index = list.indexOf(selectionRange.value[0]);
+          const next = (index + step + list.length) % list.length;
+          const half = list.length / 2;
+          if (next < half) {
+            timePickerOptions["start_emitSelectRange"](mapping[next]);
+          } else {
+            timePickerOptions["end_emitSelectRange"](mapping[next - half]);
+          }
+        };
+        const handleKeydown = (event) => {
+          const code = event.code;
+          const { left, right, up, down } = EVENT_CODE;
+          if ([left, right].includes(code)) {
+            const step = code === left ? -1 : 1;
+            changeSelectionRange(step);
+            event.preventDefault();
+            return;
+          }
+          if ([up, down].includes(code)) {
+            const step = code === up ? -1 : 1;
+            const role = selectionRange.value[0] < offset.value ? "start" : "end";
+            timePickerOptions[`${role}_scrollDown`](step);
+            event.preventDefault();
+            return;
+          }
+        };
+        const disabledHours_ = (role, compare) => {
+          const defaultDisable = disabledHours ? disabledHours(role) : [];
+          const isStart = role === "start";
+          const compareDate = compare || (isStart ? endTime.value : startTime.value);
+          const compareHour = compareDate.hour();
+          const nextDisable = isStart ? makeSelectRange(compareHour + 1, 23) : makeSelectRange(0, compareHour - 1);
+          return union(defaultDisable, nextDisable);
+        };
+        const disabledMinutes_ = (hour, role, compare) => {
+          const defaultDisable = disabledMinutes ? disabledMinutes(hour, role) : [];
+          const isStart = role === "start";
+          const compareDate = compare || (isStart ? endTime.value : startTime.value);
+          const compareHour = compareDate.hour();
+          if (hour !== compareHour) {
+            return defaultDisable;
+          }
+          const compareMinute = compareDate.minute();
+          const nextDisable = isStart ? makeSelectRange(compareMinute + 1, 59) : makeSelectRange(0, compareMinute - 1);
+          return union(defaultDisable, nextDisable);
+        };
+        const disabledSeconds_ = (hour, minute, role, compare) => {
+          const defaultDisable = disabledSeconds ? disabledSeconds(hour, minute, role) : [];
+          const isStart = role === "start";
+          const compareDate = compare || (isStart ? endTime.value : startTime.value);
+          const compareHour = compareDate.hour();
+          const compareMinute = compareDate.minute();
+          if (hour !== compareHour || minute !== compareMinute) {
+            return defaultDisable;
+          }
+          const compareSecond = compareDate.second();
+          const nextDisable = isStart ? makeSelectRange(compareSecond + 1, 59) : makeSelectRange(0, compareSecond - 1);
+          return union(defaultDisable, nextDisable);
+        };
+        const getRangeAvailableTime = ([start, end]) => {
+          return [
+            getAvailableTime(start, "start", true, end),
+            getAvailableTime(end, "end", false, start)
+          ];
+        };
+        const { getAvailableHours, getAvailableMinutes, getAvailableSeconds } = buildAvailableTimeSlotGetter(disabledHours_, disabledMinutes_, disabledSeconds_);
+        const {
+          timePickerOptions,
+          getAvailableTime,
+          onSetOption
+        } = useTimePanel({
+          getAvailableHours,
+          getAvailableMinutes,
+          getAvailableSeconds
+        });
+        const parseUserInput = (days) => {
+          if (!days)
+            return null;
+          if (isArray$1(days)) {
+            return days.map((d2) => dayjs(d2, props.format).locale(lang.value));
+          }
+          return dayjs(days, props.format).locale(lang.value);
+        };
+        const formatToString = (days) => {
+          if (!days)
+            return null;
+          if (isArray$1(days)) {
+            return days.map((d2) => d2.format(props.format));
+          }
+          return days.format(props.format);
+        };
+        const getDefaultValue2 = () => {
+          if (isArray$1(defaultValue)) {
+            return defaultValue.map((d2) => dayjs(d2).locale(lang.value));
+          }
+          const defaultDay = dayjs(defaultValue).locale(lang.value);
+          return [defaultDay, defaultDay.add(60, "m")];
+        };
+        emit2("set-picker-option", ["formatToString", formatToString]);
+        emit2("set-picker-option", ["parseUserInput", parseUserInput]);
+        emit2("set-picker-option", ["isValidValue", isValidValue]);
+        emit2("set-picker-option", ["handleKeydownInput", handleKeydown]);
+        emit2("set-picker-option", ["getDefaultValue", getDefaultValue2]);
+        emit2("set-picker-option", ["getRangeAvailableTime", getRangeAvailableTime]);
+        return (_ctx, _cache) => {
+          return _ctx.actualVisible ? (openBlock(), createElementBlock("div", {
+            key: 0,
+            class: normalizeClass([unref(nsTime).b("range-picker"), unref(nsPicker).b("panel")])
+          }, [
+            createBaseVNode("div", {
+              class: normalizeClass(unref(nsTime).be("range-picker", "content"))
+            }, [
+              createBaseVNode("div", {
+                class: normalizeClass(unref(nsTime).be("range-picker", "cell"))
+              }, [
+                createBaseVNode("div", {
+                  class: normalizeClass(unref(nsTime).be("range-picker", "header"))
+                }, toDisplayString(unref(t)("el.datepicker.startTime")), 3),
+                createBaseVNode("div", {
+                  class: normalizeClass(unref(startContainerKls))
+                }, [
+                  createVNode(TimeSpinner, {
+                    ref: "minSpinner",
+                    role: "start",
+                    "show-seconds": unref(showSeconds),
+                    "am-pm-mode": unref(amPmMode),
+                    "arrow-control": unref(arrowControl),
+                    "spinner-date": unref(startTime),
+                    "disabled-hours": disabledHours_,
+                    "disabled-minutes": disabledMinutes_,
+                    "disabled-seconds": disabledSeconds_,
+                    onChange: handleMinChange,
+                    onSetOption: unref(onSetOption),
+                    onSelectRange: setMinSelectionRange
+                  }, null, 8, ["show-seconds", "am-pm-mode", "arrow-control", "spinner-date", "onSetOption"])
+                ], 2)
+              ], 2),
+              createBaseVNode("div", {
+                class: normalizeClass(unref(nsTime).be("range-picker", "cell"))
+              }, [
+                createBaseVNode("div", {
+                  class: normalizeClass(unref(nsTime).be("range-picker", "header"))
+                }, toDisplayString(unref(t)("el.datepicker.endTime")), 3),
+                createBaseVNode("div", {
+                  class: normalizeClass(unref(endContainerKls))
+                }, [
+                  createVNode(TimeSpinner, {
+                    ref: "maxSpinner",
+                    role: "end",
+                    "show-seconds": unref(showSeconds),
+                    "am-pm-mode": unref(amPmMode),
+                    "arrow-control": unref(arrowControl),
+                    "spinner-date": unref(endTime),
+                    "disabled-hours": disabledHours_,
+                    "disabled-minutes": disabledMinutes_,
+                    "disabled-seconds": disabledSeconds_,
+                    onChange: handleMaxChange,
+                    onSetOption: unref(onSetOption),
+                    onSelectRange: setMaxSelectionRange
+                  }, null, 8, ["show-seconds", "am-pm-mode", "arrow-control", "spinner-date", "onSetOption"])
+                ], 2)
+              ], 2)
+            ], 2),
+            createBaseVNode("div", {
+              class: normalizeClass(unref(nsTime).be("panel", "footer"))
+            }, [
+              createBaseVNode("button", {
+                type: "button",
+                class: normalizeClass([unref(nsTime).be("panel", "btn"), "cancel"]),
+                onClick: _cache[0] || (_cache[0] = ($event) => handleCancel())
+              }, toDisplayString(unref(t)("el.datepicker.cancel")), 3),
+              createBaseVNode("button", {
+                type: "button",
+                class: normalizeClass([unref(nsTime).be("panel", "btn"), "confirm"]),
+                disabled: unref(btnConfirmDisabled),
+                onClick: _cache[1] || (_cache[1] = ($event) => handleConfirm())
+              }, toDisplayString(unref(t)("el.datepicker.confirm")), 11, _hoisted_1$z)
+            ], 2)
+          ], 2)) : createCommentVNode("v-if", true);
+        };
+      }
+    });
+    var TimeRangePanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$V, [["__file", "panel-time-range.vue"]]);
+    dayjs.extend(customParseFormat);
+    var TimePicker = /* @__PURE__ */ defineComponent({
+      name: "ElTimePicker",
+      install: null,
+      props: {
+        ...timePickerDefaultProps,
+        isRange: {
+          type: Boolean,
+          default: false
+        }
+      },
+      emits: ["update:modelValue"],
+      setup(props, ctx) {
+        const commonPicker = ref();
+        const [type, Panel] = props.isRange ? ["timerange", TimeRangePanel] : ["time", TimePickPanel];
+        const modelUpdater = (value) => ctx.emit("update:modelValue", value);
+        provide("ElPopperOptions", props.popperOptions);
+        ctx.expose({
+          focus: (e) => {
+            var _a2;
+            (_a2 = commonPicker.value) == null ? void 0 : _a2.handleFocusInput(e);
+          },
+          blur: (e) => {
+            var _a2;
+            (_a2 = commonPicker.value) == null ? void 0 : _a2.handleBlurInput(e);
+          },
+          handleOpen: () => {
+            var _a2;
+            (_a2 = commonPicker.value) == null ? void 0 : _a2.handleOpen();
+          },
+          handleClose: () => {
+            var _a2;
+            (_a2 = commonPicker.value) == null ? void 0 : _a2.handleClose();
+          }
+        });
+        return () => {
+          var _a2;
+          const format2 = (_a2 = props.format) != null ? _a2 : DEFAULT_FORMATS_TIME;
+          return createVNode(CommonPicker, mergeProps(props, {
+            "ref": commonPicker,
+            "type": type,
+            "format": format2,
+            "onUpdate:modelValue": modelUpdater
+          }), {
+            default: (props2) => createVNode(Panel, props2, null)
+          });
+        };
+      }
+    });
+    const _TimePicker = TimePicker;
+    _TimePicker.install = (app2) => {
+      app2.component(_TimePicker.name, _TimePicker);
+    };
+    const ElTimePicker = _TimePicker;
     var localeData$1 = { exports: {} };
     (function(module2, exports2) {
       !function(n, e) {
@@ -36035,7 +36443,52 @@ var require_index_001 = __commonJS({
             }
           }
         });
+        const handleShowSelect = (row) => {
+          row.showSelect = !row.showSelect;
+        };
+        const handleSelectChange = (row) => {
+          row.showSelect = false;
+        };
+        const getTagType = (value) => {
+          switch (value) {
+            case 0:
+              return "success";
+            case 1:
+              return "danger";
+            case 2:
+              return "warning";
+            default:
+              return "primary";
+          }
+        };
+        const getTagName = (value) => {
+          switch (value) {
+            case 0:
+              return "工作日";
+            case 1:
+              return "休息日";
+            case 2:
+              return "补班日";
+            default:
+              return "未知";
+          }
+        };
+        const options = [
+          {
+            value: 0,
+            label: "工作日"
+          },
+          {
+            value: 1,
+            label: "节假日"
+          },
+          {
+            value: 2,
+            label: "补班日"
+          }
+        ];
         const value3 = ref(0);
+        const width = ref("30%");
         const activities = ref([]);
         const currentPage = ref(1);
         const pageSize = ref(10);
@@ -36056,6 +36509,7 @@ var require_index_001 = __commonJS({
           formData.value.hideErrBtn = false;
           formData.value.showFooter = true;
           console.log("handleClick", tab.paneName);
+          width.value = "30%";
           switch (tab.paneName) {
             case "first":
               break;
@@ -36064,8 +36518,60 @@ var require_index_001 = __commonJS({
               break;
             case "thrid":
               formData.value.showFooter = false;
+              width.value = "50%";
               break;
           }
+        };
+        const handleChangeWorkTime = (row) => {
+          const loadings = showLoading("修改中...");
+          const body = {
+            mac: formData.value.client.mac,
+            day: row.date,
+            data: row
+          };
+          console.log("handleChangeWorkTime", body);
+          fetch("../api/work/update", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(body)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("handleChangeWorkTime", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+            showErrorTips("修改失败");
+          }).finally(() => {
+            loadings.close();
+          });
+        };
+        const handleDeleteWorkTime = (row) => {
+          const loadings = showLoading("修改中...");
+          const body = {
+            mac: formData.value.client.mac,
+            day: row.date
+          };
+          console.log("handleChangeWorkTime", body);
+          fetch("../api/work/del", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(body)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("handleChangeWorkTime", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+            showErrorTips("修改失败");
+          }).finally(() => {
+            loadings.close();
+          });
+        };
+        const defaultExpandedKeys = ref(["1001"]);
+        const handleExpandChange = (row, expanded) => {
+          console.log("展开状态变化:", row, "是否展开:", expanded);
         };
         function initOnWorkTime() {
           if (!formData.value.client) {
@@ -36078,8 +36584,8 @@ var require_index_001 = __commonJS({
             formData.value.client.nick.workType = {};
           }
         }
-        function handleChangeWorkTime(isOnWork) {
-          console.log("handleChangeWorkTime", value3.value, formData.value.client.mac);
+        function handleAddWorkTime(isOnWork) {
+          console.log("handleAddWorkTime", value3.value, formData.value.client.mac);
           const loadings = showLoading("补签申请中...");
           const row = {
             timestamp: value3.value,
@@ -36093,13 +36599,31 @@ var require_index_001 = __commonJS({
           }).then((res) => {
             return res.json();
           }).then((json) => {
-            console.log("handleChangeWorkTime", json);
+            console.log("handleAddWorkTime", json);
             showTips(json.code, json.msg);
           }).catch((error) => {
             console.log("error", error);
             showErrorTips("补签失败");
           }).finally(() => {
             loadings.close();
+          });
+        }
+        function fetchWorkEvent() {
+          const row = {
+            mac: formData.value.client.mac
+          };
+          fetch("../api/work/tigger", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(row)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("fetchWorkEvent", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+          }).finally(() => {
           });
         }
         function fetchWorkData() {
@@ -36113,8 +36637,7 @@ var require_index_001 = __commonJS({
           }).then((res) => {
             return res.json();
           }).then((json) => {
-            console.log("handleChangeWorkTime", json);
-            showTips(json.code, json.msg);
+            console.log("fetchWorkData", json);
             if (json.code === 0 && json.data) {
               activities.value = json.data;
             }
@@ -36250,7 +36773,13 @@ var require_index_001 = __commonJS({
           const _component_el_button = ElButton;
           const _component_el_popconfirm = ElPopconfirm;
           const _component_el_table_column = ElTableColumn;
+          const _component_el_time_picker = ElTimePicker;
           const _component_el_tag = ElTag;
+          const _component_el_option = ElOption;
+          const _component_el_select = ElSelect;
+          const _component_el_dropdown_item = ElDropdownItem;
+          const _component_el_dropdown_menu = ElDropdownMenu;
+          const _component_el_dropdown = ElDropdown;
           const _component_el_table = ElTable;
           const _component_el_pagination = ElPagination;
           const _component_el_tabs = ElTabs;
@@ -36260,7 +36789,7 @@ var require_index_001 = __commonJS({
               modal: true,
               "close-on-click-modal": true,
               "close-on-press-escape": true,
-              width: unref(isMobile)() ? "80%" : "30%",
+              width: unref(isMobile)() ? "80%" : width.value,
               modelValue: formData.value.show,
               "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => formData.value.show = $event),
               title: formData.value.title
@@ -36344,7 +36873,8 @@ var require_index_001 = __commonJS({
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_el_tab_pane, {
+                      formData.value.client.nick.workType.onWorkTime != "" ? (openBlock(), createBlock(_component_el_tab_pane, {
+                        key: 0,
                         label: "静态IP设置",
                         name: "second"
                       }, {
@@ -36387,7 +36917,7 @@ var require_index_001 = __commonJS({
                           })
                         ]),
                         _: 1
-                      }),
+                      })) : createCommentVNode("", true),
                       createVNode(_component_el_tab_pane, {
                         label: "统计",
                         name: "thrid"
@@ -36404,12 +36934,13 @@ var require_index_001 = __commonJS({
                               }, null, 8, ["modelValue"]),
                               createVNode(_component_el_popconfirm, {
                                 title: "确定补签上班吗?",
-                                onConfirm: _cache[9] || (_cache[9] = ($event) => handleChangeWorkTime(true))
+                                onConfirm: _cache[9] || (_cache[9] = ($event) => handleAddWorkTime(true))
                               }, {
                                 reference: withCtx(() => [
                                   createVNode(_component_el_button, {
                                     type: "primary",
-                                    style: { "margin-left": "10px" }
+                                    style: { "margin-left": "10px" },
+                                    plain: ""
                                   }, {
                                     default: withCtx(() => [
                                       createTextVNode("补签上班 ")
@@ -36421,12 +36952,13 @@ var require_index_001 = __commonJS({
                               }),
                               createVNode(_component_el_popconfirm, {
                                 title: "确定补签下班吗?",
-                                onConfirm: _cache[10] || (_cache[10] = ($event) => handleChangeWorkTime(false))
+                                onConfirm: _cache[10] || (_cache[10] = ($event) => handleAddWorkTime(false))
                               }, {
                                 reference: withCtx(() => [
                                   createVNode(_component_el_button, {
                                     type: "primary",
-                                    style: { "margin-left": "10px" }
+                                    style: { "margin-left": "10px" },
+                                    plain: ""
                                   }, {
                                     default: withCtx(() => [
                                       createTextVNode("补签下班 ")
@@ -36435,11 +36967,36 @@ var require_index_001 = __commonJS({
                                   })
                                 ]),
                                 _: 1
+                              }),
+                              createVNode(_component_el_button, {
+                                type: "warning",
+                                style: { "margin-left": "10px" },
+                                plain: "",
+                                onClick: fetchWorkData
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode("刷新 ")
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_el_button, {
+                                type: "warning",
+                                style: { "margin-left": "10px" },
+                                plain: "",
+                                onClick: fetchWorkEvent
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode("触发统计 ")
+                                ]),
+                                _: 1
                               })
                             ]),
                             createVNode(_component_el_table, {
                               data: paginatedTableData.value,
-                              border: ""
+                              border: "",
+                              "row-key": "id",
+                              "expand-row-keys": defaultExpandedKeys.value,
+                              onExpandChange: handleExpandChange
                             }, {
                               default: withCtx(() => [
                                 createVNode(_component_el_table_column, { type: "expand" }, {
@@ -36447,7 +37004,8 @@ var require_index_001 = __commonJS({
                                     createBaseVNode("div", _hoisted_5$1, [
                                       createVNode(_component_el_table, {
                                         data: props.row.workTime,
-                                        border: ""
+                                        border: "",
+                                        "row-key": "id"
                                       }, {
                                         default: withCtx(() => [
                                           createVNode(_component_el_table_column, {
@@ -36457,10 +37015,32 @@ var require_index_001 = __commonJS({
                                           createVNode(_component_el_table_column, {
                                             label: "上班",
                                             prop: "workTime1"
+                                          }, {
+                                            default: withCtx((scope) => [
+                                              createVNode(_component_el_time_picker, {
+                                                modelValue: scope.row.workTime1,
+                                                "onUpdate:modelValue": ($event) => scope.row.workTime1 = $event,
+                                                style: { "width": "100px" },
+                                                "arrow-control": "",
+                                                "value-format": "HH:mm:ss"
+                                              }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                            ]),
+                                            _: 1
                                           }),
                                           createVNode(_component_el_table_column, {
                                             label: "下班",
                                             prop: "workTime2"
+                                          }, {
+                                            default: withCtx((scope) => [
+                                              createVNode(_component_el_time_picker, {
+                                                modelValue: scope.row.workTime2,
+                                                "onUpdate:modelValue": ($event) => scope.row.workTime2 = $event,
+                                                style: { "width": "100px" },
+                                                "arrow-control": "",
+                                                "value-format": "HH:mm:ss"
+                                              }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                            ]),
+                                            _: 1
                                           }),
                                           createVNode(_component_el_table_column, {
                                             label: "加班时长",
@@ -36480,23 +37060,75 @@ var require_index_001 = __commonJS({
                                             prop: "isWeekDay"
                                           }, {
                                             default: withCtx((scope) => [
-                                              scope.row.isWeekDay ? (openBlock(), createBlock(_component_el_tag, {
+                                              !scope.row.showSelect ? (openBlock(), createBlock(_component_el_tag, {
                                                 key: 0,
-                                                type: "danger"
+                                                type: getTagType(scope.row.dayType),
+                                                onDblclick: ($event) => handleShowSelect(scope.row)
                                               }, {
                                                 default: withCtx(() => [
-                                                  createTextVNode("节假日 ")
+                                                  createTextVNode(toDisplayString(getTagName(scope.row.dayType)), 1)
                                                 ]),
-                                                _: 1
-                                              })) : (openBlock(), createBlock(_component_el_tag, {
+                                                _: 2
+                                              }, 1032, ["type", "onDblclick"])) : (openBlock(), createBlock(_component_el_select, {
                                                 key: 1,
-                                                type: "success"
+                                                modelValue: scope.row.dayType,
+                                                "onUpdate:modelValue": ($event) => scope.row.dayType = $event,
+                                                onChange: ($event) => handleSelectChange(scope.row)
                                               }, {
                                                 default: withCtx(() => [
-                                                  createTextVNode("工作日")
+                                                  (openBlock(), createElementBlock(Fragment, null, renderList(options, (item) => {
+                                                    return createVNode(_component_el_option, {
+                                                      label: item.label,
+                                                      key: item.label,
+                                                      value: item.value
+                                                    }, null, 8, ["label", "value"]);
+                                                  }), 64))
                                                 ]),
-                                                _: 1
-                                              }))
+                                                _: 2
+                                              }, 1032, ["modelValue", "onUpdate:modelValue", "onChange"]))
+                                            ]),
+                                            _: 1
+                                          }),
+                                          createVNode(_component_el_table_column, {
+                                            label: "操作",
+                                            max: "80",
+                                            fixed: "right",
+                                            align: "center"
+                                          }, {
+                                            default: withCtx(({ row }) => [
+                                              createVNode(_component_el_dropdown, {
+                                                size: "small",
+                                                "split-button": "",
+                                                type: "primary"
+                                              }, {
+                                                dropdown: withCtx(() => [
+                                                  createVNode(_component_el_dropdown_menu, null, {
+                                                    default: withCtx(() => [
+                                                      createVNode(_component_el_dropdown_item, {
+                                                        onClick: ($event) => handleDeleteWorkTime(row)
+                                                      }, {
+                                                        default: withCtx(() => [
+                                                          createTextVNode("删除")
+                                                        ]),
+                                                        _: 2
+                                                      }, 1032, ["onClick"])
+                                                    ]),
+                                                    _: 2
+                                                  }, 1024)
+                                                ]),
+                                                default: withCtx(() => [
+                                                  createVNode(_component_el_popconfirm, {
+                                                    title: "确定修改吗",
+                                                    onConfirm: ($event) => handleChangeWorkTime(row)
+                                                  }, {
+                                                    reference: withCtx(() => [
+                                                      createTextVNode(" 修改")
+                                                    ]),
+                                                    _: 2
+                                                  }, 1032, ["onConfirm"])
+                                                ]),
+                                                _: 2
+                                              }, 1024)
                                             ]),
                                             _: 1
                                           })
@@ -36515,10 +37147,23 @@ var require_index_001 = __commonJS({
                                   prop: "overtime",
                                   label: "累计时长",
                                   align: "center"
+                                }, {
+                                  default: withCtx((scope) => [
+                                    createVNode(_component_el_tag, {
+                                      type: "danger",
+                                      size: "large"
+                                    }, {
+                                      default: withCtx(() => [
+                                        createTextVNode(toDisplayString(scope.row.overtime), 1)
+                                      ]),
+                                      _: 2
+                                    }, 1024)
+                                  ]),
+                                  _: 1
                                 })
                               ]),
                               _: 1
-                            }, 8, ["data"]),
+                            }, 8, ["data", "expand-row-keys"]),
                             createVNode(_component_el_pagination, {
                               style: { "margin-top": "20px" },
                               "page-size": pageSize.value,
@@ -36578,7 +37223,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const ClientSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-3da6668f"]]);
+    const ClientSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-3603733a"]]);
     const _hoisted_1 = { id: "app" };
     const _hoisted_2 = { class: "grid-content header-color" };
     const _hoisted_3 = { class: "header-content" };
@@ -37184,4 +37829,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-4H0GXWwj.js.map
+//# sourceMappingURL=index-uWsvhS5Z.js.map

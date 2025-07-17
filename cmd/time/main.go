@@ -170,7 +170,7 @@ func tee5() {
 				OnWorkTime:  t1.UnixMilli(),
 				OffWorkTime: t3.UnixMilli(),
 				Weekday:     int(t3.Weekday()),
-				IsWeekDay:   t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday,
+				//IsWeekDay:   t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday,
 			}
 			day := t1.Format(time.DateOnly)
 			days[day] = &item
@@ -182,7 +182,7 @@ func tee5() {
 
 }
 
-func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkType) []*openwrt.Work {
+func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTypeSetting) []*openwrt.Work {
 	on := u.GetTime(workType.OnWorkTime, u.GetLocation())
 	off := u.GetTime(workType.OffWorkTime, u.GetLocation())
 	if on == nil || off == nil {
@@ -236,12 +236,12 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 							tempWorkTime.WorkTime1 = t1.Format(time.TimeOnly)
 							tempWorkTime.WorkTime2 = t2.Format(time.TimeOnly)
 							tempWorkTime.Weekday = int(t2.Weekday())
-							weekIndex := int(t1.Weekday())
-							isWeekDay := weekIndex == 0 || weekIndex == 6
-							tempWorkTime.IsWeekDay = isWeekDay
-							if isWeekDay && !ts.IsWeekDay {
-								tempWorkTime.IsWeekDay = !ts.IsWeekDay
-							}
+							//weekIndex := int(t1.Weekday())
+							//isWeekDay := weekIndex == 0 || weekIndex == 6
+							//tempWorkTime.IsWeekDay = isWeekDay
+							//if isWeekDay && !ts.IsWeekDay {
+							//	tempWorkTime.IsWeekDay = !ts.IsWeekDay
+							//}
 
 							onWorkTime := time.Date(t1.Year(), t1.Month(), t1.Day(), on.Hour(), on.Minute(), on.Second(), 0, t1.Location())
 							offWorkTime := time.Date(t1.Year(), t1.Month(), t1.Day(), off.Hour(), off.Minute(), off.Second(), 0, t1.Location())
@@ -333,7 +333,7 @@ func tee3() {
 	//	}
 	//	fmt.Println(u.TimestampToDateTime(status.Timestamp))
 	//}
-	data := groupTimestampsByDay(list, openwrt.WorkType{
+	data := groupTimestampsByDay(list, openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",
 	})
@@ -358,7 +358,7 @@ func tee6() {
 	statusDir := "/Users/uuxia/Downloads/192.168.1.1"
 	mac := "work"
 	tempFilePath := filepath.Join(statusDir, mac)
-	d, err := openwrt.GetWorkTime(mac, tempFilePath, &openwrt.WorkType{
+	d, err := openwrt.GetWorkTime(mac, tempFilePath, &openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",
 	})
@@ -372,7 +372,96 @@ func tee6() {
 		}
 	}
 }
+
+func tee7() {
+	mac := "5a:a7:22:62:3d:26"
+	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202507171747", mac)
+	d, err := openwrt.GetWorkTime(mac, tempFilePath, &openwrt.WorkTypeSetting{
+		OnWorkTime:  "09:00:00",
+		OffWorkTime: "18:30:00",
+	})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		jsonBytes, _ := json.MarshalIndent(d, "", " ")
+		fmt.Println(string(jsonBytes))
+		for _, work := range d {
+			fmt.Printf("%+v\n", work)
+		}
+	}
+}
+
+//	{
+//		"mac": "5a:a7:22:62:3d:26",
+//		"day": "2025-07-17",
+//			"data": {
+//			"date": "2025-07-17",
+//			"weekday": 4,
+//			"workTime1": "08:17:00",
+//			"workTime2": "08:00:00",
+//			"overWorkTimes": "1h0m0s",
+//			"dayType": 0
+//		}
+//	}
+func tee8() {
+	jsonStr := "{\n    \"mac\": \"5a:a7:22:62:3d:26\",\n    \"day\": \"2025-07-17\",\n    \"data\": {\n        \"date\": \"2025-07-17\",\n        \"weekday\": 4,\n        \"workTime1\": \"08:17:00\",\n        \"workTime2\": \"19:00:00\",\n        \"overWorkTimes\": \"1h0m0s\",\n        \"dayType\": 0\n    }\n}"
+	fmt.Println(jsonStr)
+
+	workDir := "/Users/uuxia/Downloads/192.168.1.1/202507171747"
+	//202507171747
+	var body struct {
+		Mac  string                 `json:"mac"`
+		Day  string                 `json:"day"`
+		Data map[string]interface{} `json:"data"`
+	}
+	json.Unmarshal([]byte(jsonStr), &body)
+	fmt.Println(body)
+
+	data := body.Data
+	day := body.Day
+	openwrt.TestSetWorkTime(false, body.Mac, workDir, body.Day, func(tempEntry *openwrt.WorkEntry) {
+		if v, ok := data["workTime1"]; ok {
+			if vv, okk := v.(string); okk {
+				t, err := u.AutoParse(fmt.Sprintf("%s %s", day, vv))
+				if err == nil && t != nil {
+					timestamp := t.UnixMilli()
+					if !u.IsMillisecondTimestamp(timestamp) {
+						timestamp *= 1000
+					}
+					tempEntry.OnWorkTime = timestamp
+				}
+			}
+		}
+		if v, ok := data["workTime2"]; ok {
+			if vv, okk := v.(string); okk {
+				t, err := u.AutoParse(fmt.Sprintf("%s %s", day, vv))
+				if err == nil && t != nil {
+					timestamp := t.UnixMilli()
+					if !u.IsMillisecondTimestamp(timestamp) {
+						timestamp *= 1000
+					}
+					tempEntry.OffWorkTime = timestamp
+				}
+			}
+		}
+		if v, ok := data["weekday"]; ok {
+			if vv, okk := v.(int); okk {
+				tempEntry.Weekday = vv
+			}
+		}
+		if v, ok := data["dayType"]; ok {
+			if vv, okk := v.(int); okk {
+				tempEntry.DayType = vv
+			}
+		}
+	})
+}
 func main() {
 	//tee5()
-	tee6()
+	//tee6()
+	tee7()
+	//tee8()
+	//day := "2025-07-17"
+	//d, _ := u.AutoParse(day)
+	//fmt.Println(d.Format("2006-01"))
 }

@@ -38,13 +38,13 @@ type Status struct {
 	IsWeekDay bool  `json:"isWeekDay"`
 }
 type NickEntry struct {
-	Name      string    `json:"name"`
-	IsPush    bool      `json:"isPush"`
-	MAC       string    `json:"mac"`
-	IP        string    `json:"ip"`
-	StartTime int64     `json:"starTime"`
-	Hostname  string    `json:"hostname"`
-	WorkType  *WorkType `json:"workType"`
+	Name      string           `json:"name"`
+	IsPush    bool             `json:"isPush"`
+	MAC       string           `json:"mac"`
+	IP        string           `json:"ip"`
+	StartTime int64            `json:"starTime"`
+	Hostname  string           `json:"hostname"`
+	WorkType  *WorkTypeSetting `json:"workType"`
 }
 type DHCPLease struct {
 	IP        string     `json:"ip"`  //DHCP 服务器分配给客户端的 IP

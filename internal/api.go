@@ -240,6 +240,33 @@ func (this *Api) AddWorkTime(w http.ResponseWriter, r *http.Request) {
 	res.Ok("添加成功")
 }
 
+func (this *Api) DelWorkTime(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[struct {
+		Mac string `json:"mac"`
+		Day string `json:"day"`
+	}](r)
+	if err != nil {
+		res.Err(err)
+		return
+	}
+	if body.Mac == "" {
+		res.Err(fmt.Errorf("mac is empty"))
+		return
+	}
+	if body.Day == "" {
+		res.Err(fmt.Errorf("Day is empty"))
+		return
+	}
+	err = openwrt.DelWorkTime(body.Mac, body.Day)
+	if err != nil {
+		res.Err(err)
+		return
+	}
+	res.Ok("删除成功")
+}
+
 func (this *Api) GetWorkTime(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)
@@ -265,6 +292,28 @@ func (this *Api) GetWorkTime(w http.ResponseWriter, r *http.Request) {
 	res.Object("获取成功", data)
 }
 
+func (this *Api) TiggerSignCardEvent(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[struct {
+		Mac string `json:"mac"`
+	}](r)
+	if err != nil {
+		res.Err(err)
+		return
+	}
+	if body.Mac == "" {
+		res.Err(fmt.Errorf("mac is empty"))
+		return
+	}
+	err = openwrt.GetInstance().NotifySignCardEvent(3, body.Mac, glog.Now())
+	if err != nil {
+		res.Err(err)
+		return
+	}
+	res.Ok("ok")
+}
+
 func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)
@@ -285,6 +334,7 @@ func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("Day is empty"))
 		return
 	}
+	glog.Printf("%+v\n", body)
 	err = openwrt.UpdatetWorkTime(body.Mac, body.Day, body.Data)
 	if err != nil {
 		res.Err(fmt.Errorf("UpdatetWorkTime err %v", err))

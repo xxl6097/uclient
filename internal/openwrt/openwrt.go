@@ -48,6 +48,19 @@ func (this *openWRT) init() {
 	this.initListenFsnotify()
 }
 
+func (this *openWRT) getDeviceName(macAddr string) (string, string) {
+	temp := this.clients[macAddr]
+	if temp != nil {
+		if temp.Nick != nil && temp.Nick.Name != "" {
+			return temp.Nick.Name, temp.IP
+		} else {
+			return temp.Hostname, temp.IP
+		}
+	} else {
+		return macAddr, ""
+	}
+}
+
 func (this *openWRT) printMessage(macAddr string, format string) {
 	temp := this.clients[macAddr]
 	if temp != nil {
@@ -174,7 +187,9 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 			this.fnWatcher()
 		}
 		if cls.Nick != nil {
-			err := sysLogUpdateWorkTime(macAddr, timestamp, cls.Nick.WorkType)
+			err := sysLogUpdateWorkTime(macAddr, timestamp, cls.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
+				this.NotifySignCardEvent(working, macAddress, t1)
+			})
 			if err != nil {
 				glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
 			}

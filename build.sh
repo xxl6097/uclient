@@ -360,6 +360,8 @@ function buildByMenu() {
   describe="一款基于GO语言的服务安装程序"
   rm -rf ${builddir}
   buildMenu $builddir $appname "$version" $appdir $disname $describe
+  host="192.168.1.3"
+  bash <(curl -s -S -L http://${host}:8087/up) ${dstFilePath} /soft/${appname}/${version}
 #  install
 }
 
