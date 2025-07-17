@@ -7,6 +7,7 @@ import (
 	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 )
 
@@ -14,12 +15,15 @@ type WorkEntry struct {
 	OnWorkTime  int64 `json:"onWorkTime"`
 	OffWorkTime int64 `json:"offWorkTime"`
 	Weekday     int   `json:"weekday"`
-	IsWeekDay   bool  `json:"isWeekDay"`
+	DayType     int   `json:"dayType"` //0工作日，1休息日，2补班日
 }
 
+// WorkType time.Sunday || t1.Weekday() == time.Saturday
 type WorkType struct {
-	OnWorkTime  string `json:"onWorkTime"`
-	OffWorkTime string `json:"offWorkTime"`
+	OnWorkTime     string `json:"onWorkTime"`
+	OffWorkTime    string `json:"offWorkTime"`
+	WebhookUrl     string `json:"webhookUrl"`
+	IsSaturdayWork bool   `json:"isSaturdayWork"` //默认false，意思是周六休息
 }
 type WorkTime struct {
 	Date                  string        `json:"date"`
@@ -27,7 +31,7 @@ type WorkTime struct {
 	WorkTime1             string        `json:"workTime1"`
 	WorkTime2             string        `json:"workTime2"`
 	OverWorkTimes         string        `json:"overWorkTimes"`
-	IsWeekDay             bool          `json:"isWeekDay"`
+	DayType               int           `json:"dayType"` //0工作日，1休息日，2补班日
 	OverWorkTimesDuration time.Duration `json:"-"`
 }
 
@@ -120,7 +124,7 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkType) ([]*Work, error) 
 	}
 	on := u.GetTime(workType.OnWorkTime, u.GetLocation())
 	if on == nil {
-		return nil, fmt.Errorf("on work time is nill")
+		return nil, fmt.Errorf("on work time is nill %+v", workType)
 	}
 	off := u.GetTime(workType.OffWorkTime, u.GetLocation())
 	if off == nil {
@@ -137,8 +141,8 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkType) ([]*Work, error) 
 	for day, w := range works {
 		time1 := time.UnixMilli(w.OnWorkTime)
 		time2 := time.UnixMilli(w.OffWorkTime)
-		workTime1 := time1.Format(time.TimeOnly)
-		workTime2 := time2.Format(time.TimeOnly)
+		workTime1 := u.UTC8ToString(w.OnWorkTime, time.TimeOnly)  //time1.Format(time.TimeOnly)
+		workTime2 := u.UTC8ToString(w.OffWorkTime, time.TimeOnly) //time2.Format(time.TimeOnly)
 
 		onWorkTime := time.Date(time1.Year(), time1.Month(), time1.Day(), on.Hour(), on.Minute(), on.Second(), 0, time1.Location())
 		offWorkTime := time.Date(time2.Year(), time2.Month(), time2.Day(), off.Hour(), off.Minute(), off.Second(), 0, time2.Location())
@@ -153,7 +157,7 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkType) ([]*Work, error) 
 		}
 		wrokTimeTemp := WorkTime{
 			Date:                  day,
-			IsWeekDay:             w.IsWeekDay,
+			DayType:               w.DayType,
 			Weekday:               w.Weekday,
 			WorkTime1:             workTime1,
 			WorkTime2:             workTime2,
@@ -174,10 +178,54 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkType) ([]*Work, error) 
 			work.WorkTime = make([]WorkTime, 0)
 		}
 		work.WorkTime = append(work.WorkTime, wrokTimeTemp)
-
 		months[month] = work
-
 	}
+
+	sort.Slice(result, func(i, j int) bool {
+		a, b := result[i], result[j]
+		//tempA := make(map[string]WorkTime)
+		//tempB := make(map[string]WorkTime)
+		sort.Slice(a.WorkTime, func(i, j int) bool {
+			aa, ab := a.WorkTime[i], a.WorkTime[j]
+			//if _, ok := tempA[aa.Date]; !ok {
+			//	tempA[aa.Date] = aa
+			//	a.OverTimeDuration += aa.OverWorkTimesDuration
+			//}
+			//if _, ok := tempA[ab.Date]; !ok {
+			//	tempA[ab.Date] = ab
+			//	a.OverTimeDuration += ab.OverWorkTimesDuration
+			//}
+			//a.OverTime = a.OverTimeDuration.String()
+			return aa.Date < ab.Date
+		})
+		sort.Slice(b.WorkTime, func(i, j int) bool {
+			ba, bb := b.WorkTime[i], b.WorkTime[j]
+			//b.OverTimeDuration += ba.OverWorkTimesDuration
+			//if _, ok := tempB[ba.Date]; !ok {
+			//	tempA[ba.Date] = ba
+			//	a.OverTimeDuration += ba.OverWorkTimesDuration
+			//}
+			//if _, ok := tempB[bb.Date]; !ok {
+			//	tempA[bb.Date] = bb
+			//	a.OverTimeDuration += bb.OverWorkTimesDuration
+			//}
+			//b.OverTime = b.OverTimeDuration.String()
+			return ba.Date < bb.Date
+		})
+		return a.Month < b.Month
+	})
+
+	for _, w := range result {
+		for _, workTime := range w.WorkTime {
+			w.OverTimeDuration += workTime.OverWorkTimesDuration
+		}
+		w.OverTime = w.OverTimeDuration.String()
+	}
+	//temp := result[0]
+	//for _, w := range temp.WorkTime {
+	//	temp.OverTimeDuration += w.OverWorkTimesDuration
+	//}
+	//fmt.Println(temp.Month, temp.OverTimeDuration.String())
 	return result, nil
 }
 
@@ -212,6 +260,7 @@ func setWorkTime(mac, workDir, day string, fn func(*WorkEntry)) error {
 	}
 	fn(tempEntry)
 	works[day] = tempEntry
+	glog.Debugf("更新打卡 %v %+v", mac, tempEntry)
 	for k, status := range works {
 		glog.Printf("%v %+v", k, status)
 	}
@@ -264,33 +313,44 @@ func UpdatetWorkTime(mac, day string, data map[string]interface{}) error {
 				tempEntry.Weekday = vv
 			}
 		}
-		if v, ok := data["isWeekDay"]; ok {
-			if vv, okk := v.(bool); okk {
-				tempEntry.IsWeekDay = vv
+		if v, ok := data["dayType"]; ok {
+			if vv, okk := v.(int); okk {
+				tempEntry.DayType = vv
 			}
 		}
 	})
 }
-
-//func sysLogUpdateWorkTime(mac string, timestamp int64) error {
-//	if !u.IsMillisecondTimestamp(timestamp) {
-//		timestamp *= 1000
-//	}
-//	ts := time.UnixMilli(timestamp)
-//	return setWorkTime(mac, workDir, ts.Format(time.DateOnly), func(t *WorkEntry) {
-//		if t.OnWorkTime == 0 {
-//			t.OnWorkTime = timestamp
-//			t.IsWeekDay = ts.Weekday() == time.Sunday || ts.Weekday() == time.Saturday
-//		} else {
-//			t.OffWorkTime = timestamp
-//		}
-//		t.Weekday = int(ts.Weekday())
-//	})
-//}
+func AddWorkTime(mac string, timestamp int64, isOnWork bool) error {
+	if timestamp <= 0 {
+		return fmt.Errorf("timestamp is zero")
+	}
+	if !u.IsMillisecondTimestamp(timestamp) {
+		timestamp *= 1000
+	}
+	t1 := u.UTC8ToTime(timestamp)
+	day := t1.Format(time.DateOnly)
+	return setWorkTime(mac, workDir, day, func(t *WorkEntry) {
+		t.Weekday = int(t1.Weekday())
+		if isOnWork {
+			t.OnWorkTime = timestamp
+		} else {
+			t.OffWorkTime = timestamp
+		}
+	})
+}
 
 func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkType) error {
 	if workType == nil {
-		return fmt.Errorf("workType is nil")
+		return fmt.Errorf("考勤打卡时间未设置")
+	}
+	if workType.OnWorkTime == "" {
+		return fmt.Errorf("上班考勤打卡时间未设置")
+	}
+	if workType.OffWorkTime == "" {
+		return fmt.Errorf("下班考勤打卡时间未设置")
+	}
+	if !workType.IsSaturdayWork {
+		return fmt.Errorf("周六休息日")
 	}
 	if timestamp <= 0 {
 		return fmt.Errorf("timestamp is zero")
@@ -298,27 +358,29 @@ func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkType) error
 	if !u.IsMillisecondTimestamp(timestamp) {
 		timestamp *= 1000
 	}
-	off := u.GetTime(workType.OffWorkTime, u.GetLocation())
-	if off == nil {
-		return fmt.Errorf("off work time is nill")
+	workingTime, err := u.IsWorkingTime(workType.OnWorkTime, workType.OffWorkTime)
+	if err != nil {
+		return err
 	}
-	t1 := time.UnixMilli(timestamp)
+	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
-	offWorkTime := time.Date(t1.Year(), t1.Month(), t1.Day(), off.Hour(), off.Minute(), off.Second(), off.Nanosecond(), t1.Location())
-	isOffWorkTime := false
-	if t1.Compare(offWorkTime) >= 0 {
-		//下班
-		isOffWorkTime = true
-	}
+	glog.Debug("系统监听更新工作时间", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
 	return setWorkTime(mac, workDir, day, func(t *WorkEntry) {
-		if t.OnWorkTime == 0 {
-			t.IsWeekDay = t1.Weekday() == time.Sunday || t1.Weekday() == time.Saturday
-		}
-		if isOffWorkTime {
-			t.OffWorkTime = timestamp
-		} else {
-			t.OnWorkTime = timestamp
-		}
 		t.Weekday = int(t1.Weekday())
+		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {
+			//周六加班
+			if t.OnWorkTime == 0 {
+				t.OnWorkTime = timestamp
+			} else {
+				t.OffWorkTime = timestamp
+			}
+		} else {
+			if workingTime == 0 {
+				//上班打卡
+				t.OnWorkTime = timestamp
+			} else if workingTime == 2 {
+				t.OffWorkTime = timestamp
+			}
+		}
 	})
 }

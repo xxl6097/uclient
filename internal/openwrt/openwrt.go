@@ -48,16 +48,29 @@ func (this *openWRT) init() {
 	this.initListenFsnotify()
 }
 
+func (this *openWRT) printMessage(macAddr string, format string) {
+	temp := this.clients[macAddr]
+	if temp != nil {
+		if temp.Nick != nil && temp.Nick.Name != "" {
+			glog.Printf(format, temp.Nick.Name)
+		} else {
+			glog.Printf(format, temp.Hostname)
+		}
+	} else {
+		glog.Printf(format, macAddr)
+	}
+}
+
 func (this *openWRT) initListenSysLog() {
 	err := listenSysLog(func(timestamp int64, macAddr string, phy string, status int, rawData string) {
 		switch status {
 		case 0:
-			glog.Debugf("设备【%s】断开了", macAddr)
+			this.printMessage("设备【%s】断开了", macAddr)
 			glog.Debug(rawData)
 			this.updateClientsBySysLog(timestamp, macAddr, phy, false)
 			break
 		case 1:
-			glog.Debugf("设备【%s】连上了", macAddr)
+			this.printMessage("设备【%s】连上了", macAddr)
 			glog.Debug(rawData)
 			this.updateClientsBySysLog(timestamp, macAddr, phy, true)
 			break
@@ -102,7 +115,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			glog.Debug("event:", event)
+			//glog.Debug("event:", event)
 			if event.Has(fsnotify.Write) {
 				//filePath := event.Name
 				if strings.EqualFold(event.Name, dhcpLeasesFilePath) {
@@ -155,7 +168,7 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 		cls.Phy = phy
 		cls.StartTime = timestamp
 		this.sysLogClientStatus[macAddr] = status
-		glog.Infof("updateClientsBySysLog:%v", cls)
+		glog.Infof("系统监听:%+v %v", cls, u.UTC8ToString(cls.StartTime, time.DateTime))
 		this.notifyWebhookMessage(cls)
 		if this.fnWatcher != nil {
 			this.fnWatcher()
@@ -169,7 +182,6 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 
 	}
 	this.updateStatusList(macAddr, []*Status{&s})
-
 }
 
 func (p *openWRT) updateClientsByDHCP() {
@@ -177,7 +189,7 @@ func (p *openWRT) updateClientsByDHCP() {
 	if err != nil {
 		glog.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
 	} else {
-		glog.Printf("DHCP更新客户端 %+v\n", len(clientArray))
+		//glog.Printf("DHCP更新客户端 %+v\n", len(clientArray))
 		arpMap, e1 := getClientsByArp(brLanString)
 		for _, client := range clientArray {
 			mac := client.MAC

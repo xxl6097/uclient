@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/ukey"
 	"github.com/xxl6097/uclient/internal/u"
 	"log"
@@ -253,7 +254,7 @@ func parseSysLog(data string) (int64, string, string, int) {
 	phy := parsePhy(data)
 	//timestamp := parseTime(data)
 	macAddr := parseMacAddr(data)
-	timestamp := time.Now().UnixMilli()
+	timestamp := glog.Now().UnixMilli() //time.Now().UnixMilli()
 	// 1. 检查字符串是否包含目标字段
 	if strings.Contains(data, apStaDisConnectString) { //AP-STA-DISCONNECTED
 		//glog.Printf("%s 设备【%s】连上了", timestamp, macAddr)

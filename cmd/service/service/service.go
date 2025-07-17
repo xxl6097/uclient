@@ -87,7 +87,7 @@ func (this *Service) GetAny(s2 string) []byte {
 func (this *Service) menu() []byte {
 	port := utils.InputIntDefault(fmt.Sprintf("输入服务端口(%d)：", 7000), 7000)
 	username := utils.InputStringEmpty(fmt.Sprintf("输入管理用户名(%s)：", "admin"), "admin")
-	password := utils.InputString(fmt.Sprintf("输入管理密码："))
+	password := utils.InputStringEmpty(fmt.Sprintf("输入管理密码(%s)：", "admin"), "admin")
 	cfg := &Config{ServerPort: port, Username: username, Password: password}
 	bb, e := ukey.StructToGob(cfg)
 	if e != nil {

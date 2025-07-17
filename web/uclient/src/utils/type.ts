@@ -1,7 +1,8 @@
-
 export interface WorkType {
   onWorkTime: string
   offWorkTime: string
+  webhookUrl: string
+  isSaturdayWork: boolean
 }
 
 export interface WorkTime {
@@ -32,9 +33,7 @@ export interface DHCPHost {
 }
 
 export interface NickEntry {
-  Name: string
   name: string
-  isPush: boolean
   mac: string
   ip: string
   starTime: string

@@ -24,10 +24,10 @@ func tee1() {
 		return
 	}
 	for _, status := range cfg {
-		fmt.Println(u.TimestampFormat(status.Timestamp))
+		fmt.Println(u.TimestampToDateTime(status.Timestamp))
 	}
-	fmt.Println("header", cfg[0].Timestamp, u.TimestampFormat(cfg[0].Timestamp))
-	fmt.Println("tailer", cfg[len(cfg)-1].Timestamp, u.TimestampFormat(cfg[len(cfg)-1].Timestamp))
+	fmt.Println("header", cfg[0].Timestamp, u.TimestampToDateTime(cfg[0].Timestamp))
+	fmt.Println("tailer", cfg[len(cfg)-1].Timestamp, u.TimestampToDateTime(cfg[len(cfg)-1].Timestamp))
 }
 
 func tee4() {
@@ -63,10 +63,10 @@ func getStatusByMac(mac string) []*openwrt.Status {
 	//		month = tempMonth
 	//		fmt.Println("\n==========================================>", tempMonth)
 	//	}
-	//	fmt.Println(u.TimestampFormat(status.Timestamp))
+	//	fmt.Println(u.TimestampToDateTime(status.Timestamp))
 	//}
-	//fmt.Println("header", cfg[0].Timestamp, u.TimestampFormat(cfg[0].Timestamp))
-	//fmt.Println("tailer", cfg[len(cfg)-1].Timestamp, u.TimestampFormat(cfg[len(cfg)-1].Timestamp))
+	//fmt.Println("header", cfg[0].Timestamp, u.TimestampToDateTime(cfg[0].Timestamp))
+	//fmt.Println("tailer", cfg[len(cfg)-1].Timestamp, u.TimestampToDateTime(cfg[len(cfg)-1].Timestamp))
 	return cfg
 }
 
@@ -331,7 +331,7 @@ func tee3() {
 	//		month = tempMonth
 	//		fmt.Println("\n==========================================>", tempMonth)
 	//	}
-	//	fmt.Println(u.TimestampFormat(status.Timestamp))
+	//	fmt.Println(u.TimestampToDateTime(status.Timestamp))
 	//}
 	data := groupTimestampsByDay(list, openwrt.WorkType{
 		OnWorkTime:  "09:00:00",
@@ -347,7 +347,7 @@ func tee3() {
 	//	for day, ts := range status {
 	//		fmt.Println(">>>>>>>>>", time.UnixMilli(day).Format(time.DateOnly), "<<<<<<<<")
 	//		for _, t := range ts {
-	//			fmt.Println("||", u.TimestampFormat(t), "||")
+	//			fmt.Println("||", u.TimestampToDateTime(t), "||")
 	//		}
 	//	}
 	//}
@@ -365,8 +365,11 @@ func tee6() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		jsonBytes, _ := json.MarshalIndent(d, "", " ")
-		fmt.Println(string(jsonBytes))
+		//jsonBytes, _ := json.MarshalIndent(d, "", " ")
+		//fmt.Println(string(jsonBytes))
+		for _, work := range d {
+			fmt.Printf("%+v\n", work)
+		}
 	}
 }
 func main() {

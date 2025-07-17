@@ -148,7 +148,40 @@ func IsMillisecondTimestamp(ts int64) bool {
 	return ts >= 1_000_000_000_000
 }
 
-func TimestampFormat(timestamp int64) string {
+func UTC8ToString(timestamp int64, layout string) string {
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
+	if IsMillisecondTimestamp(timestamp) {
+		if loc != nil {
+			return time.UnixMilli(timestamp).In(loc).Format(layout)
+		}
+		return time.UnixMilli(timestamp).Format(layout)
+	}
+	if loc != nil {
+		return time.Unix(timestamp, 0).In(loc).Format(layout)
+	}
+	return time.Unix(timestamp, 0).Format(layout)
+}
+func UTC8ToTime(timestamp int64) time.Time {
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
+	if IsMillisecondTimestamp(timestamp) {
+		if loc != nil {
+			return time.UnixMilli(timestamp).In(loc)
+		}
+		return time.UnixMilli(timestamp)
+	}
+	if loc != nil {
+		return time.Unix(timestamp, 0).In(loc)
+	}
+	return time.Unix(timestamp, 0)
+}
+
+func TimestampToDateTime(timestamp int64) string {
 	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
 	if err != nil {
 		loc = time.FixedZone("CST", 8*3600) // 东八区
@@ -202,7 +235,7 @@ func GetDay(timestamp int64) string {
 	if !IsMillisecondTimestamp(timestamp) {
 		timestamp *= 1000
 	}
-	return time.UnixMilli(timestamp * 1000).Format(time.DateOnly)
+	return UTC8ToString(timestamp, time.DateOnly)
 }
 
 func AutoParse(timeStr string) (*time.Time, error) {
@@ -228,14 +261,52 @@ func AutoParse(timeStr string) (*time.Time, error) {
 		time.TimeOnly,
 	}
 	for _, layout := range layouts {
-		loc, err := time.LoadLocation("Asia/Shanghai")
-		if err == nil {
-			t, e := time.ParseInLocation(layout, timeStr, loc) // 按北京时间解析
-			if e == nil {
-				return &t, nil // 解析成功
-			}
+		loc := GetLocation()
+		t, e := time.ParseInLocation(layout, timeStr, loc) // 按北京时间解析
+		if e == nil {
+			return &t, nil // 解析成功
 		}
-
 	}
 	return nil, fmt.Errorf("无法识别的格式")
+}
+
+// CompareTime 小于目标时间
+func CompareTime(now, target time.Time) int {
+	nowSeconds := now.Hour()*3600 + now.Minute()*60 + now.Second()
+	tarSeconds := target.Hour()*3600 + target.Minute()*60 + target.Second()
+	return nowSeconds - tarSeconds
+}
+
+// IsWorkingTime
+// 0：上班打卡
+// 1：工作时间，不能打卡
+// 2：下班打卡
+func IsWorkingTime(time1, time2 string) (int, error) {
+	t1, e1 := time.Parse(time.TimeOnly, time1)
+	if e1 != nil {
+		return -1, e1
+	}
+	t2, e2 := time.Parse(time.TimeOnly, time2)
+	if e2 != nil {
+		return -1, e2
+	}
+	now := glog.Now()
+	if CompareTime(now, t1) <= 0 {
+		//小于等于上班时间
+		return 0, nil
+	} else if CompareTime(now, t2) < 0 {
+		//工作时间内
+		return 1, nil
+	} else {
+		//大于等于下班时间
+		return 2, nil
+	}
+}
+
+func TestTimeParse(timestr string) error {
+	_, e1 := time.Parse(time.TimeOnly, timestr)
+	if e1 != nil {
+		return e1
+	}
+	return nil
 }

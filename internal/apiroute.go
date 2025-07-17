@@ -25,7 +25,7 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 
 	router.HandleFunc("/api/work/update", this.restApi.UpdatetWorkTime).Methods(http.MethodPost)
 	router.HandleFunc("/api/work/add", this.restApi.AddWorkTime).Methods(http.MethodPost)
-	router.HandleFunc("/api/work/get", this.restApi.AddWorkTime).Methods(http.MethodPost)
+	router.HandleFunc("/api/work/get", this.restApi.GetWorkTime).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/network/reset", this.restApi.ResetNetwork).Methods(http.MethodPost)
 

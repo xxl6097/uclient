@@ -24,9 +24,9 @@ func (this *openWRT) GetStatusByMac(mac string) []*Status {
 	}
 	sort.Slice(list, func(i, j int) bool {
 		//a := list[i]
-		//a.TimeLine = u.TimestampFormat(a.Timestamp)
+		//a.TimeLine = u.TimestampToDateTime(a.Timestamp)
 		//b := list[j]
-		//b.TimeLine = u.TimestampFormat(b.Timestamp)
+		//b.TimeLine = u.TimestampToDateTime(b.Timestamp)
 		return list[i].Timestamp > list[j].Timestamp
 	})
 	return list
@@ -154,22 +154,19 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) {
 	}
 	format := "#### %s \n - 名称：%s\n - IP地址：%s \n- Mac地址：%s \n- 时间：%s \n"
 	markdown["title"] = title
-	markdown["text"] = fmt.Sprintf(format, title, name, client.IP, client.MAC, u.TimestampFormat(client.StartTime))
+	markdown["text"] = fmt.Sprintf(format, title, name, client.IP, client.MAC, u.TimestampToDateTime(client.StartTime))
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
 	_ = WebHookMessage(this.webhookUrl, payload)
 }
 
-func (this *openWRT) AddWorkTime(mac string, timestamp int64) error {
-	if timestamp == 0 {
-		return fmt.Errorf("timestamp is zero")
-	}
+func (this *openWRT) GetWorkTime(mac string) ([]*Work, error) {
 	if mac == "" {
-		return fmt.Errorf("mac is empty")
+		return nil, fmt.Errorf("mac is empty")
 	}
 	if v, ok := this.clients[mac]; ok {
 		if v.Nick != nil {
-			return sysLogUpdateWorkTime(mac, timestamp, v.Nick.WorkType)
+			return getWorkTime(mac, v.Nick.WorkType)
 		}
 	}
-	return fmt.Errorf("client not found mac")
+	return nil, fmt.Errorf("client not found mac")
 }
