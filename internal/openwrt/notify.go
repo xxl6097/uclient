@@ -100,9 +100,9 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) error {
 		msg.DeviceName = client.Hostname
 	}
 	if client.Online {
-		msg.Title = fmt.Sprintf("%s上线啦", msg.DeviceName)
+		msg.Title = fmt.Sprintf("【%s】上线啦", msg.DeviceName)
 	} else {
-		msg.Title = fmt.Sprintf("%s离线了", msg.DeviceName)
+		msg.Title = fmt.Sprintf("【%s】离线了", msg.DeviceName)
 	}
 	return webhook.Notify(msg)
 }
