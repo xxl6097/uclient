@@ -51,8 +51,10 @@ func (this *openWRT) GetDeviceTimeLineDatas(tempFilePath string) []*DeviceTimeLi
 		b := u.UTC8ToTime(list[j].Timestamp)
 		du1 := t.Sub(a)
 		du2 := t.Sub(b)
-		list[i].Ago = du1.String()
-		list[j].Ago = du2.String()
+		ago1 := time.Duration(du1.Seconds()) * time.Second
+		ago2 := time.Duration(du2.Seconds()) * time.Second
+		list[i].Ago = ago1.String()
+		list[j].Ago = ago2.String()
 		list[i].DateTime = a.Format(time.DateTime)
 		list[j].DateTime = b.Format(time.DateTime)
 		return list[i].Timestamp > list[j].Timestamp

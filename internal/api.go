@@ -300,9 +300,9 @@ func (this *Api) GetWorkTime(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("GetWorkTime err %v", err))
 		return
 	}
-	for _, work := range data {
-		glog.Printf("%+v\n", work)
-	}
+	//for _, work := range data {
+	//	glog.Printf("%+v\n", work)
+	//}
 	res.Object("获取成功", data)
 }
 
@@ -348,7 +348,7 @@ func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("Day is empty"))
 		return
 	}
-	glog.Printf("%+v\n", body)
+	glog.Printf("修改 %+v\n", body)
 	err = openwrt.UpdatetWorkTime(body.Mac, body.Day, body.Data)
 	if err != nil {
 		res.Err(fmt.Errorf("UpdatetWorkTime err %v", err))

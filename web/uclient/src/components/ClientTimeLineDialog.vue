@@ -14,15 +14,15 @@
           align="center"
           fixed="left"
           :index="indexMethod"
-          width="50"
+          min-width="50"
         />
         <el-table-column
           prop="dateTime"
           label="时间"
-          width="170"
+          min-width="170"
           align="left"
         />
-        <el-table-column prop="ago" label="时长" align="left" width="195" />
+        <el-table-column prop="ago" label="时长" align="left" min-width="90" />
         <el-table-column
           prop="connected"
           label="状态"

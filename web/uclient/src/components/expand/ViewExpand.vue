@@ -65,12 +65,12 @@ ul .annotation-key {
 }
 
 .main {
-  margin-left: 60px;
+  margin-left: 0px;
 }
 
 @media screen and (max-width: 968px) {
   .main {
-    margin-left: 60px;
+    margin-left: 0px;
   }
 }
 </style>

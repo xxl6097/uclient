@@ -309,7 +309,6 @@ import {
   showTips,
 } from '../utils/utils.ts'
 import { ComponentSize, ElMessageBox, TabsPaneContext } from 'element-plus'
-// import { testSettingData } from '../utils/data.ts'
 
 const formData = ref({
   show: false,
@@ -355,6 +354,8 @@ const getTagType = (value: number) => {
       return 'danger'
     case 2:
       return 'warning'
+    case 3:
+      return 'warning'
     default:
       return 'primary'
   }
@@ -368,6 +369,8 @@ const getTagName = (value: number) => {
       return '休息日'
     case 2:
       return '补班日'
+    case 3:
+      return '加班日'
     default:
       return '未知'
   }
@@ -384,6 +387,10 @@ const options = [
   {
     value: 2,
     label: '补班日',
+  },
+  {
+    value: 3,
+    label: '加班日',
   },
 ]
 const value3 = ref<number>(0)

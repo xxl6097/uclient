@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/ukey"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
@@ -375,7 +376,7 @@ func tee6() {
 
 func tee7() {
 	mac := "5a:a7:22:62:3d:26"
-	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202507171747", mac)
+	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202507181533", mac)
 	d, err := openwrt.GetWorkTime(mac, tempFilePath, &openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",
@@ -386,9 +387,10 @@ func tee7() {
 		jsonBytes, _ := json.MarshalIndent(d, "", " ")
 		fmt.Println(string(jsonBytes))
 		for _, work := range d {
-			fmt.Printf("%+v\n", work)
+			fmt.Printf("%+v %+v\n", len(work.WorkTime), work)
 		}
 	}
+	fmt.Println("size", len(d))
 }
 
 //	{
@@ -407,7 +409,9 @@ func tee8() {
 	jsonStr := "{\n    \"mac\": \"5a:a7:22:62:3d:26\",\n    \"day\": \"2025-07-17\",\n    \"data\": {\n        \"date\": \"2025-07-17\",\n        \"weekday\": 4,\n        \"workTime1\": \"08:17:00\",\n        \"workTime2\": \"19:00:00\",\n        \"overWorkTimes\": \"1h0m0s\",\n        \"dayType\": 0\n    }\n}"
 	fmt.Println(jsonStr)
 
-	workDir := "/Users/uuxia/Downloads/192.168.1.1/202507171747"
+	jsonStr = "{\n    \"mac\": \"5a:a7:22:62:3d:26\",\n    \"day\": \"2025-07-12\",\n    \"data\": {\n        \"date\": \"2025-07-12\",\n        \"weekday\": 6,\n        \"workTime1\": \"06:28:00\",\n        \"workTime2\": \"14:42:00\",\n        \"overWorkTimes\": \"8h14m0s\",\n        \"dayType\": 2,\n        \"showSelect\": false\n    }\n}"
+
+	workDir := "/Users/uuxia/Downloads/192.168.1.1/202507181533"
 	//202507171747
 	var body struct {
 		Mac  string                 `json:"mac"`
@@ -444,15 +448,17 @@ func tee8() {
 				}
 			}
 		}
-		if v, ok := data["weekday"]; ok {
-			if vv, okk := v.(int); okk {
-				tempEntry.Weekday = vv
-			}
+		if floatVal, ok := data["weekday"].(float64); ok {
+			intVal := int(floatVal) // 显式转换为 int
+			tempEntry.Weekday = intVal
+		} else {
+			glog.Println("值非数字类型 weekday", data["weekday"])
 		}
-		if v, ok := data["dayType"]; ok {
-			if vv, okk := v.(int); okk {
-				tempEntry.DayType = vv
-			}
+		if floatVal, ok := data["dayType"].(float64); ok {
+			intVal := int(floatVal) // 显式转换为 int
+			tempEntry.DayType = intVal
+		} else {
+			glog.Println("值非数字类型 dayType", data["dayType"])
 		}
 	})
 }

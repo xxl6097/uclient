@@ -29,7 +29,8 @@ var (
 	workDir               = "/usr/local/openwrt/work"
 	nickFilePath          = "/usr/local/openwrt/nick"
 	webhookFilePath       = "/usr/local/openwrt/webhook"
-	MAX_SIZE              = 1000
+	MAX_SIZE              = 12000
+	MAX_WORK_SIZE         = 3600
 )
 
 type DeviceTimeLine struct {

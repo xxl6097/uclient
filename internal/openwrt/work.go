@@ -219,18 +219,18 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, 
 		months[month] = work
 	}
 
-	sort.Slice(result, func(i, j int) bool {
-		a, b := result[i], result[j]
-		//sort.Slice(a.WorkTime, func(i, j int) bool {
-		//	aa, ab := a.WorkTime[i], a.WorkTime[j]
-		//	return aa.Date < ab.Date
-		//})
-		//sort.Slice(b.WorkTime, func(i, j int) bool {
-		//	ba, bb := b.WorkTime[i], b.WorkTime[j]
-		//	return ba.Date < bb.Date
-		//})
-		return a.Month < b.Month
-	})
+	//sort.Slice(result, func(i, j int) bool {
+	//	a, b := result[i], result[j]
+	//	sort.Slice(a.WorkTime, func(i, j int) bool {
+	//		aa, ab := a.WorkTime[i], a.WorkTime[j]
+	//		return aa.Date < ab.Date
+	//	})
+	//	sort.Slice(b.WorkTime, func(i, j int) bool {
+	//		ba, bb := b.WorkTime[i], b.WorkTime[j]
+	//		return ba.Date < bb.Date
+	//	})
+	//	return a.Month < b.Month
+	//})
 
 	for _, w := range result {
 		sort.Slice(w.WorkTime, func(i, j int) bool {
@@ -242,6 +242,11 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, 
 		}
 		w.OverTime = w.OverTimeDuration.String()
 	}
+	sort.Slice(result, func(i, j int) bool {
+		a, b := result[i], result[j]
+		return a.Month < b.Month
+	})
+
 	//temp := result[0]
 	//for _, w := range temp.WorkTime {
 	//	temp.OverTimeDuration += w.OverWorkTimesDuration
@@ -291,9 +296,9 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) erro
 		delete(works, day)
 	}
 	glog.Debugf("更新打卡 %v %+v", mac, tempEntry)
-	for k, status := range works {
-		glog.Printf("%v %+v", k, status)
-	}
+	//for k, status := range works {
+	//	glog.Printf("%v %+v", k, status)
+	//}
 	content, err := ukey.StructToGob(works)
 	if err != nil {
 		return err
@@ -338,15 +343,18 @@ func UpdatetWorkTime(mac, day string, data map[string]interface{}) error {
 				}
 			}
 		}
-		if v, ok := data["weekday"]; ok {
-			if vv, okk := v.(int); okk {
-				tempEntry.Weekday = vv
-			}
+
+		if floatVal, ok := data["weekday"].(float64); ok {
+			intVal := int(floatVal) // 显式转换为 int
+			tempEntry.Weekday = intVal
+		} else {
+			glog.Println("值非数字类型 weekday", data["weekday"])
 		}
-		if v, ok := data["dayType"]; ok {
-			if vv, okk := v.(int); okk {
-				tempEntry.DayType = vv
-			}
+		if floatVal, ok := data["dayType"].(float64); ok {
+			intVal := int(floatVal) // 显式转换为 int
+			tempEntry.DayType = intVal
+		} else {
+			glog.Println("值非数字类型 dayType", data["dayType"])
 		}
 	})
 }
@@ -395,6 +403,9 @@ func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting
 	glog.Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
 	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
 		t.Weekday = int(t1.Weekday())
+		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {
+			t.DayType = 3
+		}
 		if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
 			if t.OnWorkTime == 0 {
 				t.OnWorkTime = timestamp

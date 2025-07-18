@@ -76,7 +76,18 @@
             min-width="130"
           >
             <template #default="props">
-              <el-text :type="props.row.online ? 'success' : 'none'"
+              <el-text
+                :type="
+                  props.row.online
+                    ? props.row.nick
+                      ? props.row.nick.workType
+                        ? props.row.nick.workType.webhookUrl !== ''
+                          ? 'warning'
+                          : 'success'
+                        : 'success'
+                      : 'success'
+                    : 'none'
+                "
                 >{{ getClientName(props.row) }}
               </el-text>
             </template>
@@ -613,6 +624,7 @@ function showNotifyMessage(cls: Client) {
         name = cls.nick.name
       }
     }
+
     if (name === '') {
       if (cls.online) {
         ElNotification({

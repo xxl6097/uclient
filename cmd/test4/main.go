@@ -50,7 +50,17 @@ func tee1() {
 		fmt.Println(line)
 	}
 }
+
+func tee2() {
+	t := glog.Now()
+	t1 := time.Date(t.Year(), t.Month(), t.Day(), rand.Intn(11), rand.Intn(60), 0, 0, time.Local)
+	sub := t.Sub(t1)
+	fmt.Println(sub.String())
+	du := time.Duration(sub.Seconds()) * time.Second
+	fmt.Println(du.String())
+}
 func main() {
 	//tee()
-	tee1()
+	//tee1()
+	tee2()
 }
