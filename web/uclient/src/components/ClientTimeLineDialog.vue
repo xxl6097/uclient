@@ -3,35 +3,32 @@
     :modal="true"
     :close-on-click-modal="true"
     :close-on-press-escape="true"
-    :width="isMobile() ? '80%' : '20%'"
+    :width="dialogWidth"
     v-model="showClientDialog"
     :title="title"
   >
     <div class="upgrade-popup-content">
-      <!--      <el-timeline style="max-width: 200px">-->
-      <!--        <el-timeline-item-->
-      <!--          v-for="(activity, index) in activities"-->
-      <!--          :key="index"-->
-      <!--          :color="activity.connected ? '#55f604' : 'red'"-->
-      <!--          :hollow="false"-->
-      <!--          :timestamp="formatToUTC8(activity.timestamp)"-->
-      <!--        >-->
-      <!--          <span :style="{ color: activity.connected ? '#55f604' : 'red' }">-->
-      <!--            {{ activity.connected ? '在线' : '离线' }}-{{-->
-      <!--              activities.length - index-->
-      <!--            }}-->
-      <!--          </span>-->
-      <!--        </el-timeline-item>-->
-      <!--      </el-timeline>-->
-
-      <el-table :data="paginatedTableData" style="width: 90%" border>
-        <el-table-column type="index" align="center" :index="indexMethod" />
-        <el-table-column prop="timestamp" label="时间" width="200">
-          <template #default="props">
-            {{ formatTimeStamp(props.row.timestamp) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="connected" label="状态" align="center">
+      <el-table :data="paginatedTableData" border>
+        <el-table-column
+          type="index"
+          align="center"
+          fixed="left"
+          :index="indexMethod"
+          width="50"
+        />
+        <el-table-column
+          prop="dateTime"
+          label="时间"
+          width="170"
+          align="left"
+        />
+        <el-table-column prop="ago" label="时长" align="left" width="195" />
+        <el-table-column
+          prop="connected"
+          label="状态"
+          fixed="right"
+          align="center"
+        >
           <template #default="scope">
             <el-tag v-if="scope.row.connected" type="success">在线</el-tag>
             <el-tag v-else type="danger">离线</el-tag>
@@ -40,16 +37,18 @@
       </el-table>
       <!-- 分页 -->
       <el-pagination
-        style="margin-top: 20px"
+        style="padding: 20px"
         v-model:page-size="pageSize"
         v-model:current-page="currentPage"
+        :pager-count="3"
         :page-sizes="[10, 20, 50, 100, 1000]"
-        layout="sizes,prev, pager, next"
+        :layout="responsiveLayout"
         background
         :size="size"
         :total="activities.length"
         @size-change="handleSizeChange"
         @current-change="handlePageChange"
+        :hide-on-single-page="true"
       />
     </div>
   </el-dialog>
@@ -57,19 +56,16 @@
 
 <script setup lang="ts">
 import { ref, defineExpose, computed } from 'vue'
-import { Client, Status } from '../utils/type.ts'
-import {
-  formatTimeStamp,
-  isMobile,
-  showErrorTips,
-  showTips,
-} from '../utils/utils.ts'
+import { Client, TimeLine } from '../utils/type.ts'
+import { showErrorTips, showTips } from '../utils/utils.ts'
 import { ComponentSize } from 'element-plus'
-
+//layout="sizes, prev, pager, next"
+// :layout="responsiveLayout"
+const responsiveLayout = ref('sizes, prev, pager, next') // 默认移动端布局
 const showClientDialog = ref(false)
 const title = ref<string>()
 
-const activities = ref<Status[]>([])
+const activities = ref<TimeLine[]>([])
 const currentPage = ref<number>(1)
 const pageSize = ref<number>(10)
 const size = ref<ComponentSize>('default')
@@ -78,13 +74,45 @@ const indexMethod = (index: number) => {
     activities.value.length - (index + (currentPage.value - 1) * pageSize.value)
   )
 }
+const dialogWidth = ref('80%')
+
 // 分页后的表格数
-const paginatedTableData = computed<Status[]>(() => {
+const paginatedTableData = computed<TimeLine[]>(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
   return activities.value.slice(start, end)
 })
-// // 分页切换
+
+const updateLayout = () => {
+  const width = window.innerWidth
+  console.log('====>updateLayout', width)
+  if (width < 640) {
+    // 小屏：简化布局
+    responsiveLayout.value = 'prev, pager, next'
+    dialogWidth.value = '80%'
+  } else if (width < 1024) {
+    // 中屏：增加跳转功能
+    responsiveLayout.value = 'prev, pager, next'
+    dialogWidth.value = '60%'
+  } else {
+    responsiveLayout.value = 'sizes, prev, pager, next, jumper'
+    if (width < 1500) {
+      dialogWidth.value = '40%'
+      if (width < 1280) {
+        dialogWidth.value = '45%'
+      }
+      if (width < 1140) {
+        dialogWidth.value = '48%'
+      }
+      if (width < 1080) {
+        dialogWidth.value = '50%'
+      }
+    } else {
+      dialogWidth.value = '35%'
+    }
+  }
+}
+// 分页切换
 const handlePageChange = (page: number) => {
   currentPage.value = page
 }
@@ -112,8 +140,8 @@ function fetchData(mac: string) {
     .catch((error) => {
       console.log('获取失败', error)
       showErrorTips('获取失败')
-      // showClientDialog.value = true
-      // activities.value = testData
+      showClientDialog.value = true
+      // activities.value = testTimeLine
     })
 }
 
@@ -128,96 +156,21 @@ function getTitle(row: Client): string {
 const openClientDetailDialog = (row: Client) => {
   console.log('打开对话框，row:', row)
   title.value = `${getTitle(row)}状态时间表`
+  updateLayout()
   // showClientDialog.value = true
   // activities.value = row.statusList
   fetchData(row.mac)
 }
-//
-// const testData = [
-//   {
-//     timestamp: 1752496014739,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752496013636,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752481034289,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752481032218,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752481018359,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752481018010,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752480934839,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752480923056,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752480907559,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752480905838,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752479583858,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752479583421,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752471812870,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752471803144,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752460403098,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752460329154,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752329802,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752303218,
-//     connected: false,
-//   },
-//   {
-//     timestamp: 1752270729,
-//     connected: true,
-//   },
-//   {
-//     timestamp: 1752265674,
-//     connected: true,
-//   },
-// ]
+
+const updateDialogWidth = () => {
+  console.log('打开对话框，updateDialogWidth')
+  updateLayout()
+}
+
 // 暴露方法供父组件调用
 defineExpose({
   openClientDialog: openClientDetailDialog,
+  updateDialogWidth: updateDialogWidth,
 })
 </script>
 <style scoped>
@@ -226,16 +179,16 @@ defineExpose({
   margin: 0;
 }
 
+.upgrade-popup-footer button {
+  margin-left: 10px;
+}
+
 .upgrade-popup-content {
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
-  display: grid;
+  display: block;
   place-items: center; /* 水平与垂直居中 */
-}
-
-.upgrade-popup-footer button {
-  margin-left: 10px;
 }
 
 .log-container {

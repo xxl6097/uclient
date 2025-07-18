@@ -212,6 +212,7 @@ import ViewExpand from './components/expand/ViewExpand.vue'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
+import { ElNotification } from 'element-plus'
 
 const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<
@@ -580,6 +581,9 @@ const dialogWidth = ref('500px')
 const updateDialogWidth = () => {
   checkMobile()
   dialogWidth.value = mobileLayout.value ? '90%' : '500px'
+  if (clientTimeLineDialogRef.value) {
+    clientTimeLineDialogRef.value.updateDialogWidth()
+  }
 }
 
 const connectSSE = () => {
@@ -591,9 +595,53 @@ const connectSSE = () => {
       console.log('update', data)
       renderTable(data)
     })
+    source.value.addEventListener('update-one', (data) => {
+      console.log('update-one', data)
+      showNotifyMessage(data)
+    })
     source.value.connect()
   } catch (e) {
     console.error('connectSSE err', e)
+  }
+}
+
+function showNotifyMessage(cls: Client) {
+  if (cls) {
+    let name = ''
+    if (cls.nick) {
+      if (cls.nick.name !== '') {
+        name = cls.nick.name
+      }
+    }
+    if (name === '') {
+      if (cls.online) {
+        ElNotification({
+          title: `未知设备上线了`,
+          message: `mac地址:${cls.mac}`,
+          type: 'success',
+        })
+      } else {
+        ElNotification({
+          title: `未知设备离线了`,
+          message: `mac地址:${cls.mac}`,
+          type: 'warning',
+        })
+      }
+    } else {
+      if (cls.online) {
+        ElNotification({
+          title: `${name}上线了`,
+          message: `mac地址:${cls.mac}`,
+          type: 'success',
+        })
+      } else {
+        ElNotification({
+          title: `${name}离线了`,
+          message: `mac地址:${cls.mac}`,
+          type: 'warning',
+        })
+      }
+    }
   }
 }
 

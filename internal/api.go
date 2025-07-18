@@ -10,6 +10,7 @@ import (
 	"github.com/xxl6097/uclient/internal/sse"
 	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
+	"path/filepath"
 	"sync"
 )
 
@@ -31,6 +32,7 @@ func NewApi(igs igs.Service) *Api {
 		},
 	}
 	openwrt.GetInstance().Listen(a.listen)
+	openwrt.GetInstance().ListenOne(a.notifySSEEvent)
 	return a
 }
 
@@ -39,6 +41,16 @@ func (this *Api) listen(list []*openwrt.DHCPLease) {
 		eve := iface.SSEEvent{
 			Event:   "update",
 			Payload: list,
+		}
+		this.sseApi.Broadcast(eve)
+	}
+}
+
+func (this *Api) notifySSEEvent(cls *openwrt.DHCPLease) {
+	if cls != nil && this.sseApi != nil {
+		eve := iface.SSEEvent{
+			Event:   "update-one",
+			Payload: cls,
 		}
 		this.sseApi.Broadcast(eve)
 	}
@@ -74,7 +86,9 @@ func (this *Api) GetStatus(w http.ResponseWriter, r *http.Request) {
 		res.Error("mac地址空～")
 		return
 	}
-	list := openwrt.GetInstance().GetStatusByMac(mac)
+
+	tempFilePath := filepath.Join(openwrt.StatusDir, mac)
+	list := openwrt.GetInstance().GetDeviceTimeLineDatas(tempFilePath)
 	if list == nil {
 		res.Ok("暂无数据")
 	} else {

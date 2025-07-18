@@ -19,15 +19,20 @@
                     placeholder="请输入设备名称"
                   />
                 </el-form-item>
-                <el-form-item label="推送地址：">
-                  <el-input
-                    v-model="formData.client.nick.workType.webhookUrl"
-                  ></el-input>
+                <el-form-item label="状态通知：">
+                  <el-checkbox
+                    v-model="formData.client.nick.isPush"
+                  ></el-checkbox>
                 </el-form-item>
                 <el-form-item label="周六加班：">
                   <el-checkbox
                     v-model="formData.client.nick.workType.isSaturdayWork"
                   ></el-checkbox>
+                </el-form-item>
+                <el-form-item label="推送地址：">
+                  <el-input
+                    v-model="formData.client.nick.workType.webhookUrl"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="统计考勤：">
                   <div style="display: flex; align-items: center">
@@ -85,7 +90,7 @@
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="统计" name="thrid">
+            <el-tab-pane label="统计" name="thrid" v-if="activities.length > 0">
               <div>
                 <div style="margin-bottom: 10px">
                   <el-date-picker
@@ -222,8 +227,8 @@
                                   <el-dropdown-menu>
                                     <el-dropdown-item
                                       @click="handleDeleteWorkTime(row)"
-                                      >删除</el-dropdown-item
-                                    >
+                                      >删除
+                                    </el-dropdown-item>
                                   </el-dropdown-menu>
                                 </template>
                               </el-dropdown>
@@ -268,7 +273,7 @@
         <el-button
           type="danger"
           v-if="formData.hideErrBtn"
-          :loading="formData.loading"
+          :loading="formData.deleteloading"
           :loading-icon="Eleme"
           @click="handleDeleteStaticIp"
           >{{ formData.loading ? '删除中...' : '删除' }}
@@ -308,6 +313,7 @@ import { ComponentSize, ElMessageBox, TabsPaneContext } from 'element-plus'
 
 const formData = ref({
   show: false,
+  deleteloading: false,
   loading: false,
   activeName: 'first',
   hideErrBtn: false,
@@ -323,6 +329,7 @@ const formData = ref({
     ip: '',
     mac: '',
     nick: {
+      isPush: false,
       workType: {
         onWorkTime: '',
         offWorkTime: '',
@@ -579,6 +586,7 @@ function fetchWorkData() {
 const handleNickSetting = () => {
   const row = {
     name: formData.value.client.nick.name,
+    isPush: formData.value.client.nick.isPush,
     starTime: formData.value.client.starTime,
     mac: formData.value.client.mac,
     ip: formData.value.client.ip,
@@ -615,7 +623,7 @@ const handleDeleteStaticIp = () => {
   console.log('handleDeleteStaticIp', formData.value.client.mac)
   const mac = formData.value.client.mac
   const name = formData.value.client.hostname
-  formData.value.loading = true
+  formData.value.deleteloading = true
   ElMessageBox.confirm(`确定删除【${name}】静态IP吗?`, 'Warning', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -640,7 +648,7 @@ const handleDeleteStaticIp = () => {
         })
         .finally(() => {
           loader.close()
-          formData.value.loading = false
+          formData.value.deleteloading = false
           hideDialog()
         })
     })

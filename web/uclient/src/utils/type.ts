@@ -27,6 +27,13 @@ export interface Status {
   connected: boolean
 }
 
+export interface TimeLine {
+  timestamp: number
+  dateTime: string
+  ago: string
+  connected: boolean
+}
+
 export interface DHCPHost {
   index: string
   hostname: string
@@ -40,6 +47,7 @@ export interface NickEntry {
   ip: string
   starTime: string
   hostname: string
+  isPush: boolean
   workType: WorkType
 }
 

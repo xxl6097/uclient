@@ -25,17 +25,23 @@ var (
 	brLanString           = "br-lan"
 	apStaDisConnectString = "AP-STA-DISCONNECTED"
 	apStaConnectString    = "AP-STA-CONNECTED"
-	statusDir             = "/usr/local/openwrt/status"
+	StatusDir             = "/usr/local/openwrt/status"
 	workDir               = "/usr/local/openwrt/work"
 	nickFilePath          = "/usr/local/openwrt/nick"
 	webhookFilePath       = "/usr/local/openwrt/webhook"
 	MAX_SIZE              = 1000
 )
 
+type DeviceTimeLine struct {
+	DateTime  string `json:"dateTime"`
+	Timestamp int64  `json:"timestamp"`
+	Connected bool   `json:"connected"`
+	Ago       string `json:"ago"`
+}
+
 type Status struct {
 	Timestamp int64 `json:"timestamp"`
 	Connected bool  `json:"connected"`
-	IsWeekDay bool  `json:"isWeekDay"`
 }
 type NickEntry struct {
 	Name      string           `json:"name"`
@@ -538,8 +544,8 @@ func getStatusByMac(mac string) []*Status {
 	if mac == "" {
 		return nil
 	}
-	_ = u.CheckDirector(statusDir)
-	tempFilePath := filepath.Join(statusDir, mac)
+	_ = u.CheckDirector(StatusDir)
+	tempFilePath := filepath.Join(StatusDir, mac)
 	//byteArray, err := os.ReadFile(tempFilePath)
 	//if err != nil {
 	//	return nil
@@ -550,6 +556,22 @@ func getStatusByMac(mac string) []*Status {
 	//	return nil
 	//}
 	return readStatusByMac(tempFilePath)
+}
+
+func readTimeLineByMac(tempFilePath string) []*DeviceTimeLine {
+	if tempFilePath == "" {
+		return nil
+	}
+	byteArray, err := os.ReadFile(tempFilePath)
+	if err != nil {
+		return nil
+	}
+	var cfg []*DeviceTimeLine
+	err = ukey.GobToStruct(byteArray, &cfg)
+	if err != nil {
+		return nil
+	}
+	return cfg
 }
 
 func readStatusByMac(tempFilePath string) []*Status {
@@ -581,8 +603,8 @@ func setStatusByMac(mac string, statusList []*Status) error {
 		return err
 	}
 
-	_ = u.CheckDirector(statusDir)
-	tempFilePath := filepath.Join(statusDir, mac)
+	_ = u.CheckDirector(StatusDir)
+	tempFilePath := filepath.Join(StatusDir, mac)
 	file, err := os.Create(tempFilePath) // 文件不存在则创建，存在则截断
 	if err != nil {
 		return err

@@ -65,6 +65,7 @@ func (this *Service) OnVersion() string {
 }
 
 func (this *Service) OnRun(service igs.Service) error {
+	defer glog.GlobalRecover()
 	this.gs = service
 	cfg, err := load()
 	if err != nil {

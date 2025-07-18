@@ -5,6 +5,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
+	"github.com/xxl6097/uclient/internal/webhook"
 	"strings"
 	"sync"
 	"time"
@@ -21,6 +22,7 @@ type openWRT struct {
 	sysLogClientStatus map[string]bool
 	mu                 sync.RWMutex
 	fnWatcher          func()
+	fnNewOne           func(*DHCPLease)
 	webhookUrl         string
 }
 
@@ -175,28 +177,48 @@ func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy 
 		Timestamp: timestamp,
 		Connected: status,
 	}
-
+	this.updateStatusList(macAddr, []*Status{&s})
 	if cls, ok := this.clients[macAddr]; ok {
 		cls.Online = status
 		cls.Phy = phy
 		cls.StartTime = timestamp
 		this.sysLogClientStatus[macAddr] = status
 		glog.Infof("系统监听:%+v %v", cls, u.UTC8ToString(cls.StartTime, time.DateTime))
-		this.notifyWebhookMessage(cls)
+		_ = this.notifyWebhookMessage(cls)
 		if this.fnWatcher != nil {
 			this.fnWatcher()
 		}
 		if cls.Nick != nil {
 			err := sysLogUpdateWorkTime(macAddr, timestamp, cls.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
-				this.NotifySignCardEvent(working, macAddress, t1)
+				_ = this.NotifySignCardEvent(working, macAddress, t1)
 			})
 			if err != nil {
 				glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
 			}
 		}
-
+		if this.fnNewOne != nil {
+			this.fnNewOne(cls)
+		}
+	} else {
+		if this.fnNewOne != nil {
+			this.fnNewOne(&DHCPLease{
+				MAC:       macAddr,
+				StartTime: timestamp,
+				Online:    status,
+			})
+		}
+		t := u.UTC8ToTime(timestamp)
+		title := fmt.Sprintf("未知设备上线")
+		if !status {
+			title = "未知设备离线"
+		}
+		_ = webhook.Notify(webhook.WebHookMessage{
+			Url:        this.webhookUrl,
+			MacAddress: macAddr,
+			TimeNow:    &t,
+			Title:      title,
+		})
 	}
-	this.updateStatusList(macAddr, []*Status{&s})
 }
 
 func (p *openWRT) updateClientsByDHCP() {

@@ -7,12 +7,20 @@ import (
 	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"sort"
+	"time"
 )
 
 func (this *openWRT) Listen(fn func([]*DHCPLease)) {
 	this.fnWatcher = func() {
 		if fn != nil {
 			fn(this.GetClients())
+		}
+	}
+}
+func (this *openWRT) ListenOne(fn func(*DHCPLease)) {
+	this.fnNewOne = func(cls *DHCPLease) {
+		if fn != nil {
+			fn(cls)
 		}
 	}
 }
@@ -27,6 +35,26 @@ func (this *openWRT) GetStatusByMac(mac string) []*Status {
 		//a.TimeLine = u.TimestampToDateTime(a.Timestamp)
 		//b := list[j]
 		//b.TimeLine = u.TimestampToDateTime(b.Timestamp)
+		return list[i].Timestamp > list[j].Timestamp
+	})
+	return list
+}
+
+func (this *openWRT) GetDeviceTimeLineDatas(tempFilePath string) []*DeviceTimeLine {
+	list := readTimeLineByMac(tempFilePath)
+	if list == nil || len(list) == 0 {
+		return nil
+	}
+	t := glog.Now()
+	sort.Slice(list, func(i, j int) bool {
+		a := u.UTC8ToTime(list[i].Timestamp)
+		b := u.UTC8ToTime(list[j].Timestamp)
+		du1 := t.Sub(a)
+		du2 := t.Sub(b)
+		list[i].Ago = du1.String()
+		list[j].Ago = du2.String()
+		list[i].DateTime = a.Format(time.DateTime)
+		list[j].DateTime = b.Format(time.DateTime)
 		return list[i].Timestamp > list[j].Timestamp
 	})
 	return list
@@ -125,38 +153,6 @@ func (this *openWRT) GetWebHook() string {
 		return ""
 	}
 	return string(data)
-}
-
-func (this *openWRT) notifyWebhookMessage(client *DHCPLease) {
-	if this.webhookUrl == "" {
-		return
-	}
-	if client == nil {
-		return
-	}
-	if client.Nick == nil {
-		return
-	}
-	if !client.Nick.IsPush {
-		return
-	}
-	markdown := make(map[string]interface{})
-	var name, title string
-	if client.Nick != nil && client.Nick.Name != "" {
-		name = client.Nick.Name
-	} else {
-		name = client.Hostname
-	}
-	if client.Online {
-		title = fmt.Sprintf("%s上线啦", name)
-	} else {
-		title = fmt.Sprintf("%s离线了", name)
-	}
-	format := "#### %s \n - 名称：%s\n - IP地址：%s \n- Mac地址：%s \n- 时间：%s \n"
-	markdown["title"] = title
-	markdown["text"] = fmt.Sprintf(format, title, name, client.IP, client.MAC, u.TimestampToDateTime(client.StartTime))
-	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
-	_ = WebHookMessage(this.webhookUrl, payload)
 }
 
 func (this *openWRT) GetWorkTime(mac string) ([]*Work, error) {
