@@ -31,30 +31,52 @@ func NewApi(igs igs.Service) *Api {
 			New: func() interface{} { return make([]byte, 32*1024) },
 		},
 	}
-	openwrt.GetInstance().Listen(a.listen)
-	openwrt.GetInstance().ListenOne(a.notifySSEEvent)
+	openwrt.GetInstance().SetFunc(func(dataType int, obj any) {
+		if obj != nil && sseApi != nil {
+			eve := iface.SSEEvent{
+				Payload: obj,
+			}
+			switch dataType {
+			case 0:
+				eve.Event = "updateAll"
+				break
+			case 1:
+				eve.Event = "updateOne"
+				break
+			case 2:
+				eve.Event = "showNotify"
+				break
+
+			}
+			sseApi.Broadcast(eve)
+		}
+	})
 	return a
 }
 
-func (this *Api) listen(list []*openwrt.DHCPLease) {
-	if len(list) >= 0 && this.sseApi != nil {
-		eve := iface.SSEEvent{
-			Event:   "update",
-			Payload: list,
-		}
-		this.sseApi.Broadcast(eve)
-	}
-}
-
-func (this *Api) notifySSEEvent(cls *openwrt.DHCPLease) {
-	if cls != nil && this.sseApi != nil {
-		eve := iface.SSEEvent{
-			Event:   "update-one",
-			Payload: cls,
-		}
-		this.sseApi.Broadcast(eve)
-	}
-}
+//func (this *Api) listen(list []*openwrt.DHCPLease) {
+//	if len(list) >= 0 && this.sseApi != nil {
+//		eve := iface.SSEEvent{
+//			Event:   "update",
+//			Payload: list,
+//		}
+//		this.sseApi.Broadcast(eve)
+//	}
+//}
+//
+//func (this *Api) eventFunc(dataType int, obj any) {
+//	if obj != nil && this.sseApi != nil {
+//		eve := iface.SSEEvent{
+//			Event:   "update-one",
+//			Payload: obj,
+//		}
+//		if dataType == 2 {
+//			eve.Event = "update-status"
+//		}
+//
+//		this.sseApi.Broadcast(eve)
+//	}
+//}
 
 func (this *Api) GetClients(w http.ResponseWriter, r *http.Request) {
 	//req := utils.GetReqMapData(w, r)

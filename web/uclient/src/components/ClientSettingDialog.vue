@@ -276,7 +276,7 @@
           :loading="formData.deleteloading"
           :loading-icon="Eleme"
           @click="handleDeleteStaticIp"
-          >{{ formData.loading ? '删除中...' : '删除' }}
+          >{{ formData.deleteloading ? '删除中...' : '删除' }}
         </el-button>
         <el-button
           type="primary"

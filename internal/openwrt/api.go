@@ -10,17 +10,25 @@ import (
 	"time"
 )
 
-func (this *openWRT) Listen(fn func([]*DHCPLease)) {
-	this.fnWatcher = func() {
+//	func (this *openWRT) Listen(fn func([]*DHCPLease)) {
+//		this.fnWatcher = func() {
+//			if fn != nil {
+//				fn(this.GetClients())
+//			}
+//		}
+//	}
+//func (this *openWRT) ListenOne(fn func(int, *DHCPLease)) {
+//	this.fnNewOne = func(dataType int, cls *DHCPLease) {
+//		if fn != nil {
+//			fn(dataType, cls)
+//		}
+//	}
+//}
+
+func (this *openWRT) SetFunc(fn func(int, any)) {
+	this.fnEvent = func(i int, obj any) {
 		if fn != nil {
-			fn(this.GetClients())
-		}
-	}
-}
-func (this *openWRT) ListenOne(fn func(*DHCPLease)) {
-	this.fnNewOne = func(cls *DHCPLease) {
-		if fn != nil {
-			fn(cls)
+			fn(i, obj)
 		}
 	}
 }
@@ -100,16 +108,16 @@ func (this *openWRT) UpdateNickName(obj *NickEntry) error {
 	if v, okk := this.clients[mac]; okk {
 		v.Nick = nick
 	}
-	if this.fnWatcher != nil {
-		this.fnWatcher()
+	if this.fnEvent != nil {
+		this.fnEvent(0, this.GetClients())
 	}
 	return updateNickData(mac, nick)
 }
 
 func (this *openWRT) ResetClients() {
 	this.initClients()
-	if this.fnWatcher != nil {
-		this.fnWatcher()
+	if this.fnEvent != nil {
+		this.fnEvent(0, this.GetClients())
 	}
 }
 

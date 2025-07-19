@@ -257,7 +257,7 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, 
 
 func getWorkTime(mac string, workType *WorkTypeSetting) ([]*Work, error) {
 	tempFilePath := filepath.Join(workDir, mac)
-	glog.Debug("GetWorkTime", mac)
+	//glog.Debug("GetWorkTime", mac)
 	return GetWorkTime(mac, tempFilePath, workType)
 }
 
@@ -279,7 +279,7 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) erro
 	//	return fmt.Errorf("fn is nil")
 	//}
 	tempFilePath := filepath.Join(workDir, mac)
-	glog.Debug("updatetWorkTime", mac)
+	//glog.Debug("updatetWorkTime", mac)
 	works := ReadWorkTimeByMac(tempFilePath)
 	if works == nil {
 		works = make(map[string]*WorkEntry)
@@ -400,7 +400,7 @@ func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting
 	}
 	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
-	glog.Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
+	//glog.Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
 	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
 		t.Weekday = int(t1.Weekday())
 		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {

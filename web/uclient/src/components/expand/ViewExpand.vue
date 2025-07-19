@@ -7,6 +7,22 @@
       <el-form-item label="名称">
         <span>{{ row.hostname }}</span>
       </el-form-item>
+      <el-form-item label="信号强度">
+        <span
+          >{{
+            row.signal
+          }}
+          信号强度（单位：dBm）：负值（越接近0表示信号越强）。`-44`为优秀信号（通常`-50`以上为良好）</span
+        >
+      </el-form-item>
+      <el-form-item label="无线频段">
+        <span
+          >{{
+            row.freq
+          }}
+          无线频段频率（单位：MHz）：`5180`属于5GHz频段（常见频段：2.4GHz范围为`2400~2483`，5GHz为`5150~5850`）</span
+        >
+      </el-form-item>
       <el-form-item label="Mac地址" v-if="isMobile()">
         <span>{{ row.mac }}</span>
       </el-form-item>

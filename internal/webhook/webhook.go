@@ -36,9 +36,6 @@ func Notify(msg WebHookMessage) error {
 	if msg.TimeNow != nil {
 		text.WriteString(fmt.Sprintf("- 今天是 %s %s\n ", msg.TimeNow.Format(time.DateOnly), u.GetWeekName(msg.TimeNow.Weekday())))
 	}
-	if msg.DutyTime != nil {
-		text.WriteString(fmt.Sprintf("- 打卡时间：%s\n ", msg.DutyTime.Format(time.DateTime)))
-	}
 	if msg.IpAddress != "" {
 		text.WriteString(fmt.Sprintf("- IP地址：%s\n ", msg.IpAddress))
 	}
@@ -51,13 +48,17 @@ func Notify(msg WebHookMessage) error {
 	if msg.MonthOverTime != "" {
 		text.WriteString(fmt.Sprintf("- 本月累计加班时长：%s\n ", msg.MonthOverTime))
 	}
-	if msg.TimeNow != nil {
+	if msg.DutyTime != nil {
+		text.WriteString(fmt.Sprintf("- 打卡时间：%s\n ", msg.DutyTime.Format(time.DateTime)))
+	} else if msg.TimeNow != nil {
 		text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", msg.TimeNow.Format(time.DateTime)))
 	}
+
 	markdown := make(map[string]interface{})
 	markdown["title"] = msg.Title
 	markdown["text"] = text.String()
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
+	glog.Debug("webhook", msg.Title)
 	return WebHook(msg.Url, payload)
 }
 func WebHook(webhookUrl string, payload any) error {
@@ -66,7 +67,7 @@ func WebHook(webhookUrl string, payload any) error {
 	if err != nil {
 		return err
 	}
-	glog.Debug("webhook", string(jsonData))
+	//glog.Debug("webhook", string(jsonData))
 	resp, err := http.Post(
 		webhookUrl,
 		"application/json",

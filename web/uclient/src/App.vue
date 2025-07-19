@@ -93,6 +93,8 @@
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
+          <el-table-column prop="signal" label="信号强度" sortable />
+          <el-table-column prop="freq" label="无线频段" sortable />
           <el-table-column
             prop="mac"
             label="Mac地址"
@@ -602,17 +604,46 @@ const connectSSE = () => {
     const sseUrl = `../api/client/sse`
     console.log('connectSSE', sseUrl)
     source.value = new EventAwareSSEClient(sseUrl)
-    source.value.addEventListener('update', (data) => {
-      console.log('update', data)
+    source.value.addEventListener('updateAll', (data) => {
+      console.log('updateAll', data)
       renderTable(data)
     })
-    source.value.addEventListener('update-one', (data) => {
-      console.log('update-one', data)
+    source.value.addEventListener('showNotify', (data) => {
+      console.log('showNotify', data)
+      updateTableByOne(data)
       showNotifyMessage(data)
+    })
+    source.value.addEventListener('updateOne', (data) => {
+      console.log('update-status', data)
+      updateTableByOne(data)
     })
     source.value.connect()
   } catch (e) {
     console.error('connectSSE err', e)
+  }
+}
+
+function updateTableByOne(cls: Client) {
+  console.log('updateTableByOne', cls)
+  if (tableData.value) {
+    // const newTableData = tableData.value.map((item: Client) => {
+    //   item.mac === cls.mac ? { ...item, online: cls.online } : item
+    // })
+    // console.log('updateTableByOne', newTableData)
+    // renderTable(newTableData)
+    const index = tableData.value.findIndex((item) => item.mac === cls.mac)
+    if (index !== -1) {
+      tableData.value.forEach((item: Client) => {
+        if (item.mac === cls.mac) {
+          item.starTime = cls.starTime
+          item.online = cls.online
+          item.freq = cls.freq
+          item.signal = cls.signal
+        }
+      })
+    } else {
+      tableData.value.push(cls)
+    }
   }
 }
 

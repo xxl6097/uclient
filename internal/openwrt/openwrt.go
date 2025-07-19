@@ -5,7 +5,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
-	"github.com/xxl6097/uclient/internal/webhook"
 	"strings"
 	"sync"
 	"time"
@@ -18,12 +17,11 @@ var (
 
 type openWRT struct {
 	//nickMap            map[string]*NickEntry
-	clients            map[string]*DHCPLease
-	sysLogClientStatus map[string]bool
-	mu                 sync.RWMutex
-	fnWatcher          func()
-	fnNewOne           func(*DHCPLease)
-	webhookUrl         string
+	clients      map[string]*DHCPLease
+	clientStatus map[string]*Status
+	mu           sync.RWMutex
+	fnEvent      func(int, any)
+	webhookUrl   string
 }
 
 // GetInstance 返回单例实例
@@ -31,7 +29,7 @@ func GetInstance() *openWRT {
 	once.Do(func() {
 		instance = &openWRT{
 			//nickMap:            make(map[string]*NickEntry),
-			sysLogClientStatus: make(map[string]bool),
+			clientStatus: make(map[string]*Status),
 		}
 		instance.init()
 		glog.Println("Singleton instance created")
@@ -47,7 +45,22 @@ func (this *openWRT) init() {
 	this.initClients()
 	time.Sleep(time.Second)
 	go this.initListenSysLog()
+	go this.subscribeHostapd()
+	//go this.subscribeDnsmasq()
 	this.initListenFsnotify()
+}
+
+func (this *openWRT) getName(macAddr string) string {
+	temp := this.clients[macAddr]
+	if temp != nil {
+		if temp.Nick != nil && temp.Nick.Name != "" {
+			return temp.Nick.Name
+		} else {
+			return temp.Hostname
+		}
+	} else {
+		return macAddr
+	}
 }
 
 func (this *openWRT) getDeviceName(macAddr string) (string, string) {
@@ -63,40 +76,299 @@ func (this *openWRT) getDeviceName(macAddr string) (string, string) {
 	}
 }
 
-func (this *openWRT) printMessage(macAddr string, format string) {
-	temp := this.clients[macAddr]
-	if temp != nil {
-		if temp.Nick != nil && temp.Nick.Name != "" {
-			glog.Printf(format, temp.Nick.Name)
-		} else {
-			glog.Printf(format, temp.Hostname)
-		}
-	} else {
-		glog.Printf(format, macAddr)
-	}
-}
-
 func (this *openWRT) initListenSysLog() {
-	err := listenSysLog(func(timestamp int64, macAddr string, phy string, status int, rawData string) {
-		switch status {
-		case 0:
-			this.printMessage("设备【%s】断开了", macAddr)
-			glog.Debug(rawData)
-			this.updateClientsBySysLog(timestamp, macAddr, phy, false)
-			break
-		case 1:
-			this.printMessage("设备【%s】连上了", macAddr)
-			glog.Debug(rawData)
-			this.updateClientsBySysLog(timestamp, macAddr, phy, true)
-			break
-		default:
-			//glog.Warnf("未知数据 %v", rawData)
-			break
-		}
+	//err := listenSysLog(func(timestamp int64, macAddr string, phy string, status int, rawData string) {
+	//	switch status {
+	//	case 0:
+	//		glog.Debugf("设备【%s】断开了", this.getName(macAddr))
+	//		glog.Debug(rawData)
+	//		this.updateClientsBySysLog(timestamp, macAddr, phy, false)
+	//		break
+	//	case 1:
+	//		glog.Debugf("设备【%s】连上了", this.getName(macAddr))
+	//		glog.Debug(rawData)
+	//		this.updateClientsBySysLog(timestamp, macAddr, phy, true)
+	//		break
+	//	default:
+	//		//glog.Warnf("未知数据 %v", rawData)
+	//		break
+	//	}
+	//})
 
+	err := subscribeSysLog(func(event *SysLogEvent) {
+		this.updateStatusBySysLog(event)
 	})
 	if err != nil {
 		glog.Error(fmt.Errorf("listenSysLog Error:%v", err))
+	}
+}
+
+//func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy string, status bool) {
+//	s := Status{
+//		Timestamp: timestamp,
+//		Connected: status,
+//	}
+//	this.updateStatusList(macAddr, []*Status{&s})
+//	if cls, ok := this.clients[macAddr]; ok {
+//		cls.Online = status
+//		cls.Phy = phy
+//		cls.StartTime = timestamp
+//		this.clientStatus[macAddr] = s
+//		glog.Infof("系统监听:%+v %v", cls, u.UTC8ToString(cls.StartTime, time.DateTime))
+//		_ = this.notifyWebhookMessage(cls)
+//		if this.fnWatcher != nil {
+//			this.fnWatcher()
+//		}
+//		if cls.Nick != nil {
+//			err := sysLogUpdateWorkTime(macAddr, timestamp, cls.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
+//				_ = this.NotifySignCardEvent(working, macAddress, t1)
+//			})
+//			if err != nil {
+//				glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
+//			}
+//		}
+//		if this.fnNewOne != nil {
+//			this.fnNewOne(1, cls)
+//		}
+//	} else {
+//		if this.fnNewOne != nil {
+//			this.fnNewOne(1, &DHCPLease{
+//				MAC:       macAddr,
+//				StartTime: timestamp,
+//				Online:    status,
+//			})
+//		}
+//		t := u.UTC8ToTime(timestamp)
+//		title := fmt.Sprintf("未知设备上线")
+//		if !status {
+//			title = "未知设备离线"
+//		}
+//		_ = webhook.Notify(webhook.WebHookMessage{
+//			Url:        this.webhookUrl,
+//			MacAddress: macAddr,
+//			TimeNow:    &t,
+//			Title:      title,
+//		})
+//	}
+//}
+
+func (this *openWRT) getClient(macAddr string) *DHCPLease {
+	if cls, ok := this.clients[macAddr]; ok {
+		return cls
+	}
+	return nil
+}
+
+//func (this *openWRT) updateClientsOnlineByHostapd(device *HostapdDevice) {
+//	s := Status{
+//		Timestamp: device.Timestamp.UnixMilli(),
+//		Connected: device.DataType == 0,
+//	}
+//	macAddr := device.Address
+//	if s.Connected {
+//		glog.Debugf("设备【%s】连上了", this.getName(macAddr))
+//	} else {
+//		glog.Debugf("设备【%s】离线了", this.getName(macAddr))
+//	}
+//	this.updateStatusList(macAddr, []*Status{&s})
+//	if cls, ok := this.clients[macAddr]; ok {
+//		cls.Signal = device.Signal
+//		cls.Freq = device.Freq
+//		cls.Online = s.Connected
+//		this.clientStatus[macAddr] = s
+//		cls.StartTime = s.Timestamp
+//		_ = this.notifyWebhookMessage(cls)
+//		if this.fnWatcher != nil {
+//			this.fnWatcher()
+//		}
+//		if cls.Nick != nil {
+//			err := sysLogUpdateWorkTime(macAddr, s.Timestamp, cls.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
+//				_ = this.NotifySignCardEvent(working, macAddress, t1)
+//			})
+//			if err != nil {
+//				glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
+//			}
+//		}
+//		if this.fnNewOne != nil {
+//			this.fnNewOne(device.DataType, cls)
+//		}
+//	} else {
+//		if this.fnNewOne != nil {
+//			this.fnNewOne(device.DataType, &DHCPLease{
+//				MAC:       macAddr,
+//				StartTime: s.Timestamp,
+//				Online:    s.Connected,
+//				Signal:    device.Signal,
+//				Freq:      device.Freq,
+//			})
+//		}
+//		t := u.UTC8ToTime(s.Timestamp)
+//		title := fmt.Sprintf("未知设备上线")
+//		if !s.Connected {
+//			title = "未知设备离线"
+//		}
+//		_ = webhook.Notify(webhook.WebHookMessage{
+//			Url:        this.webhookUrl,
+//			MacAddress: macAddr,
+//			TimeNow:    &t,
+//			Title:      title,
+//		})
+//	}
+//}
+//
+//func (this *openWRT) updateClientsStatusByHostapd(device *HostapdDevice) {
+//	macAddr := device.Address
+//	if cls, ok := this.clients[macAddr]; ok {
+//		cls.Signal = device.Signal
+//		cls.Freq = device.Freq
+//		cls.StartTime = device.Timestamp.UnixMilli()
+//		if this.fnNewOne != nil {
+//			this.fnNewOne(device.DataType, cls)
+//		}
+//	}
+//}
+
+//func (this *openWRT) updateClients(device *HostapdDevice, sysEvent *SysLogEvent, dnsData *DnsmasqDevice) {
+//	var tempData *DHCPLease
+//	s := Status{}
+//	var macAddr string
+//	hasInClients := false
+//	needPushMessage := false
+//	if device != nil {
+//		s.Timestamp = device.Timestamp.UnixMilli()
+//		s.Connected = device.DataType == 0
+//		macAddr = device.Address
+//		this.clientStatus[macAddr] = s
+//		cls := this.getClient(macAddr)
+//		hasInClients = cls != nil
+//		if device.DataType == 2 {
+//			if cls != nil {
+//				cls.Signal = device.Signal
+//				cls.Freq = device.Freq
+//				cls.StartTime = device.Timestamp.UnixMilli()
+//				//这里只是更新信号，不在web上notify通知
+//			} else {
+//				//到这里，说明这个设备没有连上路由器，cls为nil
+//			}
+//		} else {
+//			//在线、离线事件
+//			if cls != nil {
+//				cls.Signal = device.Signal
+//				cls.Freq = device.Freq
+//				cls.Online = s.Connected
+//				this.clientStatus[macAddr] = s
+//				cls.StartTime = s.Timestamp
+//				needPushMessage = true
+//				//需要web上notify通知、webhook通知、签到
+//			} else {
+//				cls = &DHCPLease{
+//					MAC:       macAddr,
+//					StartTime: s.Timestamp,
+//					Online:    s.Connected,
+//					Signal:    device.Signal,
+//					Freq:      device.Freq,
+//				}
+//				//需要web上notify通知和webhook通知
+//			}
+//		}
+//		tempData = cls
+//	}
+//	if sysEvent != nil {
+//		s.Timestamp = sysEvent.Timestamp.UnixMilli()
+//		s.Connected = sysEvent.Online
+//		macAddr = sysEvent.Mac
+//		this.clientStatus[macAddr] = s
+//		cls := this.getClient(macAddr)
+//		hasInClients = cls != nil
+//		if cls != nil {
+//			cls.Online = s.Connected
+//			cls.Phy = sysEvent.Phy
+//			cls.StartTime = s.Timestamp
+//			this.clientStatus[macAddr] = s
+//			glog.Infof("系统监听:%+v %v", cls, u.UTC8ToString(cls.StartTime, time.DateTime))
+//			needPushMessage = true
+//			//需要web上notify通知、webhook通知、签到
+//		} else {
+//			cls = &DHCPLease{
+//				MAC:       macAddr,
+//				StartTime: s.Timestamp,
+//				Online:    s.Connected,
+//			}
+//			//需要web上notify通知和webhook通知
+//		}
+//		tempData = cls
+//	}
+//	if dnsData != nil {
+//		s.Timestamp = dnsData.Timestamp.UnixMilli()
+//		s.Connected = true
+//		macAddr = dnsData.Mac
+//		this.clientStatus[macAddr] = s
+//		cls := this.getClient(macAddr)
+//		hasInClients = cls != nil
+//		//需要web上notify通知、webhook通知
+//		if cls != nil {
+//			cls.Hostname = dnsData.Name
+//			cls.Phy = dnsData.Interface
+//			cls.IP = dnsData.Ip
+//			cls.StartTime = s.Timestamp
+//			cls.Online = s.Connected
+//		} else {
+//			cls = &DHCPLease{}
+//			cls.Hostname = dnsData.Name
+//			cls.Phy = dnsData.Interface
+//			cls.IP = dnsData.Ip
+//			cls.StartTime = s.Timestamp
+//			cls.Online = s.Connected
+//		}
+//		tempData = cls
+//	}
+//
+//	glog.Debugf("设备【%s】状态：%v", this.getName(macAddr), s.Connected)
+//	if !hasInClients {
+//		if tempData != nil && this.fnEvent != nil {
+//			this.fnEvent(2, tempData)
+//		}
+//	} else if tempData != nil {
+//		if needPushMessage {
+//			_ = this.notifyWebhookMessage(tempData)
+//			if tempData.Nick != nil {
+//				err := sysLogUpdateWorkTime(macAddr, s.Timestamp, tempData.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
+//					_ = this.NotifySignCardEvent(working, macAddress, t1)
+//				})
+//				if err != nil {
+//					glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
+//				}
+//			}
+//		}
+//		t := u.UTC8ToTime(s.Timestamp)
+//		title := fmt.Sprintf("未知设备上线")
+//		if !s.Connected {
+//			title = "未知设备离线"
+//		}
+//		_ = webhook.Notify(webhook.WebHookMessage{
+//			Url:        this.webhookUrl,
+//			MacAddress: macAddr,
+//			TimeNow:    &t,
+//			Title:      title,
+//		})
+//
+//	}
+//}
+
+func (this *openWRT) subscribeHostapd() {
+	err := SubscribeHostapd(func(device *HostapdDevice) {
+		this.updateStatusByHostapd(device)
+	})
+	if err != nil {
+		glog.Error(fmt.Errorf("subscribeHostapd Error:%v", err))
+	}
+}
+func (this *openWRT) subscribeDnsmasq() {
+	err := SubscribeDnsmasq(func(device *DnsmasqDevice) {
+		this.updateStatusByDnsmasq(device)
+	})
+	if err != nil {
+		glog.Error(fmt.Errorf("subscribeHostapd Error:%v", err))
 	}
 }
 
@@ -136,9 +408,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 				if strings.EqualFold(event.Name, dhcpLeasesFilePath) {
 					this.updateClientsByDHCP()
 				}
-				if this.fnWatcher != nil {
-					this.fnWatcher()
-				}
+				this.webUpdateAll(this.GetClients())
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {
@@ -172,55 +442,6 @@ func (this *openWRT) initClients() {
 	this.clients = dataMap
 }
 
-func (this *openWRT) updateClientsBySysLog(timestamp int64, macAddr string, phy string, status bool) {
-	s := Status{
-		Timestamp: timestamp,
-		Connected: status,
-	}
-	this.updateStatusList(macAddr, []*Status{&s})
-	if cls, ok := this.clients[macAddr]; ok {
-		cls.Online = status
-		cls.Phy = phy
-		cls.StartTime = timestamp
-		this.sysLogClientStatus[macAddr] = status
-		glog.Infof("系统监听:%+v %v", cls, u.UTC8ToString(cls.StartTime, time.DateTime))
-		_ = this.notifyWebhookMessage(cls)
-		if this.fnWatcher != nil {
-			this.fnWatcher()
-		}
-		if cls.Nick != nil {
-			err := sysLogUpdateWorkTime(macAddr, timestamp, cls.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
-				_ = this.NotifySignCardEvent(working, macAddress, t1)
-			})
-			if err != nil {
-				glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
-			}
-		}
-		if this.fnNewOne != nil {
-			this.fnNewOne(cls)
-		}
-	} else {
-		if this.fnNewOne != nil {
-			this.fnNewOne(&DHCPLease{
-				MAC:       macAddr,
-				StartTime: timestamp,
-				Online:    status,
-			})
-		}
-		t := u.UTC8ToTime(timestamp)
-		title := fmt.Sprintf("未知设备上线")
-		if !status {
-			title = "未知设备离线"
-		}
-		_ = webhook.Notify(webhook.WebHookMessage{
-			Url:        this.webhookUrl,
-			MacAddress: macAddr,
-			TimeNow:    &t,
-			Title:      title,
-		})
-	}
-}
-
 func (p *openWRT) updateClientsByDHCP() {
 	clientArray, err := getClientsByDhcp()
 	if err != nil {
@@ -231,8 +452,8 @@ func (p *openWRT) updateClientsByDHCP() {
 		for _, client := range clientArray {
 			mac := client.MAC
 			//读取/tmp/dhcp.leases列表，这个列表没有状态，需要从syslog中获取
-			if status, okk := p.sysLogClientStatus[mac]; okk {
-				client.Online = status
+			if status, okk := p.clientStatus[mac]; okk {
+				client.Online = status.Connected
 			} else {
 				if e1 == nil && arpMap != nil {
 					itemData := arpMap[mac]
@@ -312,32 +533,32 @@ func (p *openWRT) updateClientsByDHCP() {
 func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	list := getStatusByMac(macAddr)
-	if list == nil {
-		list = newList
+	tempList := getStatusByMac(macAddr)
+	if tempList == nil {
+		tempList = newList
 	} else {
-		element := list[len(list)-1]
+		element := tempList[len(tempList)-1]
 		if element != nil {
 			for i, n := range newList {
 				if n.Timestamp >= element.Timestamp {
 					if n.Timestamp == element.Timestamp && n.Connected == element.Connected {
 						continue
 					}
-					list = append(list, newList[i:]...)
+					tempList = append(tempList, newList[i:]...)
 					break
 				}
 			}
 		}
 	}
-	if list == nil {
+	if tempList == nil {
 		return
 	}
-	size := len(list)
-	if len(list) > MAX_SIZE {
+	size := len(tempList)
+	if len(tempList) > MAX_SIZE {
 		tempSize := size - MAX_SIZE
-		list = list[tempSize:]
+		tempList = tempList[tempSize:]
 	}
-	_ = setStatusByMac(macAddr, list)
+	_ = setStatusByMac(macAddr, tempList)
 }
 
 func (this *openWRT) initClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DHCPLease, error) {

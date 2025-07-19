@@ -33,6 +33,13 @@ var (
 	MAX_WORK_SIZE         = 3600
 )
 
+type SysLogEvent struct {
+	Online    bool      `json:"online"`
+	Timestamp time.Time `json:"timestamp"`
+	Mac       string    `json:"mac"`
+	Phy       string    `json:"phy"`
+	RawData   string    `json:"-"`
+}
 type DeviceTimeLine struct {
 	DateTime  string `json:"dateTime"`
 	Timestamp int64  `json:"timestamp"`
@@ -60,6 +67,8 @@ type DHCPLease struct {
 	Hostname  string     `json:"hostname"` //客户端上报的主机名（可能为空或 *）
 	StartTime int64      `json:"starTime"` //租约失效的精确时间（秒级精度）
 	Online    bool       `json:"online"`
+	Signal    int        `json:"signal"`
+	Freq      int        `json:"freq"`
 	Nick      *NickEntry `json:"nick"` //
 	Static    *DHCPHost  `json:"static"`
 }
@@ -110,15 +119,15 @@ func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, 
 	}, "logread", args...)
 }
 
-func listenSysLog(fn func(int64, string, string, int, string)) error {
+func subscribeSysLog(fn func(*SysLogEvent)) error {
 	//args := []string{"-f", "|", "grep", "hostapd.*"}
 	pattern := `hostapd.*`
 	re := regexp.MustCompile(pattern)
 	return command(func(s string) {
 		if re.MatchString(s) {
-			timestamp, macAddr, phy, status := parseSysLog(s)
-			if fn != nil {
-				fn(timestamp, macAddr, phy, status, s)
+			tempData := parseSysLog(s)
+			if fn != nil && tempData != nil {
+				fn(tempData)
 			}
 			//if status == 0 {
 			//	if fn != nil {
@@ -257,20 +266,26 @@ func parseMacAddr(logLine string) string {
 	}
 	return ""
 }
-func parseSysLog(data string) (int64, string, string, int) {
+func parseSysLog(data string) *SysLogEvent {
 	phy := parsePhy(data)
 	//timestamp := parseTime(data)
 	macAddr := parseMacAddr(data)
-	timestamp := glog.Now().UnixMilli() //time.Now().UnixMilli()
+	//timestamp := glog.Now().UnixMilli() //time.Now().UnixMilli()
+	timestamp := glog.Now()
 	// 1. 检查字符串是否包含目标字段
-	if strings.Contains(data, apStaDisConnectString) { //AP-STA-DISCONNECTED
-		//glog.Printf("%s 设备【%s】连上了", timestamp, macAddr)
-		return timestamp, macAddr, phy, 0
-	} else if strings.Contains(data, apStaConnectString) { //AP-STA-CONNECTED
-		//glog.Printf("%s 设备【%s】断开了", timestamp, macAddr)
-		return timestamp, macAddr, phy, 1
+	eve := SysLogEvent{
+		Timestamp: timestamp,
+		Mac:       macAddr,
+		Phy:       phy,
 	}
-	return timestamp, macAddr, phy, -1
+	if strings.Contains(data, apStaDisConnectString) { //AP-STA-DISCONNECTED
+		eve.Online = false
+		return &eve
+	} else if strings.Contains(data, apStaConnectString) { //AP-STA-CONNECTED
+		eve.Online = true
+		return &eve
+	}
+	return nil
 }
 
 func parseLeaseLine(line string, leasetime time.Duration) (DHCPLease, error) {
@@ -505,6 +520,10 @@ func parseTimer(logLine string) (*time.Time, error) {
 		return t, err
 	}
 	return nil, nil
+}
+
+func Command(fu func(string), name string, arg ...string) error {
+	return command(fu, name, arg...)
 }
 
 func command(fu func(string), name string, arg ...string) error {

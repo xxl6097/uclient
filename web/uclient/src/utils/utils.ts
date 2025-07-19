@@ -372,3 +372,13 @@ export function getWeekDay(index: number): string {
   }
   return ''
 }
+
+export function updateOrAdd<T>(arr: T[], target: T, newValue: T): T[] {
+  const index = arr.indexOf(target) // 查找元素索引
+  if (index !== -1) {
+    arr[index] = newValue // 存在则更新
+  } else {
+    arr.push(newValue) // 不存在则添加
+  }
+  return arr
+}
