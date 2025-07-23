@@ -46,7 +46,7 @@ func (this *openWRT) init() {
 	go this.subscribeDnsmasq()
 	this.subscribeFsnotify()
 	time.AfterFunc(time.Second*10, func() {
-		this.webUpdateAll(this.GetClients())
+		this.ResetClients()
 	})
 }
 
