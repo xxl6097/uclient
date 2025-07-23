@@ -235,7 +235,7 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, 
 	for _, w := range result {
 		sort.Slice(w.WorkTime, func(i, j int) bool {
 			aa, ab := w.WorkTime[i], w.WorkTime[j]
-			return aa.Date < ab.Date
+			return aa.Date > ab.Date
 		})
 		for _, workTime := range w.WorkTime {
 			w.OverTimeDuration += workTime.OverWorkTimesDuration
@@ -244,7 +244,7 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, 
 	}
 	sort.Slice(result, func(i, j int) bool {
 		a, b := result[i], result[j]
-		return a.Month < b.Month
+		return a.Month > b.Month
 	})
 
 	//temp := result[0]
@@ -262,18 +262,19 @@ func getWorkTime(mac string, workType *WorkTypeSetting) ([]*Work, error) {
 }
 
 func TestSetWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) error {
-	return setWorkTime(isDel, mac, workDir, day, fn)
+	_, err := setWorkTime(isDel, mac, workDir, day, fn)
+	return err
 }
 
-func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) error {
+func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) (*WorkEntry, error) {
 	if mac == "" {
-		return fmt.Errorf("mac is empty")
+		return nil, fmt.Errorf("mac is empty")
 	}
 	if workDir == "" {
-		return fmt.Errorf("workDir is empty")
+		return nil, fmt.Errorf("workDir is empty")
 	}
 	if day == "" {
-		return fmt.Errorf("day is empty")
+		return nil, fmt.Errorf("day is empty")
 	}
 	//if fn == nil {
 	//	return fmt.Errorf("fn is nil")
@@ -301,24 +302,24 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) erro
 	//}
 	content, err := ukey.StructToGob(works)
 	if err != nil {
-		return err
+		return tempEntry, err
 	}
 	err = u.CheckDirector(workDir)
 	file, err := os.Create(tempFilePath) // 文件不存在则创建，存在则截断
 	if err != nil {
-		return err
+		return tempEntry, err
 	}
 	defer file.Close()
 	// 写入内容
 	_, err = file.Write(content)
-	return err
+	return tempEntry, err
 }
 
 func UpdatetWorkTime(mac, day string, data map[string]interface{}) error {
 	if data == nil {
 		return fmt.Errorf("data map is empty")
 	}
-	return setWorkTime(false, mac, workDir, day, func(tempEntry *WorkEntry) {
+	_, err := setWorkTime(false, mac, workDir, day, func(tempEntry *WorkEntry) {
 		if v, ok := data["workTime1"]; ok {
 			if vv, okk := v.(string); okk {
 				t, err := u.AutoParse(fmt.Sprintf("%s %s", day, vv))
@@ -357,6 +358,7 @@ func UpdatetWorkTime(mac, day string, data map[string]interface{}) error {
 			glog.Println("值非数字类型 dayType", data["dayType"])
 		}
 	})
+	return err
 }
 func AddWorkTime(mac string, timestamp int64, isOnWork bool) error {
 	if timestamp <= 0 {
@@ -367,7 +369,7 @@ func AddWorkTime(mac string, timestamp int64, isOnWork bool) error {
 	}
 	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
-	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
+	_, err := setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
 		t.Weekday = int(t1.Weekday())
 		if isOnWork {
 			t.OnWorkTime = timestamp
@@ -375,28 +377,30 @@ func AddWorkTime(mac string, timestamp int64, isOnWork bool) error {
 			t.OffWorkTime = timestamp
 		}
 	})
+	return err
 }
 
 func DelWorkTime(mac string, day string) error {
-	return setWorkTime(true, mac, workDir, day, nil)
+	_, err := setWorkTime(true, mac, workDir, day, nil)
+	return err
 }
 
-func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting, fn func(int, string, time.Time)) error {
+func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting) (*WorkEntry, error) {
 	if workType == nil {
-		return fmt.Errorf("考勤打卡未设置")
+		return nil, fmt.Errorf("考勤打卡未设置")
 	}
 	if workType.OnWorkTime == "" || workType.OffWorkTime == "" {
-		return fmt.Errorf("考勤打卡时间未设置 %+v", workType)
+		return nil, fmt.Errorf("考勤打卡时间未设置 %+v", workType)
 	}
 	if timestamp <= 0 {
-		return fmt.Errorf("timestamp is zero")
+		return nil, fmt.Errorf("timestamp is zero")
 	}
 	if !u.IsMillisecondTimestamp(timestamp) {
 		timestamp *= 1000
 	}
 	workingTime, err := u.IsWorkingTime(workType.OnWorkTime, workType.OffWorkTime)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
@@ -412,21 +416,15 @@ func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting
 			} else {
 				t.OffWorkTime = timestamp
 			}
-			if fn != nil {
-				fn(workingTime, mac, t1)
-			}
 		} else {
 			if workingTime == 0 {
 				//上班打卡
-				t.OnWorkTime = timestamp
-				if fn != nil {
-					fn(workingTime, mac, t1)
+				if t.OnWorkTime <= 0 {
+					//说明上午未打卡
+					t.OnWorkTime = timestamp
 				}
 			} else if workingTime == 2 {
 				t.OffWorkTime = timestamp
-				if fn != nil {
-					fn(workingTime, mac, t1)
-				}
 			}
 		}
 	})

@@ -13,18 +13,17 @@ import (
 )
 
 type WebHookMessage struct {
-	Url           string     `json:"url"`
-	Title         string     `json:"title"`
-	DeviceName    string     `json:"deviceName"`
-	IpAddress     string     `json:"ipAddress"`
-	MacAddress    string     `json:"macAddress"`
-	TimeNow       *time.Time `json:"timeNow"`
-	DutyTime      *time.Time `json:"dutyTime"`
-	TodayOverTime string     `json:"todayOverTime"`
-	MonthOverTime string     `json:"monthOverTime"`
+	Url        string `json:"url"`
+	Title      string `json:"title"`
+	DeviceName string `json:"deviceName"`
+	IpAddress  string `json:"ipAddress"`
+	MacAddress string `json:"macAddress"`
+	//WorkTime      *time.Time `json:"dutyTime"`
+	//TodayOverTime string `json:"todayOverTime"`
+	//MonthOverTime string `json:"monthOverTime"`
 }
 
-func Notify(msg WebHookMessage) error {
+func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	if msg.Url == "" {
 		return fmt.Errorf("webhook url is empty")
 	}
@@ -33,27 +32,27 @@ func Notify(msg WebHookMessage) error {
 	}
 	text := strings.Builder{}
 	text.WriteString(fmt.Sprintf("#### %s \n ", msg.Title))
-	if msg.TimeNow != nil {
-		text.WriteString(fmt.Sprintf("- 今天是 %s %s\n ", msg.TimeNow.Format(time.DateOnly), u.GetWeekName(msg.TimeNow.Weekday())))
-	}
+	now := glog.Now()
+	text.WriteString(fmt.Sprintf("- 今天是 %s %s\n ", now.Format(time.DateOnly), u.GetWeekName(now.Weekday())))
 	if msg.IpAddress != "" {
 		text.WriteString(fmt.Sprintf("- IP地址：%s\n ", msg.IpAddress))
 	}
 	if msg.MacAddress != "" {
 		text.WriteString(fmt.Sprintf("- Mac地址：%s\n ", msg.MacAddress))
 	}
-	if msg.TodayOverTime != "" {
-		text.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", msg.TodayOverTime))
+	//if msg.TodayOverTime != "" {
+	//	text.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", msg.TodayOverTime))
+	//}
+	//if msg.MonthOverTime != "" {
+	//	text.WriteString(fmt.Sprintf("- 本月累计加班时长：%s\n ", msg.MonthOverTime))
+	//}
+	if fn != nil {
+		fn(&text)
 	}
-	if msg.MonthOverTime != "" {
-		text.WriteString(fmt.Sprintf("- 本月累计加班时长：%s\n ", msg.MonthOverTime))
-	}
-	if msg.DutyTime != nil {
-		text.WriteString(fmt.Sprintf("- 打卡时间：%s\n ", msg.DutyTime.Format(time.DateTime)))
-	} else if msg.TimeNow != nil {
-		text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", msg.TimeNow.Format(time.DateTime)))
-	}
-
+	//if msg.WorkTime != nil {
+	//	text.WriteString(fmt.Sprintf("- 打卡时间：%s\n ", msg.WorkTime.Format(time.DateTime)))
+	//}
+	text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", u.TimestampToTime(glog.Now().UnixMilli())))
 	markdown := make(map[string]interface{})
 	markdown["title"] = msg.Title
 	markdown["text"] = text.String()

@@ -35,6 +35,7 @@ declare module 'vue' {
     ElText: typeof import('element-plus/es')['ElText']
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
     ElTimeSelect: typeof import('element-plus/es')['ElTimeSelect']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     StaticIpListDialog: typeof import('./src/components/StaticIpListDialog.vue')['default']
     UpgradeDialog: typeof import('./src/components/expand/UpgradeDialog.vue')['default']

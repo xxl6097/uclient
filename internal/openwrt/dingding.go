@@ -1,22 +1,32 @@
 package openwrt
 
 import (
-	"fmt"
 	"github.com/xxl6097/glog/glog"
-	"time"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 func (this *openWRT) ddingNotify(tempData *DHCPLease) {
-	_ = this.notifyWebhookMessage(tempData)
+	err := this.notifyWebhookMessage(tempData)
+	if err != nil {
+		glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
+	}
 }
-
 func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
 	if tempData.Nick != nil {
-		err := sysLogUpdateWorkTime(tempData.MAC, tempData.StartTime, tempData.Nick.WorkType, func(working int, macAddress string, t1 time.Time) {
-			_ = this.NotifySignCardEvent(working, macAddress, t1)
-		})
+		_, err := sysLogUpdateWorkTime(tempData.MAC, tempData.StartTime, tempData.Nick.WorkType)
 		if err != nil {
-			glog.Error(fmt.Errorf("updatetWorkTime Error:%v", err))
+			glog.Errorf("更新时间失败 %v %+v", err, tempData)
+		} else {
+			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+			if e1 != nil {
+				glog.Error(e1)
+			}
+			e := this.NotifySignCardEvent(working, tempData.MAC)
+			if e != nil {
+				glog.Errorf("钉钉通知打卡失败 %v %+v", e, tempData)
+			}
 		}
+	} else {
+		glog.Errorf("未设置打卡 %+v", tempData)
 	}
 }

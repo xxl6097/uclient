@@ -86,15 +86,25 @@
                           : 'success'
                         : 'success'
                       : 'success'
-                    : 'none'
+                    : 'danger'
                 "
                 >{{ getClientName(props.row) }}
               </el-text>
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
-          <el-table-column prop="signal" label="信号强度" sortable />
-          <el-table-column prop="freq" label="无线频段" sortable />
+          <el-table-column
+            prop="signal"
+            label="信号强度"
+            sortable
+            v-if="!isMobile()"
+          />
+          <el-table-column
+            prop="freq"
+            label="无线频段"
+            sortable
+            v-if="!isMobile()"
+          />
           <el-table-column
             prop="mac"
             label="Mac地址"
@@ -104,6 +114,7 @@
           <el-table-column
             prop="starTime"
             label="连接时间"
+            min-width="110"
             sortable
             v-if="!isMobile()"
           >

@@ -79,6 +79,7 @@ type ARPEntry struct {
 	MAC       net.HardwareAddr //设备的 MAC 地址
 	Mask      string           // 子网掩码（通常为 *，表示未使用）
 	Interface string           // 关联的网络接口（如 br-lan、eth0）
+	Timestamp time.Time
 }
 
 func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, error) {
@@ -165,41 +166,6 @@ func getStatusFromSysLog() (map[string][]*Status, error) {
 		return times, err
 	}
 	return nil, err
-}
-
-func parseARPLine(line string) (*ARPEntry, error) {
-	fields := strings.Fields(line)
-	if len(fields) < 6 {
-		return nil, fmt.Errorf("invalid ARP line: expected 6 fields, got %d", len(fields))
-	}
-
-	// 解析 IP 地址
-	ip := net.ParseIP(fields[0])
-	if ip == nil {
-		return nil, fmt.Errorf("invalid IP: %s", fields[0])
-	}
-
-	// 解析十六进制数值（HWType 和 Flags）
-	hwType, _ := strconv.ParseUint(strings.TrimPrefix(fields[1], "0x"), 16, 8)
-	flags, _ := strconv.ParseUint(strings.TrimPrefix(fields[2], "0x"), 16, 8)
-
-	// 解析 MAC 地址
-	mac, err := net.ParseMAC(fields[3])
-	if err != nil {
-		return nil, fmt.Errorf("invalid MAC: %v", err)
-	}
-	if mac.String() == "00:00:00:00:00:00" {
-		return nil, fmt.Errorf("error MAC")
-	}
-
-	return &ARPEntry{
-		IP:        ip,
-		HWType:    uint8(hwType),
-		Flags:     uint8(flags),
-		MAC:       mac,
-		Mask:      fields[4],
-		Interface: fields[5],
-	}, nil
 }
 
 func getLeaseTime() time.Duration {
@@ -404,54 +370,6 @@ func getArp(deviceInterfaceName string) ([]string, error) {
 		arpText = append(arpText, strings.TrimSpace(line))
 	}
 	return arpText, nil
-}
-
-func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
-	data, err := os.ReadFile(arpFilePath)
-	if err != nil {
-		return nil, err
-	}
-
-	lines := strings.Split(string(data), "\n")
-	//entries := make([]*ARPEntry, 0)
-	entries := make(map[string][]*ARPEntry)
-	for i, line := range lines {
-		if i == 0 || strings.TrimSpace(line) == "" {
-			continue // 跳过标题行和空行
-		}
-		if !strings.HasSuffix(line, deviceInterfaceName) {
-			continue // 根据Device过滤
-		}
-		entry, e := parseARPLine(line)
-		if e != nil {
-			//return nil, err
-			//glog.Error("parseARPLine error", e, line)
-			continue
-		}
-		mac := entry.MAC.String()
-		if _, ok := entries[mac]; !ok {
-			entries[mac] = []*ARPEntry{entry}
-		} else {
-			temp := entries[mac]
-			entries[mac] = append(temp, entry)
-			entries[mac] = temp
-		}
-	}
-
-	arpMap := make(map[string]*ARPEntry)
-	for mac, v := range entries {
-		if v != nil && len(v) > 0 {
-			temp := v[0]
-			for _, item := range v {
-				if item.Flags == 2 {
-					temp = item
-				}
-			}
-			arpMap[mac] = temp
-		}
-
-	}
-	return arpMap, nil
 }
 
 func parsePhy(logLine string) string {

@@ -65,7 +65,6 @@ func (this *Service) OnVersion() string {
 }
 
 func (this *Service) OnRun(service igs.Service) error {
-	defer glog.GlobalRecover()
 	this.gs = service
 	cfg, err := load()
 	if err != nil {
@@ -74,7 +73,7 @@ func (this *Service) OnRun(service igs.Service) error {
 	glog.Debug("程序运行", os.Args)
 	httpserver.New().
 		CORSMethodMiddleware().
-		AddRoute(internal.NewRoute(internal.NewApi(service))).
+		AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
 		AddRoute(assets.NewRoute()).
 		BasicAuth(cfg.Username, cfg.Password).
 		Done(cfg.ServerPort)

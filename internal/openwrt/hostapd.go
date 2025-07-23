@@ -3,6 +3,7 @@ package openwrt
 import (
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
+	"strings"
 	"time"
 )
 
@@ -95,11 +96,26 @@ func decode(s string, fn func(*HostapdDevice)) {
 		}
 	}
 }
+
+// SubscribeHostapd ubus subscribe hostapd.phy1-ap0 hostapd.phy0-ap0
 func SubscribeHostapd(fn func(*HostapdDevice)) error {
+	args := []string{"subscribe", "hostapd.*"}
+	args = []string{"subscribe", "hostapd.phy1-ap0", "hostapd.phy0-ap0"}
 	return command(func(s string) {
 		if s == "" {
 			return
 		}
 		decode(s, fn)
-	}, "ubus", "subscribe", "hostapd.*")
+	}, "ubus", args...)
+}
+
+func Monitor() error {
+	return command(func(s string) {
+		if s == "" {
+			return
+		}
+		if strings.Contains(s, "5a:a7:22:62:3d:26") {
+			glog.Info(s)
+		}
+	}, "ubus", "monitor")
 }

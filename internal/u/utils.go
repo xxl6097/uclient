@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/pkg"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -181,6 +182,23 @@ func UTC8ToTime(timestamp int64) time.Time {
 	return time.Unix(timestamp, 0)
 }
 
+func TimestampToTime(timestamp int64) string {
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
+	if IsMillisecondTimestamp(timestamp) {
+		if loc != nil {
+			return time.UnixMilli(timestamp).In(loc).Format(fmt.Sprintf("%s.000", time.TimeOnly)) // 0表示纳秒部分
+		}
+		return time.UnixMilli(timestamp).Format(fmt.Sprintf("%s.000", time.TimeOnly)) // 0表示纳秒部分
+	}
+	if loc != nil {
+		return time.Unix(timestamp, 0).In(loc).Format(time.TimeOnly) // 0表示纳秒部分
+	}
+	return time.Unix(timestamp, 0).Format(time.TimeOnly) // 0表示纳秒部分
+}
+
 func TimestampToDateTime(timestamp int64) string {
 	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
 	if err != nil {
@@ -342,6 +360,21 @@ func GetWeekName(weekday time.Weekday) string {
 		return "星期六"
 	case time.Sunday:
 		return "星期日"
+	}
+	return ""
+}
+func GetLocalMac() string {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Println("获取网络接口失败：", err)
+		return ""
+	}
+	for _, iface := range interfaces {
+		if iface.Flags&net.FlagUp != 0 && iface.HardwareAddr != nil {
+			devMac := strings.ReplaceAll(iface.HardwareAddr.String(), ":", "")
+			fmt.Println(iface.Name, ":", devMac)
+			return devMac
+		}
 	}
 	return ""
 }

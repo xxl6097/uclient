@@ -3,11 +3,12 @@ package internal
 import (
 	"fmt"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/go-http/pkg/util"
 	"github.com/xxl6097/go-service/pkg/github"
 	"github.com/xxl6097/go-service/pkg/gs/igs"
-	"github.com/xxl6097/uclient/internal/iface"
+	"github.com/xxl6097/go-sse/pkg/sse"
+	"github.com/xxl6097/go-sse/pkg/sse/isse"
 	"github.com/xxl6097/uclient/internal/openwrt"
-	"github.com/xxl6097/uclient/internal/sse"
 	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
 	"path/filepath"
@@ -16,26 +17,28 @@ import (
 
 type Api struct {
 	igs    igs.Service
-	sseApi iface.ISSE
+	sseApi isse.ISseServer
 	pool   *sync.Pool // use sync.Pool caching buf to reduce gc ratio
 }
 
-func NewApi(igs igs.Service) *Api {
+func NewApi(igs igs.Service, username, password string) *Api {
 	github.Api().SetName("xxl6097", "openwrt-client-manager")
-	sseApi := sse.NewServer()
-	sseApi.Start()
+	initSSEClient(username, password)
 	a := &Api{
 		igs:    igs,
-		sseApi: sseApi,
+		sseApi: initSSE(),
 		pool: &sync.Pool{
 			New: func() interface{} { return make([]byte, 32*1024) },
 		},
 	}
 	openwrt.GetInstance().SetFunc(func(dataType int, obj any) {
-		if obj != nil && sseApi != nil {
-			eve := iface.SSEEvent{
+		if obj != nil && a.sseApi != nil {
+			eve := isse.Event{
 				Payload: obj,
 			}
+			//eve := isse.SSEEvent{
+			//	Payload: obj,
+			//}
 			switch dataType {
 			case 0:
 				eve.Event = "updateAll"
@@ -48,10 +51,44 @@ func NewApi(igs igs.Service) *Api {
 				break
 
 			}
-			sseApi.Broadcast(eve)
+			a.sseApi.Broadcast(eve)
 		}
 	})
 	return a
+}
+
+func initSSE() isse.ISseServer {
+	//serv := sse.New().
+	//	InvalidateFun(func(request *http.Request) (string, error) {
+	//		return time.Now().Format("20060102150405.999999999"), nil
+	//	}).
+	//	Register(func(server iface.ISseServer, client *iface.Client) {
+	//		//server.Stream("内置丰富的开发模板，包括前后端开发所需的所有工具，如pycharm、idea、navicat、vscode以及XTerminal远程桌面管理工具等模板，用户可以轻松部署和管理各种应用程序和工具", time.Millisecond*500)
+	//	}).
+	//	UnRegister(nil).
+	//	Done()
+	return sse.New().Done()
+}
+
+func initSSEClient(username string, password string) *sse.Client {
+	//serv := sse.New().
+	//	InvalidateFun(func(request *http.Request) (string, error) {
+	//		return time.Now().Format("20060102150405.999999999"), nil
+	//	}).
+	//	Register(func(server iface.ISseServer, client *iface.Client) {
+	//		//server.Stream("内置丰富的开发模板，包括前后端开发所需的所有工具，如pycharm、idea、navicat、vscode以及XTerminal远程桌面管理工具等模板，用户可以轻松部署和管理各种应用程序和工具", time.Millisecond*500)
+	//	}).
+	//	UnRegister(nil).
+	//	Done()
+	url := "http://uuxia.cn:7001/api/sse"
+	return sse.NewClient(url).
+		BasicAuth(username, password).
+		ListenFunc(func(s string) {
+			glog.Debugf("SSE: %s", s)
+		}).Header(func(header *http.Header) {
+		header.Add("Sse-Event-IP-Address", util.GetHostIp())
+		header.Add("Sse-Event-MAC-Address", u.GetLocalMac())
+	}).Done()
 }
 
 //func (this *Api) listen(list []*openwrt.DHCPLease) {
@@ -136,13 +173,11 @@ func (this *Api) SetStaticIp(w http.ResponseWriter, r *http.Request) {
 	defer f(w)
 	body, err := u.GetDataByJson[openwrt.DHCPLease](r)
 	if err != nil {
-		glog.Error(err)
 		res.Err(err)
 		return
 	}
 	err = openwrt.SetStaticIpAddress(body.MAC, body.IP, body.Hostname)
 	if err != nil {
-		glog.Error(err)
 		res.Err(err)
 		return
 	} else {
@@ -342,7 +377,7 @@ func (this *Api) TiggerSignCardEvent(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("mac is empty"))
 		return
 	}
-	err = openwrt.GetInstance().NotifySignCardEvent(3, body.Mac, glog.Now())
+	err = openwrt.GetInstance().NotifySignCardEvent(3, body.Mac)
 	if err != nil {
 		res.Err(err)
 		return
@@ -379,6 +414,6 @@ func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
 	res.Ok("更新成功")
 }
 
-func (this *Api) GetSSE() iface.ISSE {
+func (this *Api) GetSSE() isse.ISseServer {
 	return this.sseApi
 }

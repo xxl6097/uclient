@@ -384,8 +384,8 @@ func tee7() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		jsonBytes, _ := json.MarshalIndent(d, "", " ")
-		fmt.Println(string(jsonBytes))
+		//jsonBytes, _ := json.MarshalIndent(d, "", " ")
+		//fmt.Println(string(jsonBytes))
 		for _, work := range d {
 			fmt.Printf("%+v %+v\n", len(work.WorkTime), work)
 		}

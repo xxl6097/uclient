@@ -676,10 +676,16 @@ function handleConfirm() {
 
 function handleStaticSet() {
   formData.value.loading = true
+  const body = {
+    hostname: formData.value.second.hostname,
+    ip: formData.value.second.ip,
+    mac: formData.value.second.mac,
+  }
+  console.log('handleStaticSet', body)
   fetch(`../api/staticip/set`, {
     credentials: 'include',
     method: 'POST',
-    body: JSON.stringify(formData.value.client),
+    body: JSON.stringify(body),
   })
     .then((res) => res.json())
     .then((json) => {
