@@ -26,7 +26,10 @@ type openWRT struct {
 // GetInstance 返回单例实例
 func GetInstance() *openWRT {
 	once.Do(func() {
-		instance = &openWRT{}
+		instance = &openWRT{
+			clients: make(map[string]*DHCPLease),
+			nicks:   make(map[string]*NickEntry),
+		}
 		instance.init()
 		glog.Println("Singleton instance created")
 	})
@@ -44,10 +47,10 @@ func (this *openWRT) init() {
 	go this.subscribeHostapd()
 	go this.subscribeArpEvent()
 	go this.subscribeDnsmasq()
-	this.subscribeFsnotify()
-	time.AfterFunc(time.Second*10, func() {
-		this.ResetClients()
-	})
+	go this.subscribeFsnotify()
+	//time.AfterFunc(time.Second*10, func() {
+	//	this.ResetClients()
+	//})
 }
 
 func (this *openWRT) getName(macAddr string) string {
@@ -137,26 +140,26 @@ func (this *openWRT) subscribeHostapd() {
 	}
 }
 
-func (this *openWRT) subscribeArp() {
-	for {
-		err := SubscribeArp(time.Second*10, func(entry *ARPEntry) {
-			glog.Infof("Arp事件:%+v", entry)
-			if entry != nil && entry.MAC != nil {
-				this.updateDeviceStatus("Arp事件", &DHCPLease{
-					MAC:       entry.MAC.String(),
-					IP:        entry.IP.String(),
-					StartTime: entry.Timestamp.UnixMilli(),
-					Phy:       entry.Interface,
-				})
-			}
-
-		})
-		if err != nil {
-			glog.Error(fmt.Errorf("订阅失败 Hostapd %v", err))
-			time.Sleep(time.Second * 10)
-		}
-	}
-}
+//func (this *openWRT) subscribeArp() {
+//	for {
+//		err := SubscribeArp(time.Second*10, func(entry *ARPEntry) {
+//			glog.Infof("Arp事件:%+v", entry)
+//			if entry != nil && entry.MAC != nil {
+//				this.updateDeviceStatus("Arp事件", &DHCPLease{
+//					MAC:       entry.MAC.String(),
+//					IP:        entry.IP.String(),
+//					StartTime: entry.Timestamp.UnixMilli(),
+//					Phy:       entry.Interface,
+//				})
+//			}
+//
+//		})
+//		if err != nil {
+//			glog.Error(fmt.Errorf("订阅失败 Hostapd %v", err))
+//			time.Sleep(time.Second * 10)
+//		}
+//	}
+//}
 
 func (this *openWRT) subscribeArpEvent() {
 	SubscribeArpCache(time.Second*10, func(entrys map[string]*ARPEntry) {
@@ -226,7 +229,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			//glog.Debug("event:", event)
+			glog.Debug("listenFsnotify:", event)
 			if event.Has(fsnotify.Write) {
 				//filePath := event.Name
 				if strings.EqualFold(event.Name, dhcpLeasesFilePath) {
@@ -248,11 +251,12 @@ func (this *openWRT) subscribeFsnotify() {
 	if err != nil {
 		glog.Error(fmt.Errorf("创建监控器失败 %v", err))
 	}
-	go this.listenFsnotify(watcher)
+	//go this.listenFsnotify(watcher)
 	err = watcher.Add(dhcpLeasesFilePath)
 	if err != nil {
 		glog.Error(fmt.Errorf("watcher add err %v", err))
 	}
+	this.listenFsnotify(watcher)
 }
 
 func (this *openWRT) initClients() {
@@ -268,10 +272,14 @@ func (this *openWRT) initClients() {
 
 func (p *openWRT) updateClientsByDHCP() {
 	clientArray, err := getClientsByDhcp()
+	nickMap, e2 := getNickData()
+	if e2 == nil {
+		p.nicks = nickMap
+	}
 	if err != nil {
 		glog.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
 	} else {
-		//glog.Printf("DHCP更新客户端 %+v\n", len(clientArray))
+		glog.Printf("DHCP更新客户端 %+v\n", len(clientArray))
 		arpMap, e1 := getClientsByArp(brLanString)
 		for _, client := range clientArray {
 			mac := client.MAC
@@ -281,6 +289,29 @@ func (p *openWRT) updateClientsByDHCP() {
 					client.Online = arp.Flags == 2
 					client.Phy = arp.Interface
 				}
+			}
+			if e2 == nil && nickMap != nil {
+				nick := nickMap[mac]
+				if nick != nil {
+					client.Nick = nick
+				}
+			}
+			if v, ok := p.clients[mac]; ok && v != nil {
+				if client.Phy != "" {
+					v.Phy = client.Phy
+				}
+				if client.IP != "" {
+					v.IP = client.IP
+				}
+				if client.Nick != nil {
+					v.Nick = client.Nick
+				}
+				if client.StartTime > 0 {
+					v.StartTime = client.StartTime
+				}
+				v.Online = client.Online
+			} else {
+				p.clients[mac] = client
 			}
 			p.updateDeviceStatus("dhcp", client)
 		}
