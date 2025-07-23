@@ -16,8 +16,8 @@ var (
 )
 
 type openWRT struct {
-	clients map[string]*DHCPLease
-	//mu         sync.RWMutex
+	clients    map[string]*DHCPLease
+	nicks      map[string]*NickEntry
 	mu         sync.Mutex
 	fnEvent    func(int, any)
 	webhookUrl string
@@ -45,6 +45,9 @@ func (this *openWRT) init() {
 	go this.subscribeArpEvent()
 	go this.subscribeDnsmasq()
 	this.subscribeFsnotify()
+	time.AfterFunc(time.Second*10, func() {
+		this.webUpdateAll(this.GetClients())
+	})
 }
 
 func (this *openWRT) getName(macAddr string) string {
@@ -129,6 +132,7 @@ func (this *openWRT) subscribeHostapd() {
 		if err != nil {
 			glog.Error(fmt.Errorf("订阅失败 Hostapd %v", err))
 			time.Sleep(time.Second * 10)
+			glog.Error(fmt.Errorf("重新订阅 Hostapd "))
 		}
 	}
 }
@@ -252,7 +256,7 @@ func (this *openWRT) subscribeFsnotify() {
 }
 
 func (this *openWRT) initClients() {
-	dataMap, err := this.initClientsFromDHCPAndArpAndSysLogAndNick()
+	dataMap, err := this.initData()
 	if err != nil {
 		glog.Errorf("initClients Error:%v", err)
 		time.Sleep(5 * time.Second)
@@ -312,12 +316,26 @@ func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
 	_ = setStatusByMac(macAddr, tempList)
 }
 
-func (this *openWRT) initClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DHCPLease, error) {
+func (this *openWRT) initData() (map[string]*DHCPLease, error) {
 	arpList, e1 := getClientsByArp(brLanString)
+	glog.Println("✅ arpList：")
+	for _, temp := range arpList {
+		glog.Debugf("%+v", temp)
+	}
 	if e1 == nil {
 		dhcpMap, e2 := getClientsByDhcp()
+		glog.Println("✅ dhcpMap：")
+		for _, temp := range dhcpMap {
+			glog.Debugf("%+v", temp)
+		}
 		sysLogMap, e3 := getStatusFromSysLog()
 		nickMap, e4 := getNickData()
+
+		this.nicks = nickMap
+		glog.Println("✅ nickMap：")
+		for _, temp := range nickMap {
+			glog.Debugf("%+v", temp)
+		}
 		stcMap, e5 := getStaticIpMap()
 		if e4 != nil {
 			nickMap = map[string]*NickEntry{}
@@ -370,6 +388,11 @@ func (this *openWRT) initClientsFromDHCPAndArpAndSysLogAndNick() (map[string]*DH
 			if err != nil {
 				glog.Errorf("NickData Save Error:%v", err)
 			}
+		}
+
+		glog.Println("✅ dataMap：")
+		for _, temp := range dataMap {
+			glog.Debugf("%+v", temp)
 		}
 		return dataMap, nil
 	}

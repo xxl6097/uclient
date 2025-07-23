@@ -61,11 +61,7 @@
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane
-              label="静态IP设置"
-              name="second"
-              v-if="formData.client.nick.workType.onWorkTime != ''"
-            >
+            <el-tab-pane label="静态IP设置" name="second">
               <el-form label-width="90">
                 <el-form-item label="设备名称：">
                   <el-input
@@ -90,7 +86,7 @@
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="统计" name="thrid" v-if="activities.length > 0">
+            <el-tab-pane label="统计" name="thrid" v-if="isThridShow()">
               <div>
                 <div style="margin-bottom: 10px">
                   <el-date-picker
@@ -153,7 +149,7 @@
                           border
                           row-key="id"
                         >
-                          <el-table-column label="日期" prop="date" />
+                          <el-table-column label="日期" prop="date" sortable />
                           <el-table-column label="上班" prop="workTime1">
                             <template #default="scope">
                               <el-time-picker
@@ -346,6 +342,21 @@ const handleSelectChange = (row: WorkTime) => {
   // showWarmDialog(`${JSON.stringify(row)}`, {}, {})
 }
 
+//activities.length > 0
+function isThridShow(): boolean {
+  if (
+    formData.value &&
+    formData.value.client &&
+    formData.value.client.nick &&
+    formData.value.client.nick.workType &&
+    formData.value.client.nick.workType.onWorkTime != '' &&
+    formData.value.client.nick.workType.offWorkTime != ''
+  ) {
+    return true
+  }
+  return false
+}
+
 const getTagType = (value: number) => {
   switch (value) {
     case 0:
@@ -502,6 +513,17 @@ const handleExpandChange = (row: any, expanded: any) => {
 }
 
 function initOnWorkTime() {
+  formData.value.client = {} as Client
+  formData.value.client.nick = {} as NickEntry
+  formData.value.client.nick.workType = {
+    onWorkTime: '',
+    offWorkTime: '',
+    webhookUrl: '',
+    isSaturdayWork: false,
+  } as WorkType
+}
+
+function checkOnWorkTime() {
   if (!formData.value.client) {
     formData.value.client = {} as Client
   }
@@ -509,7 +531,12 @@ function initOnWorkTime() {
     formData.value.client.nick = {} as NickEntry
   }
   if (!formData.value.client.nick.workType) {
-    formData.value.client.nick.workType = {} as WorkType
+    formData.value.client.nick.workType = {
+      onWorkTime: '',
+      offWorkTime: '',
+      webhookUrl: '',
+      isSaturdayWork: false,
+    } as WorkType
   }
 }
 
@@ -710,6 +737,7 @@ function handleStaticSet() {
 
 const showDialogForm = (row: Client) => {
   console.log('打开对话框，row:', row)
+  initOnWorkTime()
   formData.value.title = `设备设置`
   formData.value.client = row
   formData.value.show = true
@@ -723,8 +751,7 @@ const showDialogForm = (row: Client) => {
     formData.value.second.mac = row.static.mac
   }
   // activities.value = testSettingData
-
-  initOnWorkTime()
+  checkOnWorkTime()
   fetchWorkData()
 }
 

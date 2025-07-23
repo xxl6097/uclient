@@ -111,6 +111,7 @@ func (this *openWRT) UpdateNickName(obj *NickEntry) error {
 	if this.fnEvent != nil {
 		this.fnEvent(0, this.GetClients())
 	}
+	this.nicks[mac] = nick
 	return updateNickData(mac, nick)
 }
 

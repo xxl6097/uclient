@@ -25,12 +25,14 @@ var (
 	brLanString           = "br-lan"
 	apStaDisConnectString = "AP-STA-DISCONNECTED"
 	apStaConnectString    = "AP-STA-CONNECTED"
-	StatusDir             = "/usr/local/openwrt/status"
-	workDir               = "/usr/local/openwrt/work"
-	nickFilePath          = "/usr/local/openwrt/nick"
-	webhookFilePath       = "/usr/local/openwrt/webhook"
 	MAX_SIZE              = 12000
 	MAX_WORK_SIZE         = 3600
+)
+var (
+	StatusDir       = "/etc/config/uclient/status"
+	workDir         = "/etc/config/uclient/work"
+	nickFilePath    = "/etc/config/uclient/nick"
+	webhookFilePath = "/etc/config/uclient/webhook"
 )
 
 type SysLogEvent struct {
@@ -350,6 +352,7 @@ func updateNickData(mac string, data *NickEntry) error {
 	if data == nil {
 		return fmt.Errorf("data is nil")
 	}
+
 	return updateNicksData(map[string]*NickEntry{mac: data})
 }
 
