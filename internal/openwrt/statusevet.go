@@ -45,13 +45,13 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 	cls := this.getClient(macAddress)
 	//glog.Debugf("新数据：%+v，老数据：%+v", device, cls)
 	if cls == nil {
-		cls = device
 		nickMap, e2 := getNickData()
 		if e2 == nil {
 			this.nicks = nickMap
 			device.Nick = nickMap[macAddress]
 		}
 		this.clients[macAddress] = device
+  cls = device
 	} else {
 		if device.Online == cls.Online {
 			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
