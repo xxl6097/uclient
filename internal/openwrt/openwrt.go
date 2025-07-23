@@ -165,17 +165,20 @@ func (this *openWRT) subscribeArpEvent() {
 	SubscribeArpCache(time.Second*10, func(entrys map[string]*ARPEntry) {
 		if entrys != nil {
 			for mac, entry := range entrys {
-				if v, ok := this.clients[mac]; ok {
-					if v.Online != (entry.Flags == 2) {
-						//glog.Infof("Arp事件:%+v", entry)
-						this.updateDeviceStatus("Arp事件", &DHCPLease{
+   dhcp:=&DHCPLease{
 							MAC:       entry.MAC.String(),
 							IP:        entry.IP.String(),
 							StartTime: entry.Timestamp.UnixMilli(),
 							Phy:       entry.Interface,
-						})
+						}
+				if v, ok := this.clients[mac]; ok {
+					if v.Online != (entry.Flags == 2) {
+						//glog.Infof("Arp事件:%+v", entry)
+						this.updateDeviceStatus("Arp事件", dhcp)
 					}
-				}
+				}else{
+this.clients[mac]=dhcp
+}
 			}
 		}
 	})
