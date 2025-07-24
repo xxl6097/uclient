@@ -18,6 +18,7 @@ var (
 type openWRT struct {
 	clients    map[string]*DHCPLease
 	nicks      map[string]*NickEntry
+	leases     map[string]*DHCPLease
 	mu         sync.Mutex
 	fnEvent    func(int, any)
 	webhookUrl string
@@ -29,9 +30,9 @@ func GetInstance() *openWRT {
 		instance = &openWRT{
 			clients: make(map[string]*DHCPLease),
 			nicks:   make(map[string]*NickEntry),
+			leases:  make(map[string]*DHCPLease),
 		}
 		instance.init()
-		glog.Println("Singleton instance created")
 	})
 	return instance
 }
@@ -40,71 +41,55 @@ func (this *openWRT) init() {
 	if u.IsMacOs() {
 		return
 	}
-	this.webhookUrl = this.GetWebHook()
 	this.initClients()
-	time.Sleep(time.Second)
 	go this.subscribeSysLog()
 	go this.subscribeHostapd()
 	go this.subscribeArpEvent()
 	go this.subscribeDnsmasq()
 	go this.subscribeFsnotify()
-	//time.AfterFunc(time.Second*10, func() {
-	//	this.ResetClients()
-	//})
 }
 
-func (this *openWRT) getName(macAddr string) string {
-	temp := this.clients[macAddr]
-	if temp != nil {
-		if temp.Nick != nil && temp.Nick.Name != "" {
-			return temp.Nick.Name
-		} else {
-			return temp.Hostname
-		}
-	} else {
-		return macAddr
+func (this *openWRT) initClients() {
+	dataMap, err := this.initData()
+	if err != nil {
+		glog.Errorf("initClients Error:%v", err)
+		time.Sleep(5 * time.Second)
+		glog.Error("5 seconds later and try...")
+		this.initClients()
 	}
-}
-
-func (this *openWRT) getDeviceName(macAddr string) (string, string) {
-	temp := this.clients[macAddr]
-	if temp != nil {
-		if temp.Nick != nil && temp.Nick.Name != "" {
-			return temp.Nick.Name, temp.IP
-		} else {
-			return temp.Hostname, temp.IP
-		}
-	} else {
-		return macAddr, ""
+	if dataMap == nil || len(dataMap) == 0 {
+		glog.Error("dataMap is empty, 1 seconds later and try...")
+		time.Sleep(16 * time.Second)
+		this.initClients()
 	}
+	this.clients = dataMap
 }
 
 func (this *openWRT) subscribeSysLog() {
 	for {
 		err := subscribeSysLog(func(event *SysLogEvent) {
-			//glog.Infof("SysLog事件:%+v", event)
 			if event != nil && event.Mac != "" {
-				this.updateDeviceStatus("SysLog事件", &DHCPLease{
+				glog.Infof("SysLog事件:%+v", event)
+				eve := &DHCPLease{
 					MAC:       event.Mac,
 					Online:    event.Online,
 					StartTime: event.Timestamp.UnixMilli(),
 					Phy:       event.Phy,
-				})
+				}
+				if v, ok := this.leases[eve.MAC]; ok {
+					if v.Hostname != "" {
+						eve.Hostname = v.Hostname
+					}
+				}
+				this.updateDeviceStatus("SysLog事件", eve)
 			}
 		})
 		if err != nil {
-			glog.Error(fmt.Errorf("系统日志监听失败 %v", err))
-			time.Sleep(time.Second * 10)
+			glog.Error(fmt.Errorf("SysLog监听失败 %v", err))
+			time.Sleep(time.Second * 5)
+			glog.Error("重新g监听 SysLog")
 		}
 	}
-
-}
-
-func (this *openWRT) getClient(macAddr string) *DHCPLease {
-	if cls, ok := this.clients[macAddr]; ok {
-		return cls
-	}
-	return nil
 }
 
 func (this *openWRT) subscribeHostapd() {
@@ -121,85 +106,82 @@ func (this *openWRT) subscribeHostapd() {
 						this.webUpdateOne(cls)
 					}
 				} else {
-					//glog.Infof("Hostapd事件:%+v", device)
-					this.updateDeviceStatus("Hostapd事件", &DHCPLease{
+					glog.Infof("Hostapd事件:%+v", device)
+					dhcp := &DHCPLease{
 						MAC:       device.Address,
 						Signal:    device.Signal,
 						Freq:      device.Freq,
 						StartTime: device.Timestamp.UnixMilli(),
 						Online:    device.DataType == 0,
-					})
+					}
+					if v, ok := this.leases[dhcp.MAC]; ok {
+						if v.Hostname != "" {
+							dhcp.Hostname = v.Hostname
+						}
+					}
+					this.updateDeviceStatus("Hostapd事件", dhcp)
 				}
 			}
 		})
 		if err != nil {
-			glog.Error(fmt.Errorf("订阅失败 Hostapd %v", err))
-			time.Sleep(time.Second * 10)
-			glog.Error(fmt.Errorf("重新订阅 Hostapd "))
+			glog.Errorf("订阅失败 Hostapd %v", err)
+			time.Sleep(time.Second * 5)
+			glog.Error("重新订阅 Hostapd")
 		}
 	}
 }
-
-//func (this *openWRT) subscribeArp() {
-//	for {
-//		err := SubscribeArp(time.Second*10, func(entry *ARPEntry) {
-//			glog.Infof("Arp事件:%+v", entry)
-//			if entry != nil && entry.MAC != nil {
-//				this.updateDeviceStatus("Arp事件", &DHCPLease{
-//					MAC:       entry.MAC.String(),
-//					IP:        entry.IP.String(),
-//					StartTime: entry.Timestamp.UnixMilli(),
-//					Phy:       entry.Interface,
-//				})
-//			}
-//
-//		})
-//		if err != nil {
-//			glog.Error(fmt.Errorf("订阅失败 Hostapd %v", err))
-//			time.Sleep(time.Second * 10)
-//		}
-//	}
-//}
 
 func (this *openWRT) subscribeArpEvent() {
 	SubscribeArpCache(time.Second*10, func(entrys map[string]*ARPEntry) {
 		if entrys != nil {
 			for mac, entry := range entrys {
-   dhcp:=&DHCPLease{
-							MAC:       entry.MAC.String(),
-							IP:        entry.IP.String(),
-							StartTime: entry.Timestamp.UnixMilli(),
-							Phy:       entry.Interface,
-						}
+				dhcp := &DHCPLease{
+					MAC:       entry.MAC.String(),
+					IP:        entry.IP.String(),
+					StartTime: entry.Timestamp.UnixMilli(),
+					Phy:       entry.Interface,
+				}
+				if v, ok := this.leases[mac]; ok {
+					if v.Hostname != "" {
+						dhcp.Hostname = v.Hostname
+					}
+				}
 				if v, ok := this.clients[mac]; ok {
 					if v.Online != (entry.Flags == 2) {
-						//glog.Infof("Arp事件:%+v", entry)
+						glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
-				}else{
-this.clients[mac]=dhcp
-}
+				} else {
+					glog.Infof("Arp事件(新增):%+v", entry)
+					this.clients[mac] = dhcp
+				}
 			}
 		}
 	})
 }
 func (this *openWRT) subscribeDnsmasq() {
-	err := SubscribeDnsmasq(func(device *DnsmasqDevice) {
-		//glog.Infof("Dnsmasq事件:%+v", device)
-		if device != nil && device.Mac != "" {
-			this.updateDeviceStatus("Dnsmasq事件", &DHCPLease{
-				MAC:       device.Mac,
-				IP:        device.Ip,
-				Hostname:  device.Name,
-				StartTime: device.Timestamp.UnixMilli(),
-				Phy:       device.Interface,
-				Online:    true,
-			})
+	for {
+		err := SubscribeDnsmasq(func(device *DnsmasqDevice) {
+			if device != nil && device.Mac != "" {
+				glog.Infof("Dnsmasq事件:%+v", device)
+				dhcp := &DHCPLease{
+					MAC:       device.Mac,
+					IP:        device.Ip,
+					Hostname:  device.Name,
+					StartTime: device.Timestamp.UnixMilli(),
+					Phy:       device.Interface,
+					Online:    true,
+				}
+				this.updateDeviceStatus("Dnsmasq事件", dhcp)
+			}
+		})
+		if err != nil {
+			glog.Errorf("Dnsmasq订阅失败 %v", err)
+			time.Sleep(time.Second * 5)
+			glog.Error("重新订阅 Dnsmasq")
 		}
-	})
-	if err != nil {
-		glog.Error(fmt.Errorf("subscribeHostapd Error:%v", err))
 	}
+
 }
 
 // 检测变化并告警
@@ -232,7 +214,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			glog.Debug("listenFsnotify:", event)
+			//glog.Debug("listenFsnotify:", event)
 			if event.Has(fsnotify.Write) {
 				//filePath := event.Name
 				if strings.EqualFold(event.Name, dhcpLeasesFilePath) {
@@ -262,17 +244,6 @@ func (this *openWRT) subscribeFsnotify() {
 	this.listenFsnotify(watcher)
 }
 
-func (this *openWRT) initClients() {
-	dataMap, err := this.initData()
-	if err != nil {
-		glog.Errorf("initClients Error:%v", err)
-		time.Sleep(5 * time.Second)
-		glog.Error("5 seconds later and try...")
-		this.initClients()
-	}
-	this.clients = dataMap
-}
-
 func (p *openWRT) updateClientsByDHCP() {
 	clientArray, err := getClientsByDhcp()
 	nickMap, e2 := getNickData()
@@ -282,7 +253,7 @@ func (p *openWRT) updateClientsByDHCP() {
 	if err != nil {
 		glog.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
 	} else {
-		glog.Printf("DHCP更新客户端 %+v\n", len(clientArray))
+		glog.Printf("DHCP变化，客户端数量 %+v\n", len(clientArray))
 		arpMap, e1 := getClientsByArp(brLanString)
 		for _, client := range clientArray {
 			mac := client.MAC
@@ -316,12 +287,13 @@ func (p *openWRT) updateClientsByDHCP() {
 			} else {
 				p.clients[mac] = client
 			}
+			p.leases[mac] = client
 			p.updateDeviceStatus("dhcp", client)
 		}
 	}
 }
 
-func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
+func (this *openWRT) updateUserTimeLineData(macAddr string, newList []*Status) {
 	tempList := getStatusByMac(macAddr)
 	if tempList == nil {
 		tempList = newList
@@ -348,87 +320,4 @@ func (this *openWRT) updateStatusList(macAddr string, newList []*Status) {
 		tempList = tempList[tempSize:]
 	}
 	_ = setStatusByMac(macAddr, tempList)
-}
-
-func (this *openWRT) initData() (map[string]*DHCPLease, error) {
-	arpList, e1 := getClientsByArp(brLanString)
-	glog.Println("✅ arpList：")
-	for _, temp := range arpList {
-		glog.Debugf("%+v", temp)
-	}
-	if e1 == nil {
-		dhcpMap, e2 := getClientsByDhcp()
-		glog.Println("✅ dhcpMap：")
-		for _, temp := range dhcpMap {
-			glog.Debugf("%+v", temp)
-		}
-		sysLogMap, e3 := getStatusFromSysLog()
-		nickMap, e4 := getNickData()
-
-		this.nicks = nickMap
-		glog.Println("✅ nickMap：")
-		for _, temp := range nickMap {
-			glog.Debugf("%+v", temp)
-		}
-		stcMap, e5 := getStaticIpMap()
-		if e4 != nil {
-			nickMap = map[string]*NickEntry{}
-		}
-		dataMap := make(map[string]*DHCPLease)
-		for _, entry := range arpList {
-			mac := entry.MAC.String()
-			item := &DHCPLease{
-				IP:     entry.IP.String(),
-				MAC:    mac,
-				Phy:    entry.Interface,
-				Online: entry.Flags == 2,
-			}
-			if e2 == nil {
-				if lease, ok := dhcpMap[mac]; ok {
-					item.StartTime = lease.StartTime
-					item.Hostname = lease.Hostname
-				}
-			}
-			if e3 == nil {
-				//item.StatusList = status[mac]
-				list := sysLogMap[mac]
-				//_ = setStatusByMac(mac, list)
-				this.updateStatusList(mac, list)
-			}
-			if e4 == nil {
-				if nick, ok := nickMap[mac]; ok {
-					//item.NickName = nick.Name
-					item.Nick = nick
-				}
-			} else {
-				nick := &NickEntry{
-					StartTime: item.StartTime,
-					Hostname:  item.Hostname,
-					IP:        item.IP,
-					MAC:       mac,
-				}
-				nickMap[mac] = nick
-			}
-
-			if e5 == nil {
-				if ip, ok := stcMap[mac]; ok {
-					item.Static = ip
-				}
-			}
-			dataMap[mac] = item
-		}
-		if e4 != nil {
-			err := updateNicksData(nickMap)
-			if err != nil {
-				glog.Errorf("NickData Save Error:%v", err)
-			}
-		}
-
-		glog.Println("✅ dataMap：")
-		for _, temp := range dataMap {
-			glog.Debugf("%+v", temp)
-		}
-		return dataMap, nil
-	}
-	return nil, e1
 }

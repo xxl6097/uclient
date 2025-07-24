@@ -12,7 +12,7 @@ func (this *openWRT) ddingNotify(tempData *DHCPLease) {
 	}
 }
 func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
-	if tempData.Nick != nil {
+	if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
 		_, err := sysLogUpdateWorkTime(tempData.MAC, tempData.StartTime, tempData.Nick.WorkType)
 		if err != nil {
 			glog.Errorf("更新时间失败 %v %+v", err, tempData)

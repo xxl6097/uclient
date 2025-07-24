@@ -51,7 +51,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 			device.Nick = nickMap[macAddress]
 		}
 		this.clients[macAddress] = device
-  cls = device
+		cls = device
 	} else {
 		if device.Online == cls.Online {
 			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
@@ -84,7 +84,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 	s.Connected = device.Online
 	this.ddingNotify(cls)
 	this.webNotify(cls)
-	this.updateStatusList(macAddress, []*Status{&s})
+	this.updateUserTimeLineData(macAddress, []*Status{&s})
 	glog.Debugf("%s 状态更新 %+v", typeEvent, device)
 }
 
@@ -135,7 +135,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 //		}
 //		this.ddingNotify(cls)
 //		this.webNotify(cls)
-//		this.updateStatusList(macAddr, []*Status{&s})
+//		this.updateUserTimeLineData(macAddr, []*Status{&s})
 //	}
 //}
 //
@@ -171,7 +171,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 //	}
 //	this.ddingNotify(cls)
 //	this.webNotify(cls)
-//	this.updateStatusList(macAddr, []*Status{&s})
+//	this.updateUserTimeLineData(macAddr, []*Status{&s})
 //}
 //
 //func (this *openWRT) updateStatusByDnsmasq(dnsData *DnsmasqDevice) {
@@ -207,5 +207,5 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 //	this.ddingWorkSign(cls)
 //	this.ddingNotify(cls)
 //	this.webNotify(cls)
-//	this.updateStatusList(macAddr, []*Status{&s})
+//	this.updateUserTimeLineData(macAddr, []*Status{&s})
 //}

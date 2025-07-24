@@ -176,7 +176,7 @@ func GetUCIOutput() ([]DHCPHost, error) {
 		return nil, err
 	}
 	hosts := parseUciShowDHCP(string(output))
-	glog.Println("✅ 解析结果：")
+	glog.Println("✅ 静态IP：")
 	for _, host := range hosts {
 		glog.Printf("索引: %v | MAC: %s | IP: %s | 设备名: %s\n",
 			host.Index, host.MAC, host.IP, host.Hostname)

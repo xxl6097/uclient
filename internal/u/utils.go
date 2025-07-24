@@ -321,6 +321,19 @@ func IsWorkingTime(time1, time2 string) (int, error) {
 	}
 }
 
+func IsOnWorked(time1 string) bool {
+	t1, e1 := time.Parse(time.TimeOnly, time1)
+	if e1 != nil {
+		return false
+	}
+	now := glog.Now()
+	if CompareTime(now, t1) > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
 func DateParse(timestr string) (*time.Time, error) {
 	t, e1 := time.Parse(time.DateOnly, timestr)
 	if e1 == nil {

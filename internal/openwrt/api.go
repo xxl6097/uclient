@@ -25,6 +25,130 @@ import (
 //	}
 //}
 
+func (this *openWRT) initData() (map[string]*DHCPLease, error) {
+	this.webhookUrl = this.GetWebHook()
+	arpList, e1 := getClientsByArp(brLanString)
+	if e1 == nil {
+		glog.Debug("\n✅ arpList：")
+		for _, temp := range arpList {
+			glog.Debugf("%+v", temp)
+		}
+	}
+	if e1 == nil {
+		dhcpMap, e2 := getClientsByDhcp()
+		if e2 == nil {
+			this.leases = dhcpMap
+			glog.Debug("\n✅ dhcpMap：")
+			for _, temp := range dhcpMap {
+				glog.Debugf("%+v", temp)
+			}
+		}
+
+		sysLogMap, e3 := getStatusFromSysLog()
+		nickMap, e4 := getNickData()
+		if e4 == nil {
+			this.nicks = nickMap
+			glog.Debug("\n✅ nickMap：")
+			for _, temp := range nickMap {
+				glog.Debugf("%+v", temp)
+			}
+		}
+
+		stcMap, e5 := getStaticIpMap()
+		if e4 != nil {
+			nickMap = map[string]*NickEntry{}
+		}
+		dataMap := make(map[string]*DHCPLease)
+		for _, entry := range arpList {
+			mac := entry.MAC.String()
+			item := &DHCPLease{
+				IP:     entry.IP.String(),
+				MAC:    mac,
+				Phy:    entry.Interface,
+				Online: entry.Flags == 2,
+			}
+			if e2 == nil {
+				if lease, ok := dhcpMap[mac]; ok {
+					item.StartTime = lease.StartTime
+					item.Hostname = lease.Hostname
+				}
+			}
+			if e3 == nil {
+				//item.StatusList = status[mac]
+				list := sysLogMap[mac]
+				//_ = setStatusByMac(mac, list)
+				this.updateUserTimeLineData(mac, list)
+			}
+			if e4 == nil {
+				if nick, ok := nickMap[mac]; ok {
+					//item.NickName = nick.Name
+					item.Nick = nick
+				}
+			} else {
+				nick := &NickEntry{
+					StartTime: item.StartTime,
+					Hostname:  item.Hostname,
+					IP:        item.IP,
+					MAC:       mac,
+				}
+				nickMap[mac] = nick
+			}
+
+			if e5 == nil {
+				if ip, ok := stcMap[mac]; ok {
+					item.Static = ip
+				}
+			}
+			dataMap[mac] = item
+		}
+		if e4 != nil {
+			err := updateNicksData(nickMap)
+			if err != nil {
+				glog.Errorf("NickData Save Error:%v", err)
+			}
+		}
+
+		glog.Debug("\n✅ dataMap：")
+		for _, temp := range dataMap {
+			glog.Debugf("%+v", temp)
+		}
+		return dataMap, nil
+	}
+	return nil, e1
+}
+
+func (this *openWRT) getClient(macAddr string) *DHCPLease {
+	if cls, ok := this.clients[macAddr]; ok {
+		return cls
+	}
+	return nil
+}
+func (this *openWRT) getName(macAddr string) string {
+	temp := this.clients[macAddr]
+	if temp != nil {
+		if temp.Nick != nil && temp.Nick.Name != "" {
+			return temp.Nick.Name
+		} else {
+			return temp.Hostname
+		}
+	} else {
+		return macAddr
+	}
+}
+
+func (this *openWRT) getDeviceName(macAddr string) (string, string) {
+	temp := this.clients[macAddr]
+	if temp != nil {
+		if temp.Nick != nil && temp.Nick.Name != "" {
+			return temp.Nick.Name, temp.IP
+		} else {
+			return temp.Hostname, temp.IP
+		}
+	} else {
+		return macAddr, ""
+	}
+}
+
 func (this *openWRT) SetFunc(fn func(int, any)) {
 	this.fnEvent = func(i int, obj any) {
 		if fn != nil {
@@ -117,9 +241,7 @@ func (this *openWRT) UpdateNickName(obj *NickEntry) error {
 
 func (this *openWRT) ResetClients() {
 	this.initClients()
-	if this.fnEvent != nil {
-		this.fnEvent(0, this.GetClients())
-	}
+	this.webUpdateAll(this.GetClients())
 }
 
 func (this *openWRT) GetStaticIpMap() ([]DHCPHost, error) {

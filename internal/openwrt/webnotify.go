@@ -5,7 +5,7 @@ func (this *openWRT) webUpdateAll(obj []*DHCPLease) {
 		return
 	}
 	if this.fnEvent != nil {
-		this.fnEvent(0, this.GetClients())
+		this.fnEvent(0, obj)
 	}
 }
 

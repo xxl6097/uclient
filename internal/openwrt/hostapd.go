@@ -79,11 +79,11 @@ func decode(s string, fn func(*HostapdDevice)) {
 			switch key {
 			case "assoc":
 				tempDevice = deviceOnline(s)
-				glog.Debugf("上线 %+v", tempData)
+				//glog.Debugf("上线 %+v", tempData)
 				break
 			case "disassoc":
 				tempDevice = deviceOffline(s)
-				glog.Debugf("离线 %+v", tempData)
+				//glog.Debugf("离线 %+v", tempData)
 				break
 			case "probe":
 				tempDevice = deviceStatus(s)

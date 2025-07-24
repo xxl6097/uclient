@@ -3,6 +3,7 @@ package openwrt
 import (
 	"fmt"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/internal/webhook"
 	"strings"
 	"time"
@@ -62,7 +63,7 @@ func (this *openWRT) NotifySignCardEvent(working int, macAddress string) error {
 	}
 	if working == 0 {
 		msg.Title = fmt.Sprintf("【%s】上班了", name)
-		if wk != nil && wk.WorkTime1 != "" {
+		if wk != nil && wk.WorkTime1 != "" && u.IsOnWorked(wk.WorkTime1) {
 			return fmt.Errorf("上班已经打卡了 %v", wk.WorkTime1)
 		}
 	} else if working == 2 {
@@ -92,14 +93,6 @@ func (this *openWRT) NotifySignCardEvent(working int, macAddress string) error {
 		if monthOverTimes != "" {
 			builder.WriteString(fmt.Sprintf("- 本月加班时长：%s\n ", monthOverTimes))
 		}
-		//if entry != nil {
-		//	if entry.OnWorkTime > 0 {
-		//		builder.WriteString(fmt.Sprintf("- 上班时间：%s\n ", u.TimestampToTime(entry.OnWorkTime)))
-		//	}
-		//	if entry.OffWorkTime > 0 {
-		//		builder.WriteString(fmt.Sprintf("- 下班时间：%s\n ", u.TimestampToTime(entry.OffWorkTime)))
-		//	}
-		//}
 	})
 }
 
