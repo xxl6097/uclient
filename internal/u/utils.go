@@ -2,6 +2,7 @@ package u
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/pkg"
@@ -390,4 +391,17 @@ func GetLocalMac() string {
 		}
 	}
 	return ""
+}
+
+func IsFileExist(file string) bool {
+	_, err := os.Stat(file)
+	if errors.Is(err, os.ErrNotExist) { // 明确检查“不存在”错误
+		fmt.Println("文件不存在")
+	} else if err != nil {
+		fmt.Println("其他错误:", err)
+	} else {
+		fmt.Println("文件存在")
+		return true
+	}
+	return false
 }

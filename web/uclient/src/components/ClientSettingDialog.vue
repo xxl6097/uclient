@@ -61,31 +61,31 @@
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="静态IP设置" name="second">
-              <el-form label-width="90">
-                <el-form-item label="设备名称：">
-                  <el-input
-                    v-model="formData.second.hostname"
-                    placeholder="请输入设备名称"
-                    :input-style="
-                      formData.client.static ? { color: 'red' } : {}
-                    "
-                  />
-                </el-form-item>
-                <el-form-item label="设备Mac：">
-                  <el-input
-                    v-model="formData.second.mac"
-                    placeholder="请输入设备Mac地址"
-                  />
-                </el-form-item>
-                <el-form-item label="设备IP：">
-                  <el-input
-                    v-model="formData.second.ip"
-                    placeholder="请输入设备IP"
-                  />
-                </el-form-item>
-              </el-form>
-            </el-tab-pane>
+            <!--            <el-tab-pane label="静态IP设置" name="second">-->
+            <!--              <el-form label-width="90">-->
+            <!--                <el-form-item label="设备名称：">-->
+            <!--                  <el-input-->
+            <!--                    v-model="formData.second.hostname"-->
+            <!--                    placeholder="请输入设备名称"-->
+            <!--                    :input-style="-->
+            <!--                      formData.client.static ? { color: 'red' } : {}-->
+            <!--                    "-->
+            <!--                  />-->
+            <!--                </el-form-item>-->
+            <!--                <el-form-item label="设备Mac：">-->
+            <!--                  <el-input-->
+            <!--                    v-model="formData.second.mac"-->
+            <!--                    placeholder="请输入设备Mac地址"-->
+            <!--                  />-->
+            <!--                </el-form-item>-->
+            <!--                <el-form-item label="设备IP：">-->
+            <!--                  <el-input-->
+            <!--                    v-model="formData.second.ip"-->
+            <!--                    placeholder="请输入设备IP"-->
+            <!--                  />-->
+            <!--                </el-form-item>-->
+            <!--              </el-form>-->
+            <!--            </el-tab-pane>-->
             <el-tab-pane label="统计" name="thrid" v-if="isThridShow()">
               <div>
                 <div style="margin-bottom: 10px">

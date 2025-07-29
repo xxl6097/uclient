@@ -43,6 +43,8 @@ func (this *openWRT) init() {
 	}
 	this.initClients()
 	go this.subscribeSysLog()
+	go this.subscribeHetSysLog()
+	go this.subscribeSysLog()
 	go this.subscribeHostapd()
 	go this.subscribeArpEvent()
 	go this.subscribeDnsmasq()
@@ -50,22 +52,22 @@ func (this *openWRT) init() {
 }
 
 func (this *openWRT) initClients() {
-	dataMap, err := this.initData()
+	err := this.initData()
 	if err != nil {
 		glog.Errorf("initClients Error:%v", err)
 		time.Sleep(5 * time.Second)
 		glog.Error("5 seconds later and try...")
 		this.initClients()
 	}
-	if dataMap == nil || len(dataMap) == 0 {
+	if this.clients == nil || len(this.clients) == 0 {
 		glog.Error("dataMap is empty, 1 seconds later and try...")
 		time.Sleep(16 * time.Second)
 		this.initClients()
 	}
-	this.clients = dataMap
 }
 
 func (this *openWRT) subscribeSysLog() {
+	tryCount := 0
 	for {
 		err := subscribeSysLog(func(event *SysLogEvent) {
 			if event != nil && event.Mac != "" {
@@ -75,6 +77,9 @@ func (this *openWRT) subscribeSysLog() {
 					Online:    event.Online,
 					StartTime: event.Timestamp.UnixMilli(),
 					Phy:       event.Phy,
+				}
+				if eve.StartTime <= 0 {
+					eve.StartTime = glog.Now().UnixMilli()
 				}
 				if v, ok := this.leases[eve.MAC]; ok {
 					if v.Hostname != "" {
@@ -86,13 +91,19 @@ func (this *openWRT) subscribeSysLog() {
 		})
 		if err != nil {
 			glog.Error(fmt.Errorf("SysLog监听失败 %v", err))
-			time.Sleep(time.Second * 5)
-			glog.Error("重新g监听 SysLog")
+			time.Sleep(time.Second * 10)
+			glog.Error("重新监听 SysLog")
+			tryCount++
+			if tryCount > RE_REY_MAX_COUNT {
+				glog.Error("监听 SysLog 失败，超过最大重试次数")
+				break
+			}
 		}
 	}
 }
 
 func (this *openWRT) subscribeHostapd() {
+	tryCount := 0
 	for {
 		err := SubscribeHostapd(func(device *HostapdDevice) {
 			if device != nil && device.Address != "" {
@@ -102,6 +113,9 @@ func (this *openWRT) subscribeHostapd() {
 						cls.Signal = device.Signal
 						cls.Freq = device.Freq
 						cls.StartTime = device.Timestamp.UnixMilli()
+						if cls.StartTime <= 0 {
+							cls.StartTime = glog.Now().UnixMilli()
+						}
 						//这里只是更新信号，不在web上notify通知
 						this.webUpdateOne(cls)
 					}
@@ -113,6 +127,9 @@ func (this *openWRT) subscribeHostapd() {
 						Freq:      device.Freq,
 						StartTime: device.Timestamp.UnixMilli(),
 						Online:    device.DataType == 0,
+					}
+					if dhcp.StartTime <= 0 {
+						dhcp.StartTime = glog.Now().UnixMilli()
 					}
 					if v, ok := this.leases[dhcp.MAC]; ok {
 						if v.Hostname != "" {
@@ -127,6 +144,11 @@ func (this *openWRT) subscribeHostapd() {
 			glog.Errorf("订阅失败 Hostapd %v", err)
 			time.Sleep(time.Second * 5)
 			glog.Error("重新订阅 Hostapd")
+			tryCount++
+			if tryCount > RE_REY_MAX_COUNT {
+				glog.Error("订阅 Hostapd 失败，超过最大重试次数")
+				break
+			}
 		}
 	}
 }
@@ -140,6 +162,9 @@ func (this *openWRT) subscribeArpEvent() {
 					IP:        entry.IP.String(),
 					StartTime: entry.Timestamp.UnixMilli(),
 					Phy:       entry.Interface,
+				}
+				if dhcp.StartTime <= 0 {
+					dhcp.StartTime = glog.Now().UnixMilli()
 				}
 				if v, ok := this.leases[mac]; ok {
 					if v.Hostname != "" {
@@ -160,6 +185,7 @@ func (this *openWRT) subscribeArpEvent() {
 	})
 }
 func (this *openWRT) subscribeDnsmasq() {
+	tryCount := 0
 	for {
 		err := SubscribeDnsmasq(func(device *DnsmasqDevice) {
 			if device != nil && device.Mac != "" {
@@ -172,6 +198,9 @@ func (this *openWRT) subscribeDnsmasq() {
 					Phy:       device.Interface,
 					Online:    true,
 				}
+				if dhcp.StartTime <= 0 {
+					dhcp.StartTime = glog.Now().UnixMilli()
+				}
 				this.updateDeviceStatus("Dnsmasq事件", dhcp)
 			}
 		})
@@ -179,6 +208,11 @@ func (this *openWRT) subscribeDnsmasq() {
 			glog.Errorf("Dnsmasq订阅失败 %v", err)
 			time.Sleep(time.Second * 5)
 			glog.Error("重新订阅 Dnsmasq")
+			tryCount++
+			if tryCount > RE_REY_MAX_COUNT {
+				glog.Error("监听 Dnsmasq 失败，超过最大重试次数")
+				break
+			}
 		}
 	}
 
@@ -217,6 +251,11 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			//glog.Debug("listenFsnotify:", event)
 			if event.Has(fsnotify.Write) {
 				//filePath := event.Name
+				//switch event.Name {
+				//case dhcpLeasesFilePath:
+				//	this.updateClientsByDHCP()
+				//	break
+				//}
 				if strings.EqualFold(event.Name, dhcpLeasesFilePath) {
 					this.updateClientsByDHCP()
 				}
@@ -236,11 +275,14 @@ func (this *openWRT) subscribeFsnotify() {
 	if err != nil {
 		glog.Error(fmt.Errorf("创建监控器失败 %v", err))
 	}
+
+	this.CheckFile(dhcpLeasesFilePath)
 	//go this.listenFsnotify(watcher)
 	err = watcher.Add(dhcpLeasesFilePath)
 	if err != nil {
 		glog.Error(fmt.Errorf("watcher add err %v", err))
 	}
+	//go this.SubscribeSysJsonFile(watcher)
 	this.listenFsnotify(watcher)
 }
 
@@ -282,6 +324,8 @@ func (p *openWRT) updateClientsByDHCP() {
 				}
 				if client.StartTime > 0 {
 					v.StartTime = client.StartTime
+				} else {
+					v.StartTime = glog.Now().UnixMilli()
 				}
 				v.Online = client.Online
 			} else {

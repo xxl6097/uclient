@@ -168,7 +168,7 @@ func (this *Api) Clear(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (this *Api) SetStaticIp(w http.ResponseWriter, r *http.Request) {
+func (this *Api) AddStaticIp(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)
 	body, err := u.GetDataByJson[openwrt.DHCPLease](r)
@@ -228,16 +228,15 @@ func (this *Api) GetStaticIps(w http.ResponseWriter, r *http.Request) {
 	defer f(w)
 	ips, err := openwrt.GetInstance().GetStaticIpMap()
 	if err != nil {
-		glog.Error(err)
 		res.Err(err)
 		return
 	}
 	if ips == nil || len(ips) <= 0 {
-		glog.Error("列表空")
 		res.Err(fmt.Errorf("列表空"))
 		return
 	}
 	res.Object("请求列表成功", ips)
+	//res.Any(ips)
 }
 
 func (this *Api) ResetNetwork(w http.ResponseWriter, r *http.Request) {
@@ -361,6 +360,28 @@ func (this *Api) GetWorkTime(w http.ResponseWriter, r *http.Request) {
 	//	glog.Printf("%+v\n", work)
 	//}
 	res.Object("获取成功", data)
+}
+
+func (this *Api) OfflineDevice(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[struct {
+		Mac string `json:"mac"`
+	}](r)
+	if err != nil {
+		res.Err(err)
+		return
+	}
+	if body.Mac == "" {
+		res.Err(fmt.Errorf("mac is empty"))
+		return
+	}
+	err = openwrt.OfflineDevice(body.Mac)
+	if err != nil {
+		res.Err(err)
+		return
+	}
+	res.Ok("ok")
 }
 
 func (this *Api) TiggerSignCardEvent(w http.ResponseWriter, r *http.Request) {

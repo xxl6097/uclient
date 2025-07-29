@@ -1185,3 +1185,23 @@
 //     ago: '2h10m27.185512554s',
 //   },
 // ]
+// export const testStatics = [
+//   {
+//     "index": "@host[0]",
+//     "hostname": "fnos-nas",
+//     "mac": "8c:ec:4b:58:81:09",
+//     "ip": "192.168.1.3"
+//   },
+//   {
+//     "index": "@host[1]",
+//     "hostname": "MacBookAirM4",
+//     "mac": "7e:c7:f1:25:63:f5",
+//     "ip": "192.168.1.2"
+//   },
+//   {
+//     "index": "@host[2]",
+//     "hostname": "xiaomi15",
+//     "mac": "5a:a7:22:62:3d:26",
+//     "ip": "192.168.1.5"
+//   }
+// ]

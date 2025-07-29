@@ -27,6 +27,7 @@ var (
 	apStaConnectString    = "AP-STA-CONNECTED"
 	MAX_SIZE              = 12000
 	MAX_WORK_SIZE         = 3600
+	RE_REY_MAX_COUNT      = 5
 )
 var (
 	StatusDir       = "/etc/config/uclient/status"
@@ -92,7 +93,7 @@ func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, 
 	return dataMap, command(func(data string) {
 		if re.MatchString(data) {
 			//fmt.Println("[事件] ", data) // 输出匹配行
-			macAddr := parseMacAddr(data)
+			macAddr := ParseMacAddr(data)
 			mac, err := net.ParseMAC(macAddr)
 			if err == nil {
 				t, e := parseTimer(data)
@@ -222,7 +223,7 @@ func parseTime1(logLine string) string {
 	return ""
 }
 
-func parseMacAddr(logLine string) string {
+func ParseMacAddr(logLine string) string {
 	// 1. 定义MAC地址正则表达式（兼容冒号/短横线分隔）
 	pattern := `(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}`
 	re := regexp.MustCompile(pattern)
@@ -237,7 +238,7 @@ func parseMacAddr(logLine string) string {
 func parseSysLog(data string) *SysLogEvent {
 	phy := parsePhy(data)
 	//timestamp := parseTime(data)
-	macAddr := parseMacAddr(data)
+	macAddr := ParseMacAddr(data)
 	//timestamp := glog.Now().UnixMilli() //time.Now().UnixMilli()
 	timestamp := glog.Now()
 	// 1. 检查字符串是否包含目标字段
@@ -448,7 +449,7 @@ func Command(fu func(string), name string, arg ...string) error {
 }
 
 func command(fu func(string), name string, arg ...string) error {
-	fmt.Println(name, arg)
+	glog.Println(name, arg)
 	// 创建ubus命令对象
 	cmd := exec.Command(name, arg...)
 

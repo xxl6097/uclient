@@ -25,7 +25,7 @@ import (
 //	}
 //}
 
-func (this *openWRT) initData() (map[string]*DHCPLease, error) {
+func (this *openWRT) initData() error {
 	this.webhookUrl = this.GetWebHook()
 	arpList, e1 := getClientsByArp(brLanString)
 	if e1 == nil {
@@ -58,7 +58,6 @@ func (this *openWRT) initData() (map[string]*DHCPLease, error) {
 		if e4 != nil {
 			nickMap = map[string]*NickEntry{}
 		}
-		dataMap := make(map[string]*DHCPLease)
 		for _, entry := range arpList {
 			mac := entry.MAC.String()
 			item := &DHCPLease{
@@ -69,6 +68,9 @@ func (this *openWRT) initData() (map[string]*DHCPLease, error) {
 			}
 			if e2 == nil {
 				if lease, ok := dhcpMap[mac]; ok {
+					if lease.StartTime <= 0 {
+						lease.StartTime = glog.Now().UnixMilli()
+					}
 					item.StartTime = lease.StartTime
 					item.Hostname = lease.Hostname
 				}
@@ -99,7 +101,20 @@ func (this *openWRT) initData() (map[string]*DHCPLease, error) {
 					item.Static = ip
 				}
 			}
-			dataMap[mac] = item
+			//dataMap[mac] = item
+			if v, ok := this.clients[mac]; ok {
+				v.IP = item.IP
+				v.MAC = item.MAC
+				v.Phy = item.Phy
+				v.Hostname = item.Hostname
+				v.Online = item.Online
+				v.Signal = item.Signal
+				v.Freq = item.Freq
+				v.Nick = item.Nick
+				v.Static = item.Static
+			} else {
+				this.clients[mac] = item
+			}
 		}
 		if e4 != nil {
 			err := updateNicksData(nickMap)
@@ -109,12 +124,12 @@ func (this *openWRT) initData() (map[string]*DHCPLease, error) {
 		}
 
 		glog.Debug("\n✅ dataMap：")
-		for _, temp := range dataMap {
+		for _, temp := range this.clients {
 			glog.Debugf("%+v", temp)
 		}
-		return dataMap, nil
+		return nil
 	}
-	return nil, e1
+	return e1
 }
 
 func (this *openWRT) getClient(macAddr string) *DHCPLease {
@@ -244,15 +259,16 @@ func (this *openWRT) ResetClients() {
 	this.webUpdateAll(this.GetClients())
 }
 
-func (this *openWRT) GetStaticIpMap() ([]DHCPHost, error) {
+func (this *openWRT) GetStaticIpMap() ([]*DHCPHost, error) {
 	arr, err := GetUCIOutput()
 	if err != nil {
-		glog.Printf("Error: %v\n", err)
+		glog.Printf("GetStaticIpMap Error: %v\n", err)
 		return nil, err
 	}
-	for _, entry := range arr {
-		this.clients[entry.MAC].Static = &entry
-	}
+	//for _, entry := range arr {
+	//	this.clients[entry.MAC].Static = entry
+	//}
+	glog.Println("GetStaticIpMap：", len(arr))
 	return arr, nil
 }
 func (this *openWRT) DeleteStaticIp(mac string) error {
@@ -298,4 +314,21 @@ func (this *openWRT) GetWorkTime(mac string) ([]*Work, error) {
 		}
 	}
 	return nil, fmt.Errorf("client not found mac")
+}
+
+func (this *openWRT) CheckFile(file string) {
+	if !u.IsFileExist(file) {
+		tryCount := 0
+		for {
+			time.Sleep(time.Second * 10)
+			if u.IsFileExist(file) {
+				return
+			}
+			tryCount++
+			if tryCount > RE_REY_MAX_COUNT {
+				glog.Error("监听  失败，超过最大重试次数")
+				return
+			}
+		}
+	}
 }

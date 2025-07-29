@@ -17,21 +17,41 @@ type DHCPHost struct {
 	IP       string `json:"ip"`
 }
 
-func setStaticLease(mac, ip, name string) error {
+func DownDevice(mac, ip, name string) error {
 	// 添加或更新DHCP配置
-	cmdAdd := exec.Command("uci", "add", "dhcp", "host")
-	if err := cmdAdd.Run(); err != nil {
+	if err := exec.Command("uci", "add", "dhcp", "host").Run(); err != nil {
 		glog.Printf("新增host条目失败（可能已存在）: %v", err)
 		return err
 	}
+	return nil
+}
 
-	// 设置参数
-	exec.Command("uci", "set", "dhcp.@host[-1].name="+name).Run()
-	exec.Command("uci", "set", "dhcp.@host[-1].mac="+mac).Run()
-	exec.Command("uci", "set", "dhcp.@host[-1].ip="+ip).Run()
-
+func addStaticIp(mac, ip, name string) error {
+	// 添加或更新DHCP配置
+	if err := exec.Command("uci", "add", "dhcp", "host").Run(); err != nil {
+		glog.Printf("新增host条目失败（可能已存在）: %v", err)
+		return err
+	}
+	if err := exec.Command("uci", "set", "dhcp.@host[-1].name="+name).Run(); err != nil {
+		glog.Errorf("新增host条目失败（name出错%v）: %v", name, err)
+		return err
+	}
+	if err := exec.Command("uci", "set", "dhcp.@host[-1].mac="+mac).Run(); err != nil {
+		glog.Errorf("新增host条目失败（mac出错%v）: %v", mac, err)
+		return err
+	}
+	if err := exec.Command("uci", "set", "dhcp.@host[-1].ip="+ip).Run(); err != nil {
+		glog.Errorf("新增host条目失败（ip出错 %v）: %v", ip, err)
+		return err
+	}
+	leasetime := "infinite"
+	if err := exec.Command("uci", "set", "dhcp.@host[-1].leasetime="+leasetime).Run(); err != nil {
+		glog.Errorf("新增host条目失败（leasetime出错 %v）: %v", leasetime, err)
+		return err
+	}
 	// 提交配置变更
 	if err := exec.Command("uci", "commit", "dhcp").Run(); err != nil {
+		glog.Errorf("新增host条目失败（commit出错）: %v", err)
 		return err
 	}
 	return nil
@@ -69,15 +89,24 @@ func isStaticIpUsed(ipAddress, macAddress, name string) error {
 	}
 	for _, entry := range entries {
 		//判断IP地址相同 && Mac地址不同，说明这个IP被另外一个设备(mac)占用
-		if entry.IP == ipAddress {
-			if entry.MAC != macAddress {
-				return fmt.Errorf("ip address %s is used by %s[%s]", ipAddress, entry.Hostname, entry.MAC)
-			}
-		} else if strings.EqualFold(entry.Hostname, name) {
-			//判断名称相同的 && Mac不同，说明这个名称被占用
-			if entry.MAC != macAddress {
-				return fmt.Errorf("host %s is used by %s[%s]", name, entry.Hostname, entry.MAC)
-			}
+		//if entry.IP == ipAddress {
+		//	if entry.MAC != macAddress {
+		//		return fmt.Errorf("ip address %s is used by %s[%s]", ipAddress, entry.Hostname, entry.MAC)
+		//	}
+		//} else if strings.EqualFold(entry.Hostname, name) {
+		//	//判断名称相同的 && Mac不同，说明这个名称被占用
+		//	if entry.MAC != macAddress {
+		//		return fmt.Errorf("host %s is used by %s[%s]", name, entry.Hostname, entry.MAC)
+		//	}
+		//}
+		if strings.EqualFold(entry.Hostname, name) {
+			return fmt.Errorf("DHCP 名称相同 %v %v %v", name, entry.Hostname, entry.MAC)
+		}
+		if strings.EqualFold(entry.IP, ipAddress) {
+			return fmt.Errorf("DHCP IP相同 %v %v %v", ipAddress, entry.Hostname, entry.IP)
+		}
+		if strings.EqualFold(entry.MAC, macAddress) {
+			return fmt.Errorf("DHCP Mac相同 %v %v %v", macAddress, entry.Hostname, entry.MAC)
 		}
 	}
 	return nil
@@ -87,7 +116,7 @@ func SetStaticIpAddress(mac, ip, name string) error {
 	if err := isStaticIpUsed(ip, mac, name); err != nil {
 		return err
 	}
-	err := setStaticLease(mac, ip, name)
+	err := addStaticIp(mac, ip, name)
 	if err != nil {
 		return err
 	}
@@ -118,7 +147,7 @@ func TestStaticLease() {
 	ip := "192.168.1.50"       // 需分配的静态IP
 	name := "My-Phone"         // 设备标识
 
-	if err := setStaticLease(mac, ip, name); err != nil {
+	if err := addStaticIp(mac, ip, name); err != nil {
 		log.Fatalf("配置失败: %v", err)
 	}
 	if err := restartDNSMasq(); err != nil {
@@ -127,8 +156,8 @@ func TestStaticLease() {
 	log.Println("静态IP设置成功！")
 }
 
-func parseUciShowDHCP(output string) []DHCPHost {
-	var leases []DHCPHost
+func parseUciShowDHCP(output string) []*DHCPHost {
+	var leases []*DHCPHost
 	lines := strings.Split(output, "\n")
 	var currentIndex string
 	var currentLease DHCPHost
@@ -146,7 +175,12 @@ func parseUciShowDHCP(output string) []DHCPHost {
 
 		if match := reConfig.FindStringSubmatch(line); match != nil {
 			if currentIndex != "" {
-				leases = append(leases, currentLease)
+				leases = append(leases, &DHCPHost{
+					Index:    currentIndex,
+					Hostname: currentLease.Hostname,
+					MAC:      currentLease.MAC,
+					IP:       currentLease.IP,
+				})
 			}
 			currentIndex = match[1]
 			currentLease = DHCPHost{Index: currentIndex}
@@ -162,13 +196,13 @@ func parseUciShowDHCP(output string) []DHCPHost {
 	}
 
 	if currentIndex != "" {
-		leases = append(leases, currentLease)
+		leases = append(leases, &currentLease)
 	}
 
 	return leases
 }
 
-func GetUCIOutput() ([]DHCPHost, error) {
+func GetUCIOutput() ([]*DHCPHost, error) {
 	cmd := exec.Command("uci", "show", "dhcp")
 	output, err := cmd.Output()
 	if err != nil {
@@ -176,11 +210,11 @@ func GetUCIOutput() ([]DHCPHost, error) {
 		return nil, err
 	}
 	hosts := parseUciShowDHCP(string(output))
-	glog.Println("✅ 静态IP：")
-	for _, host := range hosts {
-		glog.Printf("索引: %v | MAC: %s | IP: %s | 设备名: %s\n",
-			host.Index, host.MAC, host.IP, host.Hostname)
-	}
+	glog.Println("✅ 静态IP：", len(hosts))
+	//for _, host := range hosts {
+	//	glog.Printf("索引: %v | MAC: %s | IP: %s | 设备名: %s\n",
+	//		host.Index, host.MAC, host.IP, host.Hostname)
+	//}
 	return hosts, nil
 }
 
@@ -192,7 +226,9 @@ func getStaticIpMap() (map[string]*DHCPHost, error) {
 	}
 	dataMap := make(map[string]*DHCPHost)
 	for _, entry := range arr {
-		dataMap[entry.MAC] = &entry
+		dataMap[entry.MAC] = entry
 	}
+
+	glog.Println("静态IPMAP：", len(dataMap))
 	return dataMap, nil
 }

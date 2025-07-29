@@ -34,9 +34,11 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 	router.HandleFunc("/api/clients/get", this.restApi.GetClients).Methods(http.MethodGet)
 	router.HandleFunc("/api/clients/reset", this.restApi.ResetClients).Methods(http.MethodPost)
 
+	router.HandleFunc("/api/client/offline", this.restApi.OfflineDevice).Methods(http.MethodPost)
+
 	router.HandleFunc("/api/webhook/set", this.restApi.SetWebhook).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/staticip/set", this.restApi.SetStaticIp).Methods(http.MethodPost)
+	router.HandleFunc("/api/staticip/set", this.restApi.AddStaticIp).Methods(http.MethodPost)
 	router.HandleFunc("/api/staticip/delete", this.restApi.DeleteStaticIp).Methods(http.MethodDelete)
 	router.HandleFunc("/api/staticip/list", this.restApi.GetStaticIps).Methods(http.MethodGet)
 

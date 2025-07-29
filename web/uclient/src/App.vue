@@ -149,6 +149,9 @@
                     <el-dropdown-item @click="handleGoToTimeLineDialog(row)"
                       >时间表
                     </el-dropdown-item>
+                    <el-dropdown-item @click="handleOfflineDevice(row)"
+                      >强制下线
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -242,9 +245,6 @@ const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<
   typeof ClientTimeLineDialog
 > | null>(null)
-// const clientStaticIpDialogRef = ref<InstanceType<
-//   typeof ClientStaticIpSettingDialog
-// > | null>(null)
 const deviceSettingDialogRef = ref<InstanceType<
   typeof ClientSettingDialog
 > | null>(null)
@@ -554,17 +554,27 @@ function handleShowStaticIpListDialog() {
       if (json && json.code === 0) {
         console.log(json)
         if (staticIpListDialogRef.value && json.data) {
-          staticIpListDialogRef.value.showDialogForm(json.data)
+          staticIpListDialogRef.value.showDialogForm(json.data, tableData.value)
+        }
+      } else {
+        if (staticIpListDialogRef.value) {
+          staticIpListDialogRef.value.showDialogForm([], tableData.value)
         }
       }
       showTips(json.code, json.msg)
     })
     .catch((error) => {
-      console.log('error', error)
+      console.log('获取失败', error)
       showErrorTips(`获取失败${JSON.stringify(error)}`)
     })
     .finally(() => {
       loadings.close()
+      if (staticIpListDialogRef.value) {
+        // staticIpListDialogRef.value.showDialogForm(
+        //   testStatics as DHCPHost[],
+        //   tableData.value,
+        // )
+      }
     })
 }
 
@@ -581,6 +591,30 @@ const handleShowDeviceSetting = (row: Client) => {
 //     clientStaticIpDialogRef.value.showDialogForm(row)
 //   }
 // }
+
+// 调整详情
+const handleOfflineDevice = (row: Client) => {
+  console.log('handleOfflineDevice', row)
+  const body = {
+    mac: row.mac,
+  }
+  fetch('../api/client/offline', {
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      console.log('handleOfflineDevice', json)
+      showTips(json.code, json.msg)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+    .finally(() => {})
+}
 
 // 调整详情
 const handleGoToTimeLineDialog = (row: Client) => {
