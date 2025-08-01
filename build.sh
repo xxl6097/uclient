@@ -326,7 +326,7 @@ function install() {
 function githubActions() {
   builddir="./release"
 #  appname="srvinstaller"
-  appdir="./cmd/service"
+  appdir="./cmd/app"
   disname="${appname}应用程序"
   describe="一款基于GO语言的服务安装程序"
   echo "===>version:${version}"

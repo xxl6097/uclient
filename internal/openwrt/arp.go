@@ -58,7 +58,7 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 	//glog.Debugf("\n%s", content)
 	lines := strings.Split(content, "\n")
 	//entries := make([]*ARPEntry, 0)
-	entries := make(map[string][]*ARPEntry)
+	entries := make(map[string]*ARPEntry)
 	for i, line := range lines {
 		if i == 0 || strings.TrimSpace(line) == "" {
 			continue // 跳过标题行和空行
@@ -73,29 +73,34 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 			continue
 		}
 		mac := entry.MAC.String()
-		if _, ok := entries[mac]; !ok {
-			entries[mac] = []*ARPEntry{entry}
-		} else {
+		if _, ok := entries[mac]; ok {
 			temp := entries[mac]
-			entries[mac] = append(temp, entry)
-			entries[mac] = temp
-		}
-	}
-
-	arpMap := make(map[string]*ARPEntry)
-	for mac, v := range entries {
-		if v != nil && len(v) > 0 {
-			temp := v[0]
-			for _, item := range v {
-				if item.Flags == 2 {
-					temp = item
-				}
+			//glog.Debugf("parseARPLine  %+v", temp)
+			if temp.Flags != entry.Flags && entry.Flags == 2 {
+				entries[mac] = entry
 			}
-			arpMap[mac] = temp
+		} else {
+			//temp := entries[mac]
+			//entries[mac] = append(temp, entry)
+			//entries[mac] = temp
+			entries[mac] = entry
 		}
-
 	}
-	return arpMap, nil
+
+	//arpMap := make(map[string]*ARPEntry)
+	//for mac, v := range entries {
+	//	if v != nil && len(v) > 0 {
+	//		temp := v[0]
+	//		for _, item := range v {
+	//			if item.Flags == 2 {
+	//				temp = item
+	//			}
+	//		}
+	//		arpMap[mac] = temp
+	//	}
+	//
+	//}
+	return entries, nil
 }
 
 // 比较两个ARP表，返回新增、删除和修改的条目

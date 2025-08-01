@@ -24,6 +24,9 @@
                 <el-dropdown-item @click="handleClearData"
                   >清空数据
                 </el-dropdown-item>
+                <el-dropdown-item @click="showVersion"
+                  >查看版本
+                </el-dropdown-item>
                 <el-dropdown-item @click="handleResetClients"
                   >重置列表
                 </el-dropdown-item>
@@ -34,7 +37,7 @@
                   >静态列表
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleWebhookSetting"
-                  >webhook设置
+                  >推送设置
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -209,6 +212,44 @@
     </template>
   </el-dialog>
 
+  <!-- 弹窗显示版本 -->
+  <el-dialog v-model="versionDialogVisible" width="30%">
+    <template #header><span>版本信息</span></template>
+    <el-descriptions :column="1" :size="size" border>
+      <el-descriptions-item width="100">
+        <template #label>
+          <div class="cell-item">软件名称</div>
+        </template>
+        {{ version?.appName }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template #label>
+          <div class="cell-item">软件版本</div>
+        </template>
+        {{ version?.appVersion }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template #label>
+          <div class="cell-item">编译时间</div>
+        </template>
+        {{ version?.buildTime }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template #label>
+          <div class="cell-item">git版本</div>
+        </template>
+        {{ version?.gitRevision }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template #label>
+          <div class="cell-item">go编译版本</div>
+        </template>
+        {{ version?.goVersion }}
+      </el-descriptions-item>
+    </el-descriptions>
+  </el-dialog>
+
+  <PushSettingDialog ref="pushDialogRef" />
   <StaticIpListDialog ref="staticIpListDialogRef" />
   <!--  <ClientStaticIpSettingDialog ref="clientStaticIpDialogRef" />-->
   <ClientSettingDialog ref="deviceSettingDialogRef" />
@@ -219,7 +260,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
-import { Client } from './utils/type.ts'
+import { Client, Version } from './utils/type.ts'
 import ClientTimeLineDialog from './components/ClientTimeLineDialog.vue'
 import {
   isMobile,
@@ -232,14 +273,14 @@ import {
   formatTimeStamp,
   xhrPromise,
   formatToUTC8,
-  Prompt,
 } from './utils/utils.ts'
 import { EventAwareSSEClient } from './utils/sseclient.ts'
 import ViewExpand from './components/expand/ViewExpand.vue'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
-import { ElNotification } from 'element-plus'
+import { ComponentSize, ElNotification } from 'element-plus'
+import PushSettingDialog from './components/PushSettingDialog.vue'
 
 const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<
@@ -248,9 +289,12 @@ const clientTimeLineDialogRef = ref<InstanceType<
 const deviceSettingDialogRef = ref<InstanceType<
   typeof ClientSettingDialog
 > | null>(null)
+
 const staticIpListDialogRef = ref<InstanceType<
   typeof StaticIpListDialog
 > | null>(null)
+
+const pushDialogRef = ref<InstanceType<typeof PushSettingDialog> | null>(null)
 
 const manusForm = ref({
   show: false,
@@ -263,6 +307,9 @@ const customColors = [
   { color: '#1989fa', percentage: 80 },
   { color: '#6f7ad3', percentage: 100 },
 ]
+
+const size = ref<ComponentSize>('default')
+const versionDialogVisible = ref(false)
 const appinfo = ref<any>()
 const globalProgress = ref(0)
 const isDark = useDark()
@@ -274,6 +321,7 @@ const searchKeyword = ref<string>('')
 const pageSize = ref<number>(50)
 const currentPage = ref<number>(1)
 const tableData = ref<Client[]>([])
+const version = ref<Version>()
 // 分页后的表格数
 const paginatedTableData = computed<Client[]>(() => {
   const start = (currentPage.value - 1) * pageSize.value
@@ -326,28 +374,31 @@ const getVersion = () => {
 }
 
 const handleWebhookSetting = () => {
-  Prompt('请输入WebHook地址', 'webhook设置', '').then((result) => {
-    console.log('handleWebhookSetting', result.value)
-    const body = {
-      webhookUrl: result.value,
-    }
-    fetch('../api/webhook/set', {
-      credentials: 'include',
-      method: 'POST',
-      body: JSON.stringify(body),
-    })
-      .then((res) => {
-        return res.json()
-      })
-      .then((json) => {
-        if (json) {
-          showTips(json.code, json.msg)
-        }
-      })
-      .catch((error) => {
-        showErrorTips(`失败:${JSON.stringify(error)}`)
-      })
-  })
+  // Prompt('请输入WebHook地址', 'webhook设置', '').then((result) => {
+  //   console.log('handleWebhookSetting', result.value)
+  //   const body = {
+  //     webhookUrl: result.value,
+  //   }
+  //   fetch('../api/webhook/set', {
+  //     credentials: 'include',
+  //     method: 'POST',
+  //     body: JSON.stringify(body),
+  //   })
+  //     .then((res) => {
+  //       return res.json()
+  //     })
+  //     .then((json) => {
+  //       if (json) {
+  //         showTips(json.code, json.msg)
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       showErrorTips(`失败:${JSON.stringify(error)}`)
+  //     })
+  // })
+  if (pushDialogRef.value) {
+    pushDialogRef.value.showDialogForm()
+  }
 }
 
 const upgradeRef = ref<InstanceType<typeof UpgradeDialog> | null>(null)
@@ -457,7 +508,24 @@ const fetchData = () => {
       // renderTable(testTableData)
     })
 }
-
+const showVersion = () => {
+  // versionDialogVisible.value = true
+  fetch('../api/version', { credentials: 'include', method: 'GET' })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      console.log('showVersion', json)
+      if (json.code === 0 && json.data) {
+        version.value = json.data
+        versionDialogVisible.value = true
+      }
+      showTips(json.code, json.msg)
+    })
+    .catch(() => {
+      showErrorTips('失败')
+    })
+}
 const handleClearData = () => {
   showWarmDialog(
     `确定清空临时数据吗？`,

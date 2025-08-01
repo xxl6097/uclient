@@ -23,7 +23,7 @@ type Api struct {
 
 func NewApi(igs igs.Service, username, password string) *Api {
 	github.Api().SetName("xxl6097", "openwrt-client-manager")
-	initSSEClient(username, password)
+	//initSSEClient(username, password)
 	a := &Api{
 		igs:    igs,
 		sseApi: initSSE(),
@@ -178,6 +178,25 @@ func (this *Api) AddStaticIp(w http.ResponseWriter, r *http.Request) {
 	}
 	err = openwrt.SetStaticIpAddress(body.MAC, body.IP, body.Hostname)
 	if err != nil {
+		res.Err(err)
+		return
+	} else {
+		res.Ok("设置成功")
+	}
+}
+
+func (this *Api) SetNtfy(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[u.NtfyInfo](r)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	}
+	err = openwrt.GetInstance().SetNtfy(body)
+	if err != nil {
+		glog.Error(err)
 		res.Err(err)
 		return
 	} else {

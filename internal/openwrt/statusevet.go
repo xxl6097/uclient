@@ -1,6 +1,8 @@
 package openwrt
 
-import "github.com/xxl6097/glog/glog"
+import (
+	"github.com/xxl6097/glog/glog"
+)
 
 //func (this *openWRT) checkMessage(macAddress string, s *Status) bool {
 //	defer this.mu.Unlock()

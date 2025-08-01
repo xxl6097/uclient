@@ -405,3 +405,36 @@ func IsFileExist(file string) bool {
 	}
 	return false
 }
+
+// AddColonToMAC 将12位连续十六进制MAC地址转换为冒号分隔格式
+func AddColonToMAC(rawMAC string) string {
+	// 1. 清洗输入：移除非十六进制字符（如冒号、连字符、空格）
+	cleanMAC := strings.Map(func(r rune) rune {
+		if (r >= '0' && r <= '9') || (r >= 'A' && r <= 'F') || (r >= 'a' && r <= 'f') {
+			return r
+		}
+		return -1 // 删除无效字符
+	}, rawMAC)
+
+	// 2. 校验长度（标准MAC为12字符）
+	if len(cleanMAC) != 12 {
+		return rawMAC
+	}
+
+	// 3. 每2字符插入冒号
+	var builder strings.Builder
+	for i := 0; i < 12; i += 2 {
+		builder.WriteString(cleanMAC[i : i+2])
+		if i < 10 { // 末尾不加冒号
+			builder.WriteString(":")
+		}
+	}
+	return strings.ToLower(builder.String()) // 统一大写输出
+}
+
+func MacFormat(mac string) string {
+	if mac != "" && !strings.Contains(mac, ":") {
+		return AddColonToMAC(mac)
+	}
+	return mac
+}

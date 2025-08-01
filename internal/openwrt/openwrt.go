@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/go-service/pkg/utils"
+	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -48,7 +51,9 @@ func (this *openWRT) init() {
 	go this.subscribeHostapd()
 	go this.subscribeArpEvent()
 	go this.subscribeDnsmasq()
+	go this.subscribeAhsapdsta()
 	go this.subscribeFsnotify()
+	this.initNtfy()
 }
 
 func (this *openWRT) initClients() {
@@ -63,6 +68,17 @@ func (this *openWRT) initClients() {
 		glog.Error("dataMap is empty, 1 seconds later and try...")
 		time.Sleep(16 * time.Second)
 		this.initClients()
+	}
+}
+
+func (this *openWRT) initNtfy() {
+	if u.IsFileExist(ntfyFilePath) {
+		info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
+		if err != nil {
+			glog.Errorf("initNtfy Error:%v", err)
+		} else {
+			go ntfy.GetInstance().Start(info)
+		}
 	}
 }
 
@@ -211,6 +227,41 @@ func (this *openWRT) subscribeDnsmasq() {
 			tryCount++
 			if tryCount > RE_REY_MAX_COUNT {
 				glog.Error("监听 Dnsmasq 失败，超过最大重试次数")
+				break
+			}
+		}
+	}
+
+}
+
+func (this *openWRT) subscribeAhsapdsta() {
+	tryCount := 0
+	for {
+		err := SubscribeSta(func(device *StaUpDown) {
+			if device != nil && device.MacAddress != "" {
+				glog.Infof("ahsapd.sta事件:%+v", device)
+				num, _ := strconv.Atoi(device.Rssi)
+				dhcp := &DHCPLease{
+					MAC:       u.MacFormat(device.MacAddress),
+					Hostname:  device.HostName,
+					StartTime: device.Timestamp.UnixMilli(),
+					Phy:       device.Ssid,
+					Online:    device.Online == 1,
+					Signal:    num,
+				}
+				if dhcp.StartTime <= 0 {
+					dhcp.StartTime = glog.Now().UnixMilli()
+				}
+				this.updateDeviceStatus("ahsapd事件", dhcp)
+			}
+		})
+		if err != nil {
+			glog.Errorf("ahsapd 订阅失败 %v", err)
+			time.Sleep(time.Second * 5)
+			glog.Error("重新订阅 ahsapd")
+			tryCount++
+			if tryCount > RE_REY_MAX_COUNT {
+				glog.Error("监听 ahsapd 失败，超过最大重试次数")
 				break
 			}
 		}

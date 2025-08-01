@@ -36,6 +36,8 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 
 	router.HandleFunc("/api/client/offline", this.restApi.OfflineDevice).Methods(http.MethodPost)
 
+	router.HandleFunc("/api/ntfy/set", this.restApi.SetNtfy).Methods(http.MethodPost)
+
 	router.HandleFunc("/api/webhook/set", this.restApi.SetWebhook).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/staticip/set", this.restApi.AddStaticIp).Methods(http.MethodPost)

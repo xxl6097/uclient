@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/go-service/pkg/utils"
+	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"sort"
@@ -294,6 +296,14 @@ func (this *openWRT) SetWebHook(webhookUrl string) error {
 		this.webhookUrl = webhookUrl
 	}
 	return err
+}
+
+func (this *openWRT) SetNtfy(info *u.NtfyInfo) error {
+	if info == nil {
+		return fmt.Errorf("NtfyInfo is nil")
+	}
+	go ntfy.GetInstance().Start(info)
+	return utils.SaveWithGob[u.NtfyInfo](*info, ntfyFilePath)
 }
 
 func (this *openWRT) GetWebHook() string {

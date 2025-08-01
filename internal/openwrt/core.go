@@ -34,6 +34,7 @@ var (
 	workDir         = "/etc/config/uclient/work"
 	nickFilePath    = "/etc/config/uclient/nick"
 	webhookFilePath = "/etc/config/uclient/webhook"
+	ntfyFilePath    = "/etc/config/uclient/ntfy"
 )
 
 type SysLogEvent struct {

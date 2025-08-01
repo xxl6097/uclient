@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
 	"io"
 	"net/http"
@@ -58,6 +59,17 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	markdown["text"] = text.String()
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
 	glog.Debug("webhook", msg.Title)
+
+	e := ntfy.GetInstance().Publish(&u.NtfyEventData{
+		Topic:    "work",
+		Title:    msg.Title,
+		Message:  text.String(),
+		Markdown: true,
+	})
+	if e != nil {
+		glog.Error("ntfy", e)
+	}
+
 	return WebHook(msg.Url, payload)
 }
 func WebHook(webhookUrl string, payload any) error {

@@ -127,5 +127,6 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) error {
 	} else {
 		msg.Title = fmt.Sprintf("【%s】离线了", msg.DeviceName)
 	}
+
 	return webhook.Notify(msg, nil)
 }
