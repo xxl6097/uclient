@@ -56,6 +56,8 @@ export interface Client {
   mac: string
   phy: string
   hostname: string
+  staType: string
+  ssid: string
   signal: number
   freq: number
   nick: NickEntry

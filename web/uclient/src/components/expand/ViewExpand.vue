@@ -23,6 +23,12 @@
       <el-form-item label="Mac地址" v-if="isMobile()">
         <span>{{ row.mac }}</span>
       </el-form-item>
+      <el-form-item label="wifi名称" v-if="isMobile()">
+        <span>{{ row.ssid }}</span>
+      </el-form-item>
+      <el-form-item label="设备类型" v-if="isMobile()">
+        <span>{{ row.staType }}</span>
+      </el-form-item>
       <el-form-item label="网络接口" v-if="row.phy !== ''">
         <span>{{ row.phy }}</span>
       </el-form-item>

@@ -3,6 +3,7 @@ package openwrt
 import (
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/uclient/internal/u"
 	"time"
 )
 
@@ -56,4 +57,42 @@ func SubscribeSta(fn func(*StaUpDown)) error {
 			}
 		}
 	}, "ubus", "subscribe", "ahsapd.sta")
+}
+
+// GetStaInfo ubus call ahsapd.sta getStaInfo
+func getStaInfo() *u.StaInfo {
+	data, err := RunCMD("ubus", "call", "ahsapd.sta", "getStaInfo")
+	if err != nil {
+		glog.Errorf("Get sta info error: %v", err)
+		return nil
+	}
+	if data == nil {
+		glog.Errorf("Get sta info error")
+		return nil
+	}
+	sta := u.StaInfo{}
+	e := json.Unmarshal(data, &sta)
+	if e != nil {
+		glog.Errorf("Get sta info error: %v", e)
+		return nil
+	}
+	return &sta
+}
+
+func GetStaInfo() map[string]*u.StaDevice {
+	data := getStaInfo()
+	if data == nil {
+		return nil
+	}
+	if data.AhsapdSta.StaDevices == nil {
+		return nil
+	}
+	devices := make(map[string]*u.StaDevice)
+	for _, device := range data.AhsapdSta.StaDevices {
+		mac := u.MacFormat(device.MacAddress)
+		if mac != "" {
+			devices[mac] = &device
+		}
+	}
+	return devices
 }

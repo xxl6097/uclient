@@ -189,7 +189,7 @@ func (this *openWRT) subscribeArpEvent() {
 				}
 				if v, ok := this.clients[mac]; ok {
 					if v.Online != (entry.Flags == 2) {
-						glog.Infof("Arp事件:%+v", entry)
+						//glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
 				} else {
@@ -384,6 +384,22 @@ func (p *openWRT) updateClientsByDHCP() {
 			}
 			p.leases[mac] = client
 			p.updateDeviceStatus("dhcp", client)
+		}
+	}
+}
+
+func (p *openWRT) updateDHCPLeases(dhcp *DHCPLease) {
+	staInfo := GetStaInfo()
+	if staInfo != nil {
+		sta := staInfo[dhcp.MAC]
+		if sta != nil {
+			if dhcp.Hostname == "" || dhcp.Hostname == "*" {
+				dhcp.Hostname = sta.HostName
+			}
+			num, _ := strconv.Atoi(sta.Rssi)
+			dhcp.Signal = num
+			dhcp.StaType = sta.StaType
+			dhcp.Ssid = sta.Ssid
 		}
 	}
 }

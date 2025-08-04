@@ -103,8 +103,8 @@
             v-if="!isMobile()"
           />
           <el-table-column
-            prop="freq"
-            label="无线频段"
+            prop="ssid"
+            label="wifi名称"
             sortable
             v-if="!isMobile()"
           />

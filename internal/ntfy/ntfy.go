@@ -89,7 +89,7 @@ func (this *Ntfy) Subscribe(address, topic string, username, password string) er
 	}
 	for scanner.Scan() {
 		text := scanner.Text()
-		glog.Info(text)
+		//glog.Info(text)
 		if this.fnArray != nil && len(this.fnArray) > 0 {
 			for _, fn := range this.fnArray {
 				fn(text)

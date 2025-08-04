@@ -320,8 +320,6 @@ function install() {
 # ${builddir}/${appname}_${version}_${os}_${arch} install
 }
 
-
-
 # shellcheck disable=SC2120
 function githubActions() {
   builddir="./release"

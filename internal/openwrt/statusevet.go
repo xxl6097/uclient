@@ -55,11 +55,11 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 		this.clients[macAddress] = device
 		cls = device
 	} else {
-		if device.Online == cls.Online {
-			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
-			return
-		}
-		cls.Online = device.Online
+		//if device.Online == cls.Online {
+		//	//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
+		//	return
+		//}
+		//cls.Online = device.Online
 		if device.Signal != 0 {
 			cls.Signal = device.Signal
 		}
@@ -78,6 +78,14 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 		if device.Hostname != "" {
 			cls.Hostname = device.Hostname
 		}
+
+		this.updateDHCPLeases(device)
+		glog.Debugf("%s 状态变化 %+v", typeEvent, device)
+		if device.Online == cls.Online {
+			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
+			return
+		}
+		cls.Online = device.Online
 		//需要webnotify通知、钉钉notify、签到
 		this.ddingWorkSign(cls)
 	}

@@ -17,11 +17,16 @@ type KernelLog struct {
 	Online     bool   // MAC地址
 }
 
+const (
+	ONLINE_KEYWORDS  = "New Sta"
+	OFFLINE_KEYWORDS = "Del Sta"
+)
+
 func parseHetSysLog(logStr string) *KernelLog {
 	online := false
-	if strings.Contains(logStr, "MacTableDeleteEntry") {
+	if strings.Contains(logStr, OFFLINE_KEYWORDS) {
 		online = false
-	} else if strings.Contains(logStr, "MacTableInsertEntry") {
+	} else if strings.Contains(logStr, ONLINE_KEYWORDS) {
 		online = true
 	} else {
 		return nil
@@ -46,9 +51,9 @@ func subscribeHetSysLog(fn func(*KernelLog)) error {
 	re := regexp.MustCompile(pattern)
 	return command(func(s string) {
 		if re.MatchString(s) {
-			if strings.Contains(s, "MacTableDeleteEntry") || strings.Contains(s, "MacTableInsertEntry") {
+			if strings.Contains(s, ONLINE_KEYWORDS) || strings.Contains(s, OFFLINE_KEYWORDS) {
 				tempData := parseHetSysLog(s)
-				glog.Debug("--->", tempData)
+				//glog.Debug("--->", tempData)
 				if fn != nil && tempData != nil {
 					fn(tempData)
 				}

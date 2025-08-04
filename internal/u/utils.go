@@ -438,3 +438,18 @@ func MacFormat(mac string) string {
 	}
 	return mac
 }
+
+//func RunCMD(command string) (string, error) {
+//	c := cmd.NewCommand(command)
+//	err := c.Execute()
+//	if err != nil {
+//		return "", err
+//	}
+//	if c.Stdout() != "" {
+//		fmt.Println("Stdout", c.Stdout())
+//	}
+//	if c.Stderr() != "" {
+//		fmt.Println("Stderr", c.Stderr())
+//	}
+//	return c.Stdout(), err
+//}

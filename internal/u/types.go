@@ -30,3 +30,38 @@ type NtfyEventData struct {
 	Message  string `json:"message,omitempty"`
 	Markdown bool   `json:"markdown,omitempty"`
 }
+
+type StaDevice struct {
+	IpAddress            string `json:"ipAddress"`
+	HostName             string `json:"hostName"`
+	MacAddress           string `json:"macAddress"`
+	VmacAddress          string `json:"vmacAddress"`
+	UpTime               string `json:"upTime"`
+	AccessTime           string `json:"accessTime"`
+	Rssi                 string `json:"rssi"`
+	RxRate               string `json:"rxRate"`
+	TxRate               string `json:"txRate"`
+	RxRateRt             string `json:"rxRate_rt"`
+	TxRateRt             string `json:"txRate_rt"`
+	TotalPacketsSent     int    `json:"totalPacketsSent"`
+	TotalPacketsReceived int    `json:"totalPacketsReceived"`
+	TotalBytesSent       int    `json:"totalBytesSent"`
+	TotalBytesReceived   int    `json:"totalBytesReceived"`
+	RateArray            []struct {
+		MaxRxRate  string `json:"maxRxRate"`
+		MaxTxRate  string `json:"maxTxRate"`
+		AverRxRate string `json:"averRxRate"`
+		AverTxRate string `json:"averTxRate"`
+		Interface  string `json:"interface"`
+	} `json:"rateArray"`
+	StaType   string `json:"staType"`
+	Radio     string `json:"radio"`
+	Channel   string `json:"channel"`
+	Ssid      string `json:"ssid"`
+	StaVendor string `json:"staVendor,omitempty"`
+}
+type StaInfo struct {
+	AhsapdSta struct {
+		StaDevices []StaDevice `json:"staDevices"`
+	} `json:"ahsapd.sta"`
+}

@@ -73,6 +73,8 @@ type DHCPLease struct {
 	Online    bool       `json:"online"`
 	Signal    int        `json:"signal"`
 	Freq      int        `json:"freq"`
+	StaType   string     `json:"staType"`
+	Ssid      string     `json:"ssid"`
 	Nick      *NickEntry `json:"nick"` //
 	Static    *DHCPHost  `json:"static"`
 }
@@ -481,6 +483,16 @@ func command(fu func(string), name string, arg ...string) error {
 		return err
 	}
 	return cmd.Wait() // 等待命令退出
+}
+
+func RunCMD(name string, args ...string) ([]byte, error) {
+	glog.Println(name, args)
+	cmd := exec.Command(name, args...)
+	output, err := cmd.CombinedOutput() // 合并stdout和stderr
+	if err != nil {
+		return nil, fmt.Errorf("执行失败: %v, 输出: %s", err, string(output))
+	}
+	return output, nil
 }
 
 func getStatusByMac(mac string) []*Status {

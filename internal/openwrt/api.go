@@ -9,6 +9,7 @@ import (
 	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -28,6 +29,7 @@ import (
 //}
 
 func (this *openWRT) initData() error {
+	staInfo := GetStaInfo()
 	this.webhookUrl = this.GetWebHook()
 	arpList, e1 := getClientsByArp(brLanString)
 	if e1 == nil {
@@ -101,6 +103,20 @@ func (this *openWRT) initData() error {
 			if e5 == nil {
 				if ip, ok := stcMap[mac]; ok {
 					item.Static = ip
+				}
+			}
+
+			if staInfo != nil {
+				//glog.Debugf("---->%+v", staInfo)
+				sta := staInfo[mac]
+				if sta != nil {
+					if item.Hostname == "" || item.Hostname == "*" {
+						item.Hostname = sta.HostName
+					}
+					num, _ := strconv.Atoi(sta.Rssi)
+					item.Signal = num
+					item.StaType = sta.StaType
+					item.Ssid = sta.Ssid
 				}
 			}
 			//dataMap[mac] = item
