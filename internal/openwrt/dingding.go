@@ -30,3 +30,15 @@ func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
 		glog.Errorf("未设置打卡 %+v", tempData)
 	}
 }
+
+func (this *openWRT) ddingWorkOffSign(tempData *DHCPLease) {
+	if tempData != nil && !tempData.Online {
+		this.ddingWorkSign(tempData)
+	}
+}
+func (this *openWRT) ddingWorkOnSign(tempData *DHCPLease) {
+	if tempData != nil && tempData.Online && !tempData.IsOnWorkSign && tempData.Signal >= -80 {
+		tempData.IsOnWorkSign = true
+		this.ddingWorkSign(tempData)
+	}
+}

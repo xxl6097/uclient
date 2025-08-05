@@ -56,9 +56,9 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 		}
 
 		mac := u.MacFormat(device.MacAddress)
-		if mac == "16:00:6f:83:35:e1" {
-			glog.Debug(device.HOSTNAME, device.RSSI)
-		}
+		//if mac == "16:00:6f:83:35:e1" {
+		//	glog.Debug(device.HOSTNAME, device.RSSI)
+		//}
 		if v, ok := this.clients[mac]; ok {
 			v.Signal = device.RSSI
 			if device.Lan != "" {
@@ -74,6 +74,7 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 				this.webUpdateAll(this.GetClients())
 				v.Device = device
 			}
+			this.ddingWorkOnSign(v)
 		} else {
 			glog.Debug("mergeStatus 不存在", device)
 		}

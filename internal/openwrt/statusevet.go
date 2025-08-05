@@ -87,7 +87,8 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 		}
 		cls.Online = device.Online
 		//需要webnotify通知、钉钉notify、签到
-		this.ddingWorkSign(cls)
+		//this.ddingWorkSign(cls)
+		this.ddingWorkOffSign(cls)
 	}
 	s := Status{}
 	s.Timestamp = device.StartTime
