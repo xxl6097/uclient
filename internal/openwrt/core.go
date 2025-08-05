@@ -271,20 +271,27 @@ func parseLeaseLine(line string, leasetime time.Duration) (DHCPLease, error) {
 	if len(fields) < 4 { // 至少包含时间戳、MAC、IP、主机名
 		return DHCPLease{}, fmt.Errorf("字段不足")
 	}
-
 	//fmt.Println("fields", fields)
 	// 解析时间戳（Unix时间）
-	startSec, _ := strconv.ParseInt(fields[0], 10, 64)
-	beijingLoc, err := time.LoadLocation("Asia/Shanghai")
-	if err != nil {
-		// 备选方案：手动创建东八区时区
-		//fmt.Println(err, "备选方案：手动创建东八区时区")
-		//beijingLoc = time.FixedZone("CST", 8*60*60) // UTC+8
-		beijingLoc = time.FixedZone("UTC+8", 8*60*60)
+	now := glog.Now()
+	var startTime = now
+	startSec, e := strconv.ParseInt(fields[0], 10, 64)
+	if e != nil {
+		//beijingLoc, err := time.LoadLocation("Asia/Shanghai")
+		//if err != nil {
+		//	// 备选方案：手动创建东八区时区
+		//	//fmt.Println(err, "备选方案：手动创建东八区时区")
+		//	//beijingLoc = time.FixedZone("CST", 8*60*60) // UTC+8
+		//	beijingLoc = time.FixedZone("UTC+8", 8*60*60)
+		//}
+		//utcTime := time.Unix(startSec, 0) //// 解析为 UTC 时间
+		//startTime = utcTime.In(beijingLoc).Add(-leasetime)
+		startTime = u.UTC8ToTime(startSec)
 	}
-	utcTime := time.Unix(startSec, 0) //// 解析为 UTC 时间
-	startTime := utcTime.In(beijingLoc).Add(-leasetime)
 	//startTime := time.Unix(startSec, 0) //// 解析为 UTC 时间
+	if startTime.UnixMilli() > now.UnixMilli() {
+		startTime = now
+	}
 
 	// 解析MAC地址
 	mac, err := net.ParseMAC(fields[1])
@@ -306,7 +313,7 @@ func parseLeaseLine(line string, leasetime time.Duration) (DHCPLease, error) {
 		IP:        ip.String(),
 		MAC:       mac.String(),
 		Hostname:  hostname,
-		StartTime: startTime.Unix(),
+		StartTime: startTime.UnixMilli(),
 		//IsActive:  time.Now().Before(startTime.Add(time.Second * time.Duration(leaseDuration))),
 	}, nil
 }
