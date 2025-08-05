@@ -39,5 +39,5 @@ func ByteCountSpeed(b uint64) string {
 		div *= unit
 		exp++
 	}
-	return fmt.Sprintf("%.1f %ciB/s", float64(b)/float64(div), "KMGTPE"[exp])
+	return fmt.Sprintf("%.2f %ciB/s", float64(b)/float64(div), "KMGTPE"[exp])
 }
