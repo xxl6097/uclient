@@ -73,6 +73,7 @@ type DHCPLease struct {
 	StartTime int64      `json:"starTime"` //租约失效的精确时间（秒级精度）
 	Online    bool       `json:"online"`
 	Signal    int        `json:"signal"`
+	Vendor    string     `json:"vendor"`
 	Freq      int        `json:"freq"`
 	StaType   string     `json:"staType"`
 	Ssid      string     `json:"ssid"`

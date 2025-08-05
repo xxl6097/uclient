@@ -110,6 +110,7 @@ func (this *openWRT) initData() error {
 				//glog.Debugf("---->%+v", staInfo)
 				sta := staInfo[mac]
 				if sta != nil {
+					item.Vendor = sta.StaVendor
 					if item.Hostname == "" || item.Hostname == "*" {
 						item.Hostname = sta.HostName
 					}

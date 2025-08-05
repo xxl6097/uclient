@@ -79,7 +79,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 			cls.Hostname = device.Hostname
 		}
 
-		//this.updateDHCPLeases(device)
+		this.updateDHCPLeases(device)
 		//glog.Debugf("%s 状态变化 %+v", typeEvent, device)
 		if device.Online == cls.Online {
 			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)

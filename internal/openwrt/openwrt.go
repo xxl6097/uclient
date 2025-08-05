@@ -400,6 +400,7 @@ func (p *openWRT) updateDHCPLeases(dhcp *DHCPLease) {
 	if staInfo != nil {
 		sta := staInfo[dhcp.MAC]
 		if sta != nil {
+			dhcp.Vendor = sta.StaVendor
 			if dhcp.Hostname == "" || dhcp.Hostname == "*" {
 				dhcp.Hostname = sta.HostName
 			}

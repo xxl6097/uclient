@@ -60,6 +60,7 @@ export interface Client {
   ssid: string
   upRate: string
   downRate: string
+  vendor: string
   signal: number
   freq: number
   nick: NickEntry

@@ -97,6 +97,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
+          <el-table-column prop="vendor" label="品牌" sortable />
           <el-table-column prop="signal" label="信号强度" sortable />
           <el-table-column prop="upRate" label="上传" sortable />
           <el-table-column prop="downRate" label="下载" sortable />
