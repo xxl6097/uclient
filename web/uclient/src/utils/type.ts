@@ -58,6 +58,8 @@ export interface Client {
   hostname: string
   staType: string
   ssid: string
+  upRate: string
+  downRate: string
   signal: number
   freq: number
   nick: NickEntry

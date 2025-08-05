@@ -65,3 +65,60 @@ type StaInfo struct {
 		StaDevices []StaDevice `json:"staDevices"`
 	} `json:"ahsapd.sta"`
 }
+
+type Device struct {
+	Lan        string `json:"lan"`
+	UpTime     int    `json:"UpTime"`
+	RSSI       int    `json:"RSSI"`
+	TxDataRate int    `json:"TxDataRate"`
+	RxDataRate int    `json:"RxDataRate"`
+	TxBytesRt  string `json:"TxBytes_rt"`
+	RxBytesRt  string `json:"RxBytes_rt"`
+	TxBytes    int    `json:"TxBytes"`
+	RxBytes    int    `json:"RxBytes"`
+	TxPkts     int    `json:"TxPkts"`
+	RxPkts     int    `json:"RxPkts"`
+	MacAddress string `json:"MacAddress"`
+	IPADDR     string `json:"IPADDR"`
+	HOSTNAME   string `json:"HOSTNAME"`
+}
+
+type PORTINFO struct {
+	PORT0 *Device `json:"PORT0"`
+	PORT1 *Device `json:"PORT1"`
+	PORT2 *Device `json:"PORT2"`
+}
+type Ra struct {
+	SSID    string    `json:"SSID"`
+	NUMBER  int       `json:"NUMBER"`
+	Stainfo []*Device `json:"stainfo"`
+}
+
+type G2 struct {
+	Ra0    *Ra `json:"ra0"`
+	Ra1    *Ra `json:"ra1"`
+	NUMBER int `json:"NUMBER"`
+}
+type G5 struct {
+	Rax0   *Ra `json:"rax0"`
+	NUMBER int `json:"NUMBER"`
+}
+
+type DeviceStatus struct {
+	MEM        int       `json:"MEM"`
+	UPTIME     int       `json:"UPTIME"`
+	CPU        int       `json:"CPU"`
+	WANMAC     string    `json:"WANMAC"`
+	OPMODE     string    `json:"OPMODE"`
+	WANIP      string    `json:"WANIP"`
+	NETMASK    string    `json:"NETMASK"`
+	GATEWAY    string    `json:"GATEWAY"`
+	DNS        string    `json:"DNS"`
+	WANUPTIME  int       `json:"WAN_UPTIME"`
+	PROTO      string    `json:"PROTO"`
+	IPV6ENABLE int       `json:"IPV6ENABLE"`
+	NETSTATUS  int       `json:"NETSTATUS"`
+	PORTINFO   *PORTINFO `json:"PORTINFO"`
+	G2         *G2       `json:"2G"`
+	G5         *G5       `json:"5G"`
+}

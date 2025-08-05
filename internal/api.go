@@ -67,7 +67,23 @@ func initSSE() isse.ISseServer {
 	//	}).
 	//	UnRegister(nil).
 	//	Done()
-	return sse.New().Done()
+	return sse.
+		New().
+		Register(func(server isse.ISseServer, client *isse.Client) {
+			glog.Debug("sse新链接", client)
+			//openwrt.GetInstance().StartStatus()
+		}).
+		UnRegister(func(server isse.ISseServer, client *isse.Client) {
+			cls := server.GetClients()
+			if cls != nil {
+				glog.Debug("sse链接断开", len(cls), client)
+				if len(cls) == 0 {
+					//表示没有客户端了
+					//openwrt.GetInstance().StopStatus()
+				}
+			}
+		}).
+		Done()
 }
 
 func initSSEClient(username string, password string) *sse.Client {

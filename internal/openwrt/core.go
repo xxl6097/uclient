@@ -21,6 +21,7 @@ import (
 var (
 	arpFilePath           = "/proc/net/arp"
 	dhcpLeasesFilePath    = "/tmp/dhcp.leases"
+	hetsysinfoFilePath    = "/tmp/hetsysinfo.json"
 	dhcpCfgFilePath       = "/etc/config/dhcp"
 	brLanString           = "br-lan"
 	apStaDisConnectString = "AP-STA-DISCONNECTED"
@@ -75,6 +76,9 @@ type DHCPLease struct {
 	Freq      int        `json:"freq"`
 	StaType   string     `json:"staType"`
 	Ssid      string     `json:"ssid"`
+	UpRate    string     `json:"upRate,omitempty"`
+	DownRate  string     `json:"downRate,omitempty"`
+	Device    *u.Device  `json:"device,omitempty"`
 	Nick      *NickEntry `json:"nick"` //
 	Static    *DHCPHost  `json:"static"`
 }
@@ -486,7 +490,7 @@ func command(fu func(string), name string, arg ...string) error {
 }
 
 func RunCMD(name string, args ...string) ([]byte, error) {
-	glog.Println(name, args)
+	//glog.Println(name, args)
 	cmd := exec.Command(name, args...)
 	output, err := cmd.CombinedOutput() // 合并stdout和stderr
 	if err != nil {

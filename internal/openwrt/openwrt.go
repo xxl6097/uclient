@@ -1,6 +1,7 @@
 package openwrt
 
 import (
+	"context"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/glog"
@@ -19,21 +20,25 @@ var (
 )
 
 type openWRT struct {
-	clients    map[string]*DHCPLease
-	nicks      map[string]*NickEntry
-	leases     map[string]*DHCPLease
-	mu         sync.Mutex
-	fnEvent    func(int, any)
-	webhookUrl string
+	clients      map[string]*DHCPLease
+	nicks        map[string]*NickEntry
+	leases       map[string]*DHCPLease
+	mu           sync.Mutex
+	fnEvent      func(int, any)
+	webhookUrl   string
+	ctx          context.Context
+	cancel       context.CancelFunc
+	statusRuning bool
 }
 
 // GetInstance 返回单例实例
 func GetInstance() *openWRT {
 	once.Do(func() {
 		instance = &openWRT{
-			clients: make(map[string]*DHCPLease),
-			nicks:   make(map[string]*NickEntry),
-			leases:  make(map[string]*DHCPLease),
+			clients:      make(map[string]*DHCPLease),
+			nicks:        make(map[string]*NickEntry),
+			leases:       make(map[string]*DHCPLease),
+			statusRuning: false,
 		}
 		instance.init()
 	})
@@ -53,6 +58,7 @@ func (this *openWRT) init() {
 	go this.subscribeDnsmasq()
 	go this.subscribeAhsapdsta()
 	go this.subscribeFsnotify()
+	go this.subscribeStatus()
 	this.initNtfy()
 }
 
@@ -330,6 +336,7 @@ func (this *openWRT) subscribeFsnotify() {
 	this.CheckFile(dhcpLeasesFilePath)
 	//go this.listenFsnotify(watcher)
 	err = watcher.Add(dhcpLeasesFilePath)
+	//err = watcher.Add(hetsysinfoFilePath)
 	if err != nil {
 		glog.Error(fmt.Errorf("watcher add err %v", err))
 	}
