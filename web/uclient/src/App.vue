@@ -362,7 +362,8 @@ const getVersion = () => {
       if (json && json.code === 0 && json.data) {
         appinfo.value = json.data
         if (json.data && json.data.appVersion) {
-          title.value = `客户端列表 ${json.data.appVersion}`
+          title.value = `uclient ${json.data.hostName} ${json.data.appVersion}`
+          document.title = title.value
         }
       }
     })
