@@ -3,6 +3,7 @@ package openwrt
 import (
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
+	"time"
 )
 
 func (this *openWRT) ddingNotify(tempData *DHCPLease) {
@@ -36,9 +37,31 @@ func (this *openWRT) ddingWorkOffSign(tempData *DHCPLease) {
 		this.ddingWorkSign(tempData)
 	}
 }
-func (this *openWRT) ddingWorkOnSign(tempData *DHCPLease) {
-	if tempData != nil && tempData.Online && !tempData.IsOnWorkSign && tempData.Signal >= -80 {
-		tempData.IsOnWorkSign = true
-		this.ddingWorkSign(tempData)
+func (this *openWRT) ddingSign(tempData *DHCPLease) {
+	if tempData != nil {
+		if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
+			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+			if e1 == nil {
+				t1 := glog.Now()
+				switch working {
+				case 0:
+					if tempData.Online && tempData.Signal >= -80 {
+						this.ddingWorkSign(tempData)
+					}
+					break
+				case 2:
+					if tempData.Signal < -80 {
+						this.ddingWorkSign(tempData)
+					}
+					break
+				default:
+					if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
+						if tempData.Signal < -80 || (tempData.Online && tempData.Signal >= -80 && tempData.Signal < -70) {
+							this.ddingWorkSign(tempData)
+						}
+					}
+				}
+			}
+		}
 	}
 }

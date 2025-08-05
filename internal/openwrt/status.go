@@ -74,7 +74,7 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 				this.webUpdateAll(this.GetClients())
 				v.Device = device
 			}
-			this.ddingWorkOnSign(v)
+			this.ddingSign(v)
 		} else {
 			glog.Debug("mergeStatus 不存在", device)
 		}

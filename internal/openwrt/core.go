@@ -66,22 +66,21 @@ type NickEntry struct {
 	WorkType  *WorkTypeSetting `json:"workType"`
 }
 type DHCPLease struct {
-	IP           string     `json:"ip"`  //DHCP 服务器分配给客户端的 IP
-	MAC          string     `json:"mac"` //设备的物理地址，格式为 xx:xx:xx:xx:xx:xx
-	Phy          string     `json:"phy"`
-	Hostname     string     `json:"hostname"` //客户端上报的主机名（可能为空或 *）
-	StartTime    int64      `json:"starTime"` //租约失效的精确时间（秒级精度）
-	Online       bool       `json:"online"`
-	IsOnWorkSign bool       `json:"isOnWorkSign"`
-	Signal       int        `json:"signal"`
-	Freq         int        `json:"freq"`
-	StaType      string     `json:"staType"`
-	Ssid         string     `json:"ssid"`
-	UpRate       string     `json:"upRate,omitempty"`
-	DownRate     string     `json:"downRate,omitempty"`
-	Device       *u.Device  `json:"device,omitempty"`
-	Nick         *NickEntry `json:"nick"` //
-	Static       *DHCPHost  `json:"static"`
+	IP        string     `json:"ip"`  //DHCP 服务器分配给客户端的 IP
+	MAC       string     `json:"mac"` //设备的物理地址，格式为 xx:xx:xx:xx:xx:xx
+	Phy       string     `json:"phy"`
+	Hostname  string     `json:"hostname"` //客户端上报的主机名（可能为空或 *）
+	StartTime int64      `json:"starTime"` //租约失效的精确时间（秒级精度）
+	Online    bool       `json:"online"`
+	Signal    int        `json:"signal"`
+	Freq      int        `json:"freq"`
+	StaType   string     `json:"staType"`
+	Ssid      string     `json:"ssid"`
+	UpRate    string     `json:"upRate,omitempty"`
+	DownRate  string     `json:"downRate,omitempty"`
+	Device    *u.Device  `json:"device,omitempty"`
+	Nick      *NickEntry `json:"nick"` //
+	Static    *DHCPHost  `json:"static"`
 }
 type ARPEntry struct {
 	IP        net.IP           //设备的 IPv4 地址
