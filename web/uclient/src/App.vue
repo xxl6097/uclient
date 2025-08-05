@@ -80,17 +80,18 @@
           >
             <template #default="props">
               <el-text
-                :type="
+                :tag="
                   props.row.online
                     ? props.row.nick
                       ? props.row.nick.workType
                         ? props.row.nick.workType.webhookUrl !== ''
-                          ? 'warning'
-                          : 'success'
-                        : 'success'
-                      : 'success'
-                    : 'danger'
+                          ? 'ins'
+                          : 'p'
+                        : 'p'
+                      : 'p'
+                    : 'p'
                 "
+                :type="props.row.online ? 'success' : 'danger'"
                 >{{ getClientName(props.row) }}
               </el-text>
             </template>
