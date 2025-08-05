@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (this *openWRT) NotifySignCardEvent(working int, macAddress string) error {
+func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string) error {
 	cls, ok := this.clients[macAddress]
 	if !ok {
 		return fmt.Errorf("设备【%s】不存在内存", macAddress)
@@ -60,6 +60,7 @@ func (this *openWRT) NotifySignCardEvent(working int, macAddress string) error {
 		DeviceName: name,
 		IpAddress:  ip,
 		MacAddress: macAddress,
+		Signal:     signal,
 	}
 	if working == 0 {
 		msg.Title = fmt.Sprintf("【%s】上班了", name)
@@ -122,6 +123,7 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) error {
 	} else {
 		msg.DeviceName = client.Hostname
 	}
+	msg.Signal = client.Signal
 	if client.Online {
 		msg.Title = fmt.Sprintf("【%s】上线啦", msg.DeviceName)
 	} else {

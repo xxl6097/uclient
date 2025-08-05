@@ -119,6 +119,9 @@ func (this *openWRT) initData() error {
 					item.Ssid = sta.Ssid
 				}
 			}
+			if item.IP != "" {
+				item.Online = u.Ping(item.IP)
+			}
 			//dataMap[mac] = item
 			if v, ok := this.clients[mac]; ok {
 				v.IP = item.IP

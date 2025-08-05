@@ -19,6 +19,7 @@ type WebHookMessage struct {
 	DeviceName string `json:"deviceName"`
 	IpAddress  string `json:"ipAddress"`
 	MacAddress string `json:"macAddress"`
+	Signal     int    `json:"signal"`
 	//WorkTime      *time.Time `json:"dutyTime"`
 	//TodayOverTime string `json:"todayOverTime"`
 	//MonthOverTime string `json:"monthOverTime"`
@@ -41,6 +42,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	if msg.MacAddress != "" {
 		text.WriteString(fmt.Sprintf("- Mac地址：%s\n ", msg.MacAddress))
 	}
+	text.WriteString(fmt.Sprintf("- 信号：%d\n ", msg.Signal))
 	//if msg.TodayOverTime != "" {
 	//	text.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", msg.TodayOverTime))
 	//}

@@ -21,7 +21,7 @@ func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
 			if e1 != nil {
 				glog.Error(e1)
 			}
-			e := this.NotifySignCardEvent(working, tempData.MAC)
+			e := this.NotifySignCardEvent(working, tempData.Signal, tempData.MAC)
 			if e != nil {
 				glog.Errorf("钉钉通知打卡失败 %v %+v", e, tempData)
 			}

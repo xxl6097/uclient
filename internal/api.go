@@ -417,7 +417,7 @@ func (this *Api) TiggerSignCardEvent(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("mac is empty"))
 		return
 	}
-	err = openwrt.GetInstance().NotifySignCardEvent(3, body.Mac)
+	err = openwrt.GetInstance().NotifySignCardEvent(3, 0, body.Mac)
 	if err != nil {
 		res.Err(err)
 		return
