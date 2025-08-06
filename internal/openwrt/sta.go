@@ -1,6 +1,7 @@
 package openwrt
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
@@ -43,8 +44,8 @@ type Sta struct {
 	StaUpDown *StaUpDown `json:"staUpDown"`
 }
 
-func SubscribeSta(fn func(*StaUpDown)) error {
-	return command(func(s string) {
+func SubscribeSta(ctx context.Context, fn func(*StaUpDown)) error {
+	return Command(ctx, func(s string) {
 		if s == "" {
 			return
 		}

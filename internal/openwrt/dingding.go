@@ -6,8 +6,9 @@ import (
 	"time"
 )
 
-func (this *openWRT) ddingNotify(tempData *DHCPLease) {
-	err := this.notifyWebhookMessage(tempData)
+func (this *openWRT) ddingNotify(eveName string, tempData *DHCPLease) {
+	glog.Errorf("ddingNotify %+v", tempData)
+	err := this.notifyWebhookMessage(eveName, tempData)
 	if err != nil {
 		glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
 	}
@@ -33,9 +34,32 @@ func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
 }
 
 func (this *openWRT) ddingWorkOffSign(tempData *DHCPLease) {
-	if tempData != nil && !tempData.Online {
+	if tempData != nil && !tempData.Online && this.isSignTime(tempData) {
+		glog.Errorf("ddingWorkOffSign %+v", tempData)
 		this.ddingWorkSign(tempData)
 	}
+}
+
+func (this *openWRT) isSignTime(tempData *DHCPLease) bool {
+	if tempData != nil {
+		if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
+			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+			if e1 == nil {
+				switch working {
+				case 0:
+					return true
+				case 2:
+					return true
+				default:
+					t1 := glog.Now()
+					if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
 }
 
 func (this *openWRT) ddingSign(tempData *DHCPLease) {

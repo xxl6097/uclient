@@ -1,7 +1,6 @@
 package openwrt
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
@@ -25,7 +24,6 @@ func (this *openWRT) StopStatus() {
 }
 func (this *openWRT) subscribeStatus() {
 	this.statusRuning = true
-	this.ctx, this.cancel = context.WithCancel(context.Background())
 	glog.Debug("开始计算", this.statusRuning)
 	for {
 		select {

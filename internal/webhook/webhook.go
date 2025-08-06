@@ -18,6 +18,7 @@ type WebHookMessage struct {
 	Url        string `json:"url"`
 	Title      string `json:"title"`
 	DeviceName string `json:"deviceName"`
+	EventName  string `json:"eventName"`
 	IpAddress  string `json:"ipAddress"`
 	MacAddress string `json:"macAddress"`
 	Signal     int    `json:"signal"`
@@ -40,6 +41,9 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	hostName, err := os.Hostname()
 	if err == nil && hostName != "" {
 		text.WriteString(fmt.Sprintf("- 设备：%s\n ", hostName))
+	}
+	if msg.EventName != "" {
+		text.WriteString(fmt.Sprintf("- 类型：%s\n ", msg.EventName))
 	}
 
 	if msg.IpAddress != "" {

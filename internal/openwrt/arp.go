@@ -1,6 +1,7 @@
 package openwrt
 
 import (
+	"context"
 	"fmt"
 	"github.com/xxl6097/glog/glog"
 	"net"
@@ -179,17 +180,22 @@ func SubscribeArp(interval time.Duration, fn func(entry *ARPEntry)) error {
 	}
 }
 
-func SubscribeArpCache(interval time.Duration, fn func(entry map[string]*ARPEntry)) {
+func SubscribeArpCache(ctx context.Context, interval time.Duration, fn func(entry map[string]*ARPEntry)) {
 	for {
-		time.Sleep(interval)
-		// 获取当前ARP表
-		currentEntries, e1 := getClientsByArp(brLanString)
-		if e1 != nil {
-			glog.Printf("读取ARP表失败: %v\n", e1)
-			continue
-		}
-		if fn != nil {
-			fn(currentEntries)
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			time.Sleep(interval)
+			// 获取当前ARP表
+			currentEntries, e1 := getClientsByArp(brLanString)
+			if e1 != nil {
+				glog.Printf("读取ARP表失败: %v\n", e1)
+				continue
+			}
+			if fn != nil {
+				fn(currentEntries)
+			}
 		}
 	}
 }

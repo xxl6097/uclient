@@ -97,7 +97,7 @@ func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string)
 	})
 }
 
-func (this *openWRT) notifyWebhookMessage(client *DHCPLease) error {
+func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) error {
 	if this.webhookUrl == "" {
 		return fmt.Errorf("webhookUrl is empty")
 	}
@@ -116,6 +116,7 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) error {
 		Url:        this.webhookUrl,
 		IpAddress:  client.IP,
 		MacAddress: client.MAC,
+		EventName:  eveName,
 		//WorkTime:   &t,
 	}
 	if client.Nick != nil && client.Nick.Name != "" {
@@ -129,6 +130,6 @@ func (this *openWRT) notifyWebhookMessage(client *DHCPLease) error {
 	} else {
 		msg.Title = fmt.Sprintf("【%s】离线了", msg.DeviceName)
 	}
-
+	glog.Debugf("ding通知 %+v", client)
 	return webhook.Notify(msg, nil)
 }

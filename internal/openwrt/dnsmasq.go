@@ -1,6 +1,7 @@
 package openwrt
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
 	"time"
@@ -19,8 +20,8 @@ type Dnsmasq struct {
 	DhcpAck *DnsmasqDevice `json:"dhcp.ack"`
 }
 
-func SubscribeDnsmasq(fn func(*DnsmasqDevice)) error {
-	return command(func(s string) {
+func SubscribeDnsmasq(ctx context.Context, fn func(*DnsmasqDevice)) error {
+	return Command(ctx, func(s string) {
 		if s == "" {
 			return
 		}

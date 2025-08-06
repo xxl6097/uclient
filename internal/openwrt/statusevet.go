@@ -93,10 +93,10 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 	s := Status{}
 	s.Timestamp = device.StartTime
 	s.Connected = device.Online
-	this.ddingNotify(cls)
+	this.ddingNotify(typeEvent, cls)
 	this.webNotify(cls)
 	this.updateUserTimeLineData(macAddress, []*Status{&s})
-	glog.Debugf("%s 状态更新 %+v", typeEvent, device)
+	glog.Debugf("状态更新[%s] %+v", typeEvent, device)
 }
 
 //func (this *openWRT) updateStatusByHostapd(device *HostapdDevice) {

@@ -49,9 +49,8 @@ func (this *openWRT) init() {
 	if u.IsMacOs() {
 		return
 	}
+	this.ctx, this.cancel = context.WithCancel(context.Background())
 	this.initClients()
-	go this.subscribeSysLog()
-	go this.subscribeHetSysLog()
 	go this.subscribeSysLog()
 	go this.subscribeArpEvent()
 	go this.subscribeFsnotify()
@@ -67,6 +66,12 @@ func (this *openWRT) init() {
 		go this.subscribeAhsapdsta()
 	}
 	this.initNtfy()
+}
+
+func (this *openWRT) Close() {
+	if this.cancel != nil {
+		this.cancel()
+	}
 }
 
 func (this *openWRT) initClients() {
@@ -98,92 +103,121 @@ func (this *openWRT) initNtfy() {
 func (this *openWRT) subscribeSysLog() {
 	tryCount := 0
 	for {
-		err := subscribeSysLog(func(event *SysLogEvent) {
-			if event != nil && event.Mac != "" {
-				glog.Infof("SysLog事件:%+v", event)
-				eve := &DHCPLease{
-					MAC:       event.Mac,
-					Online:    event.Online,
-					StartTime: event.Timestamp.UnixMilli(),
-					Phy:       event.Phy,
-				}
-				if eve.StartTime <= 0 {
-					eve.StartTime = glog.Now().UnixMilli()
-				}
-				if v, ok := this.leases[eve.MAC]; ok {
-					if v.Hostname != "" {
-						eve.Hostname = v.Hostname
+		select {
+		case <-this.ctx.Done():
+			return
+		default:
+			err := subscribeSysLogs(func(s string) {
+				subscribeHostapdLog(s, func(event *SysLogEvent) {
+					if event != nil && event.Mac != "" {
+						glog.Infof("Hostapd事件:%+v", event)
+						eve := &DHCPLease{
+							MAC:       event.Mac,
+							Online:    event.Online,
+							StartTime: event.Timestamp.UnixMilli(),
+							Phy:       event.Phy,
+						}
+						if eve.StartTime <= 0 {
+							eve.StartTime = glog.Now().UnixMilli()
+						}
+						if v, ok := this.leases[eve.MAC]; ok {
+							if v.Hostname != "" {
+								eve.Hostname = v.Hostname
+							}
+						}
+						this.updateDeviceStatus("Hostapd事件", eve)
 					}
+				})
+				subscribeHetSysLog(s, func(event *KernelLog) {
+					if event != nil && event.MACAddress != "" {
+						glog.Infof("HetSysLog事件:%+v", event)
+						eve := &DHCPLease{
+							MAC:       event.MACAddress,
+							Online:    event.Online,
+							StartTime: glog.Now().UnixMilli(),
+						}
+						if v, ok := this.leases[eve.MAC]; ok {
+							if v.Hostname != "" {
+								eve.Hostname = v.Hostname
+							}
+						}
+						this.updateDeviceStatus("HetSysLog事件", eve)
+					}
+				})
+			})
+			if err != nil {
+				glog.Error(fmt.Errorf("监听失败 %v", err))
+				time.Sleep(time.Second * 10)
+				glog.Error("重新监听 SysLog")
+				tryCount++
+				if tryCount > RE_REY_MAX_COUNT {
+					glog.Error("监听 SysLog 失败，超过最大重试次数")
+					break
 				}
-				this.updateDeviceStatus("SysLog事件", eve)
-			}
-		})
-		if err != nil {
-			glog.Error(fmt.Errorf("SysLog监听失败 %v", err))
-			time.Sleep(time.Second * 10)
-			glog.Error("重新监听 SysLog")
-			tryCount++
-			if tryCount > RE_REY_MAX_COUNT {
-				glog.Error("监听 SysLog 失败，超过最大重试次数")
-				break
 			}
 		}
 	}
+
 }
 
 func (this *openWRT) subscribeHostapd() {
 	tryCount := 0
 	for {
-		err := SubscribeHostapd(func(device *HostapdDevice) {
-			if device != nil && device.Address != "" {
-				if device.DataType == 2 {
-					cls := this.getClient(device.Address)
-					if cls != nil {
-						cls.Signal = device.Signal
-						cls.Freq = device.Freq
-						cls.StartTime = device.Timestamp.UnixMilli()
-						if cls.StartTime <= 0 {
-							cls.StartTime = glog.Now().UnixMilli()
+		select {
+		case <-this.ctx.Done():
+			return
+		default:
+			err := SubscribeHostapd(this.ctx, func(device *HostapdDevice) {
+				if device != nil && device.Address != "" {
+					if device.DataType == 2 {
+						cls := this.getClient(device.Address)
+						if cls != nil {
+							cls.Signal = device.Signal
+							cls.Freq = device.Freq
+							cls.StartTime = device.Timestamp.UnixMilli()
+							if cls.StartTime <= 0 {
+								cls.StartTime = glog.Now().UnixMilli()
+							}
+							//这里只是更新信号，不在web上notify通知
+							this.webUpdateOne(cls)
 						}
-						//这里只是更新信号，不在web上notify通知
-						this.webUpdateOne(cls)
-					}
-				} else {
-					glog.Infof("Hostapd事件:%+v", device)
-					dhcp := &DHCPLease{
-						MAC:       device.Address,
-						Signal:    device.Signal,
-						Freq:      device.Freq,
-						StartTime: device.Timestamp.UnixMilli(),
-						Online:    device.DataType == 0,
-					}
-					if dhcp.StartTime <= 0 {
-						dhcp.StartTime = glog.Now().UnixMilli()
-					}
-					if v, ok := this.leases[dhcp.MAC]; ok {
-						if v.Hostname != "" {
-							dhcp.Hostname = v.Hostname
+					} else {
+						glog.Infof("Hostapd事件:%+v", device)
+						dhcp := &DHCPLease{
+							MAC:       device.Address,
+							Signal:    device.Signal,
+							Freq:      device.Freq,
+							StartTime: device.Timestamp.UnixMilli(),
+							Online:    device.DataType == 0,
 						}
+						if dhcp.StartTime <= 0 {
+							dhcp.StartTime = glog.Now().UnixMilli()
+						}
+						if v, ok := this.leases[dhcp.MAC]; ok {
+							if v.Hostname != "" {
+								dhcp.Hostname = v.Hostname
+							}
+						}
+						this.updateDeviceStatus("Hostapd事件", dhcp)
 					}
-					this.updateDeviceStatus("Hostapd事件", dhcp)
 				}
-			}
-		})
-		if err != nil {
-			glog.Errorf("订阅失败 Hostapd %v", err)
-			time.Sleep(time.Second * 5)
-			glog.Error("重新订阅 Hostapd")
-			tryCount++
-			if tryCount > RE_REY_MAX_COUNT {
-				glog.Error("订阅 Hostapd 失败，超过最大重试次数")
-				break
+			})
+			if err != nil {
+				glog.Errorf("订阅失败 Hostapd %v", err)
+				time.Sleep(time.Second * 5)
+				glog.Error("重新订阅 Hostapd")
+				tryCount++
+				if tryCount > RE_REY_MAX_COUNT {
+					glog.Error("订阅 Hostapd 失败，超过最大重试次数")
+					break
+				}
 			}
 		}
 	}
 }
 
 func (this *openWRT) subscribeArpEvent() {
-	SubscribeArpCache(time.Second*10, func(entrys map[string]*ARPEntry) {
+	SubscribeArpCache(this.ctx, time.Second*10, func(entrys map[string]*ARPEntry) {
 		if entrys != nil {
 			for mac, entry := range entrys {
 				dhcp := &DHCPLease{
@@ -202,7 +236,7 @@ func (this *openWRT) subscribeArpEvent() {
 				}
 				if v, ok := this.clients[mac]; ok {
 					if v.Online != (entry.Flags == 2) {
-						//glog.Infof("Arp事件:%+v", entry)
+						glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
 				} else {
@@ -216,31 +250,36 @@ func (this *openWRT) subscribeArpEvent() {
 func (this *openWRT) subscribeDnsmasq() {
 	tryCount := 0
 	for {
-		err := SubscribeDnsmasq(func(device *DnsmasqDevice) {
-			if device != nil && device.Mac != "" {
-				glog.Infof("Dnsmasq事件:%+v", device)
-				dhcp := &DHCPLease{
-					MAC:       device.Mac,
-					IP:        device.Ip,
-					Hostname:  device.Name,
-					StartTime: device.Timestamp.UnixMilli(),
-					Phy:       device.Interface,
-					Online:    true,
+		select {
+		case <-this.ctx.Done():
+			return
+		default:
+			err := SubscribeDnsmasq(this.ctx, func(device *DnsmasqDevice) {
+				if device != nil && device.Mac != "" {
+					glog.Infof("Dnsmasq事件:%+v", device)
+					dhcp := &DHCPLease{
+						MAC:       device.Mac,
+						IP:        device.Ip,
+						Hostname:  device.Name,
+						StartTime: device.Timestamp.UnixMilli(),
+						Phy:       device.Interface,
+						Online:    true,
+					}
+					if dhcp.StartTime <= 0 {
+						dhcp.StartTime = glog.Now().UnixMilli()
+					}
+					this.updateDeviceStatus("Dnsmasq事件", dhcp)
 				}
-				if dhcp.StartTime <= 0 {
-					dhcp.StartTime = glog.Now().UnixMilli()
+			})
+			if err != nil {
+				glog.Errorf("Dnsmasq订阅失败 %v", err)
+				time.Sleep(time.Second * 5)
+				glog.Error("重新订阅 Dnsmasq")
+				tryCount++
+				if tryCount > RE_REY_MAX_COUNT {
+					glog.Error("监听 Dnsmasq 失败，超过最大重试次数")
+					break
 				}
-				this.updateDeviceStatus("Dnsmasq事件", dhcp)
-			}
-		})
-		if err != nil {
-			glog.Errorf("Dnsmasq订阅失败 %v", err)
-			time.Sleep(time.Second * 5)
-			glog.Error("重新订阅 Dnsmasq")
-			tryCount++
-			if tryCount > RE_REY_MAX_COUNT {
-				glog.Error("监听 Dnsmasq 失败，超过最大重试次数")
-				break
 			}
 		}
 	}
@@ -250,32 +289,37 @@ func (this *openWRT) subscribeDnsmasq() {
 func (this *openWRT) subscribeAhsapdsta() {
 	tryCount := 0
 	for {
-		err := SubscribeSta(func(device *StaUpDown) {
-			if device != nil && device.MacAddress != "" {
-				glog.Infof("ahsapd.sta事件:%+v", device)
-				num, _ := strconv.Atoi(device.Rssi)
-				dhcp := &DHCPLease{
-					MAC:       u.MacFormat(device.MacAddress),
-					Hostname:  device.HostName,
-					StartTime: device.Timestamp.UnixMilli(),
-					Phy:       device.Ssid,
-					Online:    device.Online == 1,
-					Signal:    num,
+		select {
+		case <-this.ctx.Done():
+			return
+		default:
+			err := SubscribeSta(this.ctx, func(device *StaUpDown) {
+				if device != nil && device.MacAddress != "" {
+					glog.Infof("ahsapd.sta事件:%+v", device)
+					num, _ := strconv.Atoi(device.Rssi)
+					dhcp := &DHCPLease{
+						MAC:       u.MacFormat(device.MacAddress),
+						Hostname:  device.HostName,
+						StartTime: device.Timestamp.UnixMilli(),
+						Phy:       device.Ssid,
+						Online:    device.Online == 1,
+						Signal:    num,
+					}
+					if dhcp.StartTime <= 0 {
+						dhcp.StartTime = glog.Now().UnixMilli()
+					}
+					this.updateDeviceStatus("ahsapd事件", dhcp)
 				}
-				if dhcp.StartTime <= 0 {
-					dhcp.StartTime = glog.Now().UnixMilli()
+			})
+			if err != nil {
+				glog.Errorf("ahsapd 订阅失败 %v", err)
+				time.Sleep(time.Second * 5)
+				glog.Error("重新订阅 ahsapd")
+				tryCount++
+				if tryCount > RE_REY_MAX_COUNT {
+					glog.Error("监听 ahsapd 失败，超过最大重试次数")
+					break
 				}
-				this.updateDeviceStatus("ahsapd事件", dhcp)
-			}
-		})
-		if err != nil {
-			glog.Errorf("ahsapd 订阅失败 %v", err)
-			time.Sleep(time.Second * 5)
-			glog.Error("重新订阅 ahsapd")
-			tryCount++
-			if tryCount > RE_REY_MAX_COUNT {
-				glog.Error("监听 ahsapd 失败，超过最大重试次数")
-				break
 			}
 		}
 	}
@@ -330,6 +374,9 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 				return
 			}
 			glog.Error("error:", err)
+		case <-this.ctx.Done():
+			glog.Debug("listenFsnotify 退出", this.statusRuning)
+			return
 		}
 	}
 }

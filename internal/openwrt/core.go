@@ -2,6 +2,7 @@ package openwrt
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/xxl6097/glog/glog"
@@ -131,31 +132,42 @@ func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, 
 	}, "logread", args...)
 }
 
-func subscribeSysLog(fn func(*SysLogEvent)) error {
-	//args := []string{"-f", "|", "grep", "hostapd.*"}
+func subscribeHostapdLog(s string, fn func(*SysLogEvent)) {
 	pattern := `hostapd.*`
 	re := regexp.MustCompile(pattern)
-	return command(func(s string) {
-		if re.MatchString(s) {
-			tempData := parseSysLog(s)
-			if fn != nil && tempData != nil {
-				fn(tempData)
-			}
-			//if status == 0 {
-			//	if fn != nil {
-			//		fn(timestamp, macAddr, phy, false)
-			//	}
-			//} else if status == 1 {
-			//	if fn != nil {
-			//		fn(timestamp, macAddr, phy, true)
-			//	}
-			//} else {
-			//	//fmt.Printf("未知类型 %s\n", s)
-			//}
+	if re.MatchString(s) {
+		tempData := parseSysLog(s)
+		if fn != nil && tempData != nil {
+			fn(tempData)
 		}
-
-	}, "logread", "-f")
+	}
 }
+
+//func subscribeSysLog(fn func(*SysLogEvent)) error {
+//	//args := []string{"-f", "|", "grep", "hostapd.*"}
+//	pattern := `hostapd.*`
+//	re := regexp.MustCompile(pattern)
+//	return command(func(s string) {
+//		if re.MatchString(s) {
+//			tempData := parseSysLog(s)
+//			if fn != nil && tempData != nil {
+//				fn(tempData)
+//			}
+//			//if status == 0 {
+//			//	if fn != nil {
+//			//		fn(timestamp, macAddr, phy, false)
+//			//	}
+//			//} else if status == 1 {
+//			//	if fn != nil {
+//			//		fn(timestamp, macAddr, phy, true)
+//			//	}
+//			//} else {
+//			//	//fmt.Printf("未知类型 %s\n", s)
+//			//}
+//		}
+//
+//	}, "logread", "-f")
+//}
 
 func getStatusFromSysLog() (map[string][]*Status, error) {
 	pattern := `AP-STA-(CONNECTED|DISCONNECTED)`
@@ -459,11 +471,50 @@ func parseTimer(logLine string) (*time.Time, error) {
 	return nil, nil
 }
 
-func Command(fu func(string), name string, arg ...string) error {
-	return command(fu, name, arg...)
+func Command(ctx context.Context, fu func(string), name string, arg ...string) error {
+	return cmd(ctx, fu, name, arg...)
 }
 
 func command(fu func(string), name string, arg ...string) error {
+	return cmd(context.Background(), fu, name, arg...)
+}
+
+func cmd(ctx context.Context, fu func(string), name string, arg ...string) error {
+	glog.Println(name, arg)
+	//ctx, cancel := context.WithCancel(context.Background())
+	// 创建ubus命令对象
+	cmd := exec.CommandContext(ctx, name, arg...)
+
+	// 创建标准输出管道
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Printf("创建管道失败: %v\n", err)
+		return err
+	}
+
+	// 启动命令
+	if e := cmd.Start(); e != nil {
+		fmt.Printf("启动命令失败: %v\n", e)
+		return err
+	}
+	defer cmd.Process.Kill() // 确保退出时终止进程
+
+	// 实时读取输出流
+	scanner := bufio.NewScanner(stdout)
+	for scanner.Scan() {
+		rawEvent := scanner.Text()
+		//fmt.Printf("原始事件: %s\n", rawEvent)
+		fu(rawEvent)
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("读取错误: %v\n", err)
+		return err
+	}
+	return cmd.Wait() // 等待命令退出
+}
+
+func command1(fu func(string), name string, arg ...string) error {
 	glog.Println(name, arg)
 	// 创建ubus命令对象
 	cmd := exec.Command(name, arg...)
