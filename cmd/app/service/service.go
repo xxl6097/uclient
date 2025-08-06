@@ -11,7 +11,6 @@ import (
 	"github.com/xxl6097/go-service/pkg/utils"
 	assets "github.com/xxl6097/uclient/assets/openwrt"
 	"github.com/xxl6097/uclient/internal"
-	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/pkg"
 	"os"
 )
@@ -22,7 +21,7 @@ type Service struct {
 }
 
 func (this *Service) OnFinish() {
-	openwrt.GetInstance().Close()
+	//openwrt.GetInstance().Close()
 }
 
 type Config struct {
