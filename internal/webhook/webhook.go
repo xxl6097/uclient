@@ -9,6 +9,7 @@ import (
 	"github.com/xxl6097/uclient/internal/u"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -36,6 +37,11 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	text.WriteString(fmt.Sprintf("#### %s \n ", msg.Title))
 	now := glog.Now()
 	text.WriteString(fmt.Sprintf("- 今天是 %s %s\n ", now.Format(time.DateOnly), u.GetWeekName(now.Weekday())))
+	hostName, err := os.Hostname()
+	if err != nil && hostName != "" {
+		text.WriteString(fmt.Sprintf("- 设备：%s\n ", hostName))
+	}
+
 	if msg.IpAddress != "" {
 		text.WriteString(fmt.Sprintf("- IP地址：%s\n ", msg.IpAddress))
 	}
