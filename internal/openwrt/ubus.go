@@ -44,3 +44,24 @@ func OfflineDevice(macAddr string) error {
 	return nil
 
 }
+
+func UbusList() string {
+	// 构造 ubus 命令
+	cmd := exec.Command(
+		"ubus",
+		"list",
+	)
+
+	// 设置系统级错误处理（权限提升）
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true, // 避免子进程被父进程信号中断
+	}
+
+	// 执行命令并捕获输出
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		glog.Printf("❌ %v\n输出: %s\n", err, string(output))
+		return ""
+	}
+	return string(output)
+}

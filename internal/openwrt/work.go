@@ -12,10 +12,12 @@ import (
 )
 
 type WorkEntry struct {
-	OnWorkTime  int64 `json:"onWorkTime"`
-	OffWorkTime int64 `json:"offWorkTime"`
-	Weekday     int   `json:"weekday"`
-	DayType     int   `json:"dayType"` //0工作日，1节假日，2补班日，3加班日
+	OnWorkTime    int64 `json:"onWorkTime"`
+	OffWorkTime   int64 `json:"offWorkTime"`
+	OnWorkSignal  int   `json:"onWorkSignal"`
+	OffWorkSignal int   `json:"offWorkSignal"`
+	Weekday       int   `json:"weekday"`
+	DayType       int   `json:"dayType"` //0工作日，1节假日，2补班日，3加班日
 }
 
 // WorkTypeSetting time.Sunday || t1.Weekday() == time.Saturday
@@ -385,7 +387,72 @@ func DelWorkTime(mac string, day string) error {
 	return err
 }
 
-func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting) (*WorkEntry, error) {
+func GetTodaySign(mac string) *WorkEntry {
+	day := glog.Now().Format(time.DateOnly)
+	tempFilePath := filepath.Join(workDir, mac)
+	works := ReadWorkTimeByMac(tempFilePath)
+	if works == nil {
+		return &WorkEntry{}
+	}
+	tempEntry := works[day]
+	return tempEntry
+}
+
+func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {
+	if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
+		return nil, fmt.Errorf("参数不全 %+v", tempData)
+	}
+	workType := tempData.Nick.WorkType
+	mac := tempData.MAC
+	timestamp := tempData.Nick.StartTime
+	if workType == nil {
+		return nil, fmt.Errorf("考勤打卡未设置")
+	}
+	if workType.OnWorkTime == "" || workType.OffWorkTime == "" {
+		return nil, fmt.Errorf("考勤打卡时间未设置 %+v", workType)
+	}
+	if timestamp <= 0 {
+		return nil, fmt.Errorf("timestamp is zero")
+	}
+	if !u.IsMillisecondTimestamp(timestamp) {
+		timestamp *= 1000
+	}
+	workingTime, err := u.IsWorkingTime(workType.OnWorkTime, workType.OffWorkTime)
+	if err != nil {
+		return nil, err
+	}
+	t1 := u.UTC8ToTime(timestamp)
+	day := t1.Format(time.DateOnly)
+	//glog.Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
+	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
+		t.Weekday = int(t1.Weekday())
+		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {
+			t.DayType = 3
+		}
+		if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
+			if t.OnWorkTime == 0 {
+				t.OnWorkTime = timestamp
+				t.OnWorkSignal = tempData.Signal
+			} else {
+				t.OffWorkTime = timestamp
+				t.OffWorkSignal = tempData.Signal
+			}
+		} else {
+			if workingTime == 0 {
+				//上班打卡
+				if t.OnWorkTime <= 0 {
+					//说明上午未打卡
+					t.OnWorkTime = timestamp
+					t.OnWorkSignal = tempData.Signal
+				}
+			} else if workingTime == 2 {
+				t.OffWorkTime = timestamp
+				t.OffWorkSignal = tempData.Signal
+			}
+		}
+	})
+}
+func sysLogUpdateWorkTime1(mac string, timestamp int64, workType *WorkTypeSetting) (*WorkEntry, error) {
 	if workType == nil {
 		return nil, fmt.Errorf("考勤打卡未设置")
 	}
@@ -428,7 +495,4 @@ func sysLogUpdateWorkTime(mac string, timestamp int64, workType *WorkTypeSetting
 			}
 		}
 	})
-}
-
-func markOnWork(timestamp int64) {
 }

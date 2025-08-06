@@ -65,10 +65,11 @@ func (this *openWRT) initData() error {
 		for _, entry := range arpList {
 			mac := entry.MAC.String()
 			item := &DHCPLease{
-				IP:     entry.IP.String(),
-				MAC:    mac,
-				Phy:    entry.Interface,
-				Online: entry.Flags == 2,
+				IP:        entry.IP.String(),
+				MAC:       mac,
+				Phy:       entry.Interface,
+				Online:    entry.Flags == 2,
+				StartTime: entry.Timestamp.UnixMilli(),
 			}
 			if e2 == nil {
 				if lease, ok := dhcpMap[mac]; ok {

@@ -14,7 +14,7 @@ func (this *openWRT) ddingNotify(tempData *DHCPLease) {
 }
 func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
 	if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
-		_, err := sysLogUpdateWorkTime(tempData.MAC, tempData.StartTime, tempData.Nick.WorkType)
+		_, err := sysLogUpdateWorkTime(tempData)
 		if err != nil {
 			glog.Errorf("更新时间失败 %v %+v", err, tempData)
 		} else {
@@ -37,27 +37,44 @@ func (this *openWRT) ddingWorkOffSign(tempData *DHCPLease) {
 		this.ddingWorkSign(tempData)
 	}
 }
+
 func (this *openWRT) ddingSign(tempData *DHCPLease) {
 	if tempData != nil {
 		if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
 			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
 			if e1 == nil {
-				t1 := glog.Now()
 				switch working {
 				case 0:
 					if tempData.Online && tempData.Signal >= -80 {
-						this.ddingWorkSign(tempData)
+						wk := GetTodaySign(tempData.MAC)
+						if wk.OnWorkTime == 0 {
+							this.ddingWorkSign(tempData)
+						}
 					}
 					break
 				case 2:
-					if tempData.Signal < -80 {
-						this.ddingWorkSign(tempData)
+					if tempData.Signal < -80 && tempData.Signal > -90 {
+						wk := GetTodaySign(tempData.MAC)
+						if wk.OffWorkTime <= 0 {
+							this.ddingWorkSign(tempData)
+						} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
+							this.ddingWorkSign(tempData)
+						}
 					}
 					break
 				default:
+					t1 := glog.Now()
 					if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
-						if tempData.Signal < -80 || (tempData.Online && tempData.Signal >= -80 && tempData.Signal < -70) {
-							this.ddingWorkSign(tempData)
+						if (tempData.Signal < -80 && tempData.Signal > -90) || (tempData.Online && tempData.Signal >= -80) {
+							wk := GetTodaySign(tempData.MAC)
+							if wk.OnWorkTime <= 0 {
+								this.ddingWorkSign(tempData)
+							} else if wk.OffWorkTime <= 0 {
+								this.ddingWorkSign(tempData)
+							} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
+								this.ddingWorkSign(tempData)
+							}
+
 						}
 					}
 				}

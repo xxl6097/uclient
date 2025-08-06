@@ -53,12 +53,19 @@ func (this *openWRT) init() {
 	go this.subscribeSysLog()
 	go this.subscribeHetSysLog()
 	go this.subscribeSysLog()
-	go this.subscribeHostapd()
 	go this.subscribeArpEvent()
-	go this.subscribeDnsmasq()
-	go this.subscribeAhsapdsta()
 	go this.subscribeFsnotify()
 	go this.subscribeStatus()
+	result := UbusList()
+	if strings.Contains(result, "hostapd") {
+		go this.subscribeHostapd()
+	}
+	if strings.Contains(result, "dnsmasq") {
+		go this.subscribeDnsmasq()
+	}
+	if strings.Contains(result, "ahsapd.sta") {
+		go this.subscribeAhsapdsta()
+	}
 	this.initNtfy()
 }
 
