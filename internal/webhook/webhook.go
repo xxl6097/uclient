@@ -38,7 +38,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	now := glog.Now()
 	text.WriteString(fmt.Sprintf("- 今天是 %s %s\n ", now.Format(time.DateOnly), u.GetWeekName(now.Weekday())))
 	hostName, err := os.Hostname()
-	if err != nil && hostName != "" {
+	if err == nil && hostName != "" {
 		text.WriteString(fmt.Sprintf("- 设备：%s\n ", hostName))
 	}
 
