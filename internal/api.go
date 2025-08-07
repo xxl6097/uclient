@@ -22,7 +22,7 @@ type Api struct {
 }
 
 func NewApi(igs igs.Service, username, password string) *Api {
-	github.Api().SetName("xxl6097", "openwrt-client-manager")
+	github.Api().SetName("xxl6097", "uclient")
 	//initSSEClient(username, password)
 	a := &Api{
 		igs:    igs,
