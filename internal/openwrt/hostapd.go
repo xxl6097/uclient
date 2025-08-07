@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
-	"os"
 	"time"
 )
 
@@ -99,10 +98,10 @@ func decode(s string, fn func(*HostapdDevice)) {
 }
 
 // SubscribeHostapd ubus subscribe hostapd.phy1-ap0 hostapd.phy0-ap0
-func SubscribeHostapd(ctx context.Context, exitFun func(process *os.Process), fn func(*HostapdDevice)) error {
+func SubscribeHostapd(ctx context.Context, fn func(*HostapdDevice)) error {
 	args := []string{"subscribe", "hostapd.*"}
 	args = []string{"subscribe", "hostapd.phy1-ap0", "hostapd.phy0-ap0"}
-	return Command(ctx, exitFun, func(s string) {
+	return Command(ctx, func(s string) {
 		if s == "" {
 			return
 		}

@@ -100,7 +100,7 @@ func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, 
 	// 2. 编译正则表达式（匹配连接/断开事件）
 	//pattern := `AP-STA-(CONNECTED|DISCONNECTED)`
 	re := regexp.MustCompile(pattern)
-	return dataMap, Command(context.Background(), nil, func(data string) {
+	return dataMap, Command(context.Background(), func(data string) {
 		if re.MatchString(data) {
 			//fmt.Println("[事件] ", data) // 输出匹配行
 			macAddr := ParseMacAddr(data)
@@ -480,7 +480,7 @@ func parseTimer(logLine string) (*time.Time, error) {
 //	return Cmd(context.Background(), exitFun, fu, name, arg...)
 //}
 
-func Command(ctx context.Context, exitFun func(process *os.Process), fu func(string), name string, arg ...string) error {
+func Command(ctx context.Context, fu func(string), name string, arg ...string) error {
 	glog.Println(name, arg)
 	//ctx, cancel := context.WithCancel(context.Background())
 	// 创建ubus命令对象
@@ -492,9 +492,6 @@ func Command(ctx context.Context, exitFun func(process *os.Process), fu func(str
 	if err != nil {
 		fmt.Printf("创建管道失败: %v\n", err)
 		return err
-	}
-	if exitFun != nil {
-		exitFun(ccc.Process)
 	}
 
 	// 启动命令
