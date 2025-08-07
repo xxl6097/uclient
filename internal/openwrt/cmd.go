@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/utils/util"
-	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -60,11 +59,11 @@ func killPid(pid int) {
 	if runtime.GOOS == "windows" {
 		killCmd := exec.Command("taskkill", "/F", "/PID", strconv.Itoa(pid))
 		if err := killCmd.Run(); err != nil {
-			log.Fatal("终止失败:", err)
+			glog.Error("终止失败:", err)
 		}
 	} else {
 		if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
-			log.Fatal("终止失败:", err)
+			glog.Error("终止失败:", err)
 		}
 	}
 }
