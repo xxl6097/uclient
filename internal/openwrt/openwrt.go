@@ -8,11 +8,9 @@ import (
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -261,15 +259,10 @@ func (this *openWRT) subscribeArpEvent() {
 }
 func (this *openWRT) subscribeDnsmasq() {
 	tryCount := 0
-	var proc *os.Process
 	for {
 		select {
 		case <-this.ctx.Done():
 			glog.Debug("Dnsmasq 监听退出...")
-			if proc != nil {
-				_ = proc.Kill()
-				_ = syscall.Kill(-proc.Pid, syscall.SIGKILL)
-			}
 			return
 		default:
 			err := SubscribeDnsmasq(this.ctx, func(device *DnsmasqDevice) {
@@ -306,15 +299,10 @@ func (this *openWRT) subscribeDnsmasq() {
 
 func (this *openWRT) subscribeAhsapdsta() {
 	tryCount := 0
-	var proc *os.Process
 	for {
 		select {
 		case <-this.ctx.Done():
 			glog.Debug("Ahsapdsta 监听退出...")
-			if proc != nil {
-				_ = proc.Kill()
-				_ = syscall.Kill(-proc.Pid, syscall.SIGKILL)
-			}
 			return
 		default:
 			err := SubscribeSta(this.ctx, func(device *StaUpDown) {
