@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/ukey"
+	"github.com/xxl6097/go-service/pkg/utils/util"
 	"github.com/xxl6097/uclient/internal/u"
 	"log"
 	"net"
@@ -16,7 +17,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 )
 
@@ -485,7 +485,8 @@ func Command(ctx context.Context, exitFun func(process *os.Process), fu func(str
 	//ctx, cancel := context.WithCancel(context.Background())
 	// 创建ubus命令对象
 	ccc := exec.CommandContext(ctx, name, arg...)
-	ccc.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
+	//ccc.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
+	util.SetPlatformSpecificAttrs(ccc)
 	// 创建标准输出管道
 	stdout, err := ccc.StdoutPipe()
 	if err != nil {
@@ -521,8 +522,9 @@ func Command(ctx context.Context, exitFun func(process *os.Process), fu func(str
 func RunCMD(name string, args ...string) ([]byte, error) {
 	//glog.Println(name, args)
 	cmd := exec.Command(name, args...)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
-	output, err := cmd.CombinedOutput()                   // 合并stdout和stderr
+	//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
+	util.SetPlatformSpecificAttrs(cmd)
+	output, err := cmd.CombinedOutput() // 合并stdout和stderr
 	if err != nil {
 		return nil, fmt.Errorf("执行失败: %v, 输出: %s", err, string(output))
 	}

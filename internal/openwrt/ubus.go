@@ -3,8 +3,8 @@ package openwrt
 import (
 	"fmt"
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/go-service/pkg/utils/util"
 	"os/exec"
-	"syscall"
 )
 
 var (
@@ -29,9 +29,10 @@ func OfflineDevice(macAddr string) error {
 	)
 
 	// 设置系统级错误处理（权限提升）
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true, // 避免子进程被父进程信号中断
-	}
+	//cmd.SysProcAttr = &syscall.SysProcAttr{
+	//	Setpgid: true, // 避免子进程被父进程信号中断
+	//}
+	util.SetPlatformSpecificAttrs(cmd)
 
 	// 执行命令并捕获输出
 	output, err := cmd.CombinedOutput()
@@ -53,9 +54,10 @@ func UbusList() string {
 	)
 
 	// 设置系统级错误处理（权限提升）
-	c.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true, // 避免子进程被父进程信号中断
-	}
+	//c.SysProcAttr = &syscall.SysProcAttr{
+	//	Setpgid: true, // 避免子进程被父进程信号中断
+	//}
+	util.SetPlatformSpecificAttrs(c)
 
 	// 执行命令并捕获输出
 	output, err := c.CombinedOutput()
