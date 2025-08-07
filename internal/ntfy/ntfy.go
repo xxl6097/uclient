@@ -104,6 +104,7 @@ func (this *Ntfy) subscribe(info *u.NtfyInfo) {
 	for {
 		select {
 		case <-this.ctx.Done():
+			glog.Debug("ntfy 监听退出...")
 			return
 		default:
 			err := this.Subscribe(info.Address, info.Topic, info.Username, info.Password)

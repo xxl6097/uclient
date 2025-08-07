@@ -10,23 +10,9 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
-
-//	func (this *openWRT) Listen(fn func([]*DHCPLease)) {
-//		this.fnWatcher = func() {
-//			if fn != nil {
-//				fn(this.GetClients())
-//			}
-//		}
-//	}
-//func (this *openWRT) ListenOne(fn func(int, *DHCPLease)) {
-//	this.fnNewOne = func(dataType int, cls *DHCPLease) {
-//		if fn != nil {
-//			fn(dataType, cls)
-//		}
-//	}
-//}
 
 func (this *openWRT) initData() error {
 	staInfo := GetStaInfo()
@@ -47,8 +33,10 @@ func (this *openWRT) initData() error {
 				glog.Debugf("%+v", temp)
 			}
 		}
-
-		sysLogMap, e3 := getStatusFromSysLog()
+		var sysLogMap map[string][]*Status
+		if strings.Contains(this.ulistString, "hostapd") {
+			sysLogMap, _ = getStatusFromSysLog()
+		}
 		nickMap, e4 := getNickData()
 		if e4 == nil {
 			this.nicks = nickMap
@@ -80,10 +68,8 @@ func (this *openWRT) initData() error {
 					item.Hostname = lease.Hostname
 				}
 			}
-			if e3 == nil {
-				//item.StatusList = status[mac]
+			if sysLogMap != nil && len(sysLogMap) > 0 {
 				list := sysLogMap[mac]
-				//_ = setStatusByMac(mac, list)
 				this.updateUserTimeLineData(mac, list)
 			}
 			if e4 == nil {
@@ -275,11 +261,6 @@ func (this *openWRT) UpdateNickName(obj *NickEntry) error {
 	}
 	this.nicks[mac] = nick
 	return updateNickData(mac, nick)
-}
-
-func (this *openWRT) ResetClients() {
-	this.initClients()
-	this.webUpdateAll(this.GetClients())
 }
 
 func (this *openWRT) GetStaticIpMap() ([]*DHCPHost, error) {

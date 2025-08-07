@@ -58,7 +58,6 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 	content := string(data)
 	//glog.Debugf("\n%s", content)
 	lines := strings.Split(content, "\n")
-	//entries := make([]*ARPEntry, 0)
 	entries := make(map[string]*ARPEntry)
 	for i, line := range lines {
 		if i == 0 || strings.TrimSpace(line) == "" {
@@ -76,31 +75,13 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 		mac := entry.MAC.String()
 		if _, ok := entries[mac]; ok {
 			temp := entries[mac]
-			//glog.Debugf("parseARPLine  %+v", temp)
 			if temp.Flags != entry.Flags && entry.Flags == 2 {
 				entries[mac] = entry
 			}
 		} else {
-			//temp := entries[mac]
-			//entries[mac] = append(temp, entry)
-			//entries[mac] = temp
 			entries[mac] = entry
 		}
 	}
-
-	//arpMap := make(map[string]*ARPEntry)
-	//for mac, v := range entries {
-	//	if v != nil && len(v) > 0 {
-	//		temp := v[0]
-	//		for _, item := range v {
-	//			if item.Flags == 2 {
-	//				temp = item
-	//			}
-	//		}
-	//		arpMap[mac] = temp
-	//	}
-	//
-	//}
 	return entries, nil
 }
 
@@ -184,13 +165,14 @@ func SubscribeArpCache(ctx context.Context, interval time.Duration, fn func(entr
 	for {
 		select {
 		case <-ctx.Done():
+			glog.Debug("Arp监听退出...")
 			return
 		default:
 			time.Sleep(interval)
 			// 获取当前ARP表
 			currentEntries, e1 := getClientsByArp(brLanString)
 			if e1 != nil {
-				glog.Printf("读取ARP表失败: %v\n", e1)
+				glog.Errorf("读取ARP表失败: %v\n", e1)
 				continue
 			}
 			if fn != nil {

@@ -26,6 +26,7 @@ type openWRT struct {
 	mu           sync.Mutex
 	fnEvent      func(int, any)
 	webhookUrl   string
+	ulistString  string
 	ctx          context.Context
 	cancel       context.CancelFunc
 	statusRuning bool
@@ -50,19 +51,19 @@ func (this *openWRT) init() {
 		return
 	}
 	this.ctx, this.cancel = context.WithCancel(context.Background())
+	this.ulistString = UbusList()
 	this.initClients()
 	go this.subscribeSysLog()
 	go this.subscribeArpEvent()
 	go this.subscribeFsnotify()
 	go this.subscribeStatus()
-	result := UbusList()
-	if strings.Contains(result, "hostapd") {
+	if strings.Contains(this.ulistString, "hostapd") {
 		go this.subscribeHostapd()
 	}
-	if strings.Contains(result, "dnsmasq") {
+	if strings.Contains(this.ulistString, "dnsmasq") {
 		go this.subscribeDnsmasq()
 	}
-	if strings.Contains(result, "ahsapd.sta") {
+	if strings.Contains(this.ulistString, "ahsapd.sta") {
 		go this.subscribeAhsapdsta()
 	}
 	this.initNtfy()
@@ -72,8 +73,13 @@ func (this *openWRT) Close() {
 	if this.cancel != nil {
 		this.cancel()
 	}
+	ntfy.GetInstance().Stop()
 }
 
+func (this *openWRT) ResetClients() {
+	_ = this.initData()
+	this.webUpdateAll(this.GetClients())
+}
 func (this *openWRT) initClients() {
 	err := this.initData()
 	if err != nil {
@@ -105,6 +111,7 @@ func (this *openWRT) subscribeSysLog() {
 	for {
 		select {
 		case <-this.ctx.Done():
+			glog.Debug("logread 监听退出...")
 			return
 		default:
 			err := subscribeSysLogs(func(s string) {
@@ -146,12 +153,12 @@ func (this *openWRT) subscribeSysLog() {
 				})
 			})
 			if err != nil {
-				glog.Error(fmt.Errorf("监听失败 %v", err))
+				glog.Error(fmt.Errorf("logread 监听失败 %v", err))
 				time.Sleep(time.Second * 10)
-				glog.Error("重新监听 SysLog")
+				glog.Error("重新监听 logread")
 				tryCount++
 				if tryCount > RE_REY_MAX_COUNT {
-					glog.Error("监听 SysLog 失败，超过最大重试次数")
+					glog.Error("监听 logread 失败，超过最大重试次数")
 					break
 				}
 			}
@@ -165,6 +172,7 @@ func (this *openWRT) subscribeHostapd() {
 	for {
 		select {
 		case <-this.ctx.Done():
+			glog.Debug("Hostapd 监听退出...")
 			return
 		default:
 			err := SubscribeHostapd(this.ctx, func(device *HostapdDevice) {
@@ -252,6 +260,7 @@ func (this *openWRT) subscribeDnsmasq() {
 	for {
 		select {
 		case <-this.ctx.Done():
+			glog.Debug("Dnsmasq 监听退出...")
 			return
 		default:
 			err := SubscribeDnsmasq(this.ctx, func(device *DnsmasqDevice) {
@@ -291,6 +300,7 @@ func (this *openWRT) subscribeAhsapdsta() {
 	for {
 		select {
 		case <-this.ctx.Done():
+			glog.Debug("Ahsapdsta 监听退出...")
 			return
 		default:
 			err := SubscribeSta(this.ctx, func(device *StaUpDown) {
@@ -375,7 +385,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			}
 			glog.Error("error:", err)
 		case <-this.ctx.Done():
-			glog.Debug("listenFsnotify 退出", this.statusRuning)
+			glog.Debug("Fsnotify 监听退出...")
 			return
 		}
 	}

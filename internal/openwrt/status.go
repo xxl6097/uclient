@@ -24,11 +24,10 @@ func (this *openWRT) StopStatus() {
 }
 func (this *openWRT) subscribeStatus() {
 	this.statusRuning = true
-	glog.Debug("开始计算", this.statusRuning)
 	for {
 		select {
 		case <-this.ctx.Done():
-			glog.Debug("退出状态计算", this.statusRuning)
+			glog.Debug("RSSI 监听退出...")
 			return
 		default:
 			this.readStatus()
