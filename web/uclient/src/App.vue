@@ -39,6 +39,9 @@
                 <el-dropdown-item @click="handleWebhookSetting"
                   >推送设置
                 </el-dropdown-item>
+                <el-dropdown-item @click="handleGithub"
+                  >Github
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -372,7 +375,9 @@ const getVersion = () => {
       showErrorTips('失败')
     })
 }
-
+const handleGithub = () => {
+  window.open('https://github.com/xxl6097/uclient/releases')
+}
 const handleWebhookSetting = () => {
   // Prompt('请输入WebHook地址', 'webhook设置', '').then((result) => {
   //   console.log('handleWebhookSetting', result.value)
