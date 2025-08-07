@@ -300,6 +300,9 @@ func CompareTime(now, target time.Time) int {
 // 0：上班打卡
 // 1：工作时间，不能打卡
 // 2：下班打卡
+func IsWorkingTime1(time1, time2 string) (int, error) {
+	return 0, nil
+}
 func IsWorkingTime(time1, time2 string) (int, error) {
 	t1, e1 := time.Parse(time.TimeOnly, time1)
 	if e1 != nil {
