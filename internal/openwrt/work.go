@@ -295,10 +295,11 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) (*Wo
 		fn(tempEntry)
 	}
 	works[day] = tempEntry
+	glog.Debugf("1 更新打卡 %v %v %+v", isDel, mac, tempEntry)
 	if isDel {
 		delete(works, day)
 	}
-	glog.Debugf("更新打卡 %v %+v", mac, tempEntry)
+	//glog.Debugf("2 更新打卡 %v %+v", mac, tempEntry)
 	//for k, status := range works {
 	//	glog.Printf("%v %+v", k, status)
 	//}
@@ -407,7 +408,7 @@ func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {
 	}
 	workType := tempData.Nick.WorkType
 	mac := tempData.MAC
-	timestamp := tempData.Nick.StartTime
+	timestamp := tempData.StartTime
 	if workType == nil {
 		return nil, fmt.Errorf("考勤打卡未设置")
 	}
@@ -429,7 +430,7 @@ func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {
 	}
 	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
-	//glog.Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
+	glog.Debugf("sysLogUpdateWorkTime %d %v %+v", workingTime, t1.Format(time.DateTime), tempData)
 	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
 		t.Weekday = int(t1.Weekday())
 		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {
