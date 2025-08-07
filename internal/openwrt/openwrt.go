@@ -8,9 +8,11 @@ import (
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -71,9 +73,11 @@ func (this *openWRT) init() {
 
 func (this *openWRT) Close() {
 	if this.cancel != nil {
+		glog.Debug("close openWRT")
 		this.cancel()
 	}
 	ntfy.GetInstance().Stop()
+	_ = glog.Flush()
 }
 
 func (this *openWRT) ResetClients() {
@@ -108,13 +112,22 @@ func (this *openWRT) initNtfy() {
 
 func (this *openWRT) subscribeSysLog() {
 	tryCount := 0
+	var process *os.Process
 	for {
 		select {
 		case <-this.ctx.Done():
 			glog.Debug("logread 监听退出...")
+			//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
+			//syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)       // 负 PID 表示杀进程组[2,4](@ref)
+			if process != nil {
+				_ = process.Kill()
+				_ = syscall.Kill(-process.Pid, syscall.SIGKILL)
+			}
 			return
 		default:
-			err := subscribeSysLogs(func(s string) {
+			err := subscribeSysLogs(this.ctx, func(p *os.Process) {
+				process = p
+			}, func(s string) {
 				subscribeHostapdLog(s, func(event *SysLogEvent) {
 					if event != nil && event.Mac != "" {
 						glog.Infof("Hostapd事件:%+v", event)
@@ -169,13 +182,20 @@ func (this *openWRT) subscribeSysLog() {
 
 func (this *openWRT) subscribeHostapd() {
 	tryCount := 0
+	var proc *os.Process
 	for {
 		select {
 		case <-this.ctx.Done():
 			glog.Debug("Hostapd 监听退出...")
+			if proc != nil {
+				_ = proc.Kill()
+				_ = syscall.Kill(-proc.Pid, syscall.SIGKILL)
+			}
 			return
 		default:
-			err := SubscribeHostapd(this.ctx, func(device *HostapdDevice) {
+			err := SubscribeHostapd(this.ctx, func(p *os.Process) {
+				proc = p
+			}, func(device *HostapdDevice) {
 				if device != nil && device.Address != "" {
 					if device.DataType == 2 {
 						cls := this.getClient(device.Address)
@@ -257,13 +277,20 @@ func (this *openWRT) subscribeArpEvent() {
 }
 func (this *openWRT) subscribeDnsmasq() {
 	tryCount := 0
+	var proc *os.Process
 	for {
 		select {
 		case <-this.ctx.Done():
 			glog.Debug("Dnsmasq 监听退出...")
+			if proc != nil {
+				_ = proc.Kill()
+				_ = syscall.Kill(-proc.Pid, syscall.SIGKILL)
+			}
 			return
 		default:
-			err := SubscribeDnsmasq(this.ctx, func(device *DnsmasqDevice) {
+			err := SubscribeDnsmasq(this.ctx, func(p *os.Process) {
+				proc = p
+			}, func(device *DnsmasqDevice) {
 				if device != nil && device.Mac != "" {
 					glog.Infof("Dnsmasq事件:%+v", device)
 					dhcp := &DHCPLease{
@@ -297,13 +324,20 @@ func (this *openWRT) subscribeDnsmasq() {
 
 func (this *openWRT) subscribeAhsapdsta() {
 	tryCount := 0
+	var proc *os.Process
 	for {
 		select {
 		case <-this.ctx.Done():
 			glog.Debug("Ahsapdsta 监听退出...")
+			if proc != nil {
+				_ = proc.Kill()
+				_ = syscall.Kill(-proc.Pid, syscall.SIGKILL)
+			}
 			return
 		default:
-			err := SubscribeSta(this.ctx, func(device *StaUpDown) {
+			err := SubscribeSta(this.ctx, func(p *os.Process) {
+				proc = p
+			}, func(device *StaUpDown) {
 				if device != nil && device.MacAddress != "" {
 					glog.Infof("ahsapd.sta事件:%+v", device)
 					num, _ := strconv.Atoi(device.Rssi)

@@ -1,10 +1,14 @@
 package openwrt
 
-import "github.com/xxl6097/glog/glog"
+import (
+	"context"
+	"github.com/xxl6097/glog/glog"
+	"os"
+)
 
-func subscribeSysLogs(fn func(string)) error {
+func subscribeSysLogs(ctx context.Context, exitFun func(process *os.Process), fn func(string)) error {
 	glog.Debug("subscribeSysLogs...")
-	return command(func(s string) {
+	return Command(ctx, exitFun, func(s string) {
 		if fn != nil {
 			fn(s)
 		}

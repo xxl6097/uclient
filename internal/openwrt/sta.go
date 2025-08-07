@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
+	"os"
 	"time"
 )
 
@@ -44,8 +45,8 @@ type Sta struct {
 	StaUpDown *StaUpDown `json:"staUpDown"`
 }
 
-func SubscribeSta(ctx context.Context, fn func(*StaUpDown)) error {
-	return Command(ctx, func(s string) {
+func SubscribeSta(ctx context.Context, exitFun func(process *os.Process), fn func(*StaUpDown)) error {
+	return Command(ctx, exitFun, func(s string) {
 		if s == "" {
 			return
 		}

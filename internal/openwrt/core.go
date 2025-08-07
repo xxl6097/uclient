@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -99,7 +100,7 @@ func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, 
 	// 2. 编译正则表达式（匹配连接/断开事件）
 	//pattern := `AP-STA-(CONNECTED|DISCONNECTED)`
 	re := regexp.MustCompile(pattern)
-	return dataMap, command(func(data string) {
+	return dataMap, Command(context.Background(), nil, func(data string) {
 		if re.MatchString(data) {
 			//fmt.Println("[事件] ", data) // 输出匹配行
 			macAddr := ParseMacAddr(data)
@@ -471,33 +472,36 @@ func parseTimer(logLine string) (*time.Time, error) {
 	return nil, nil
 }
 
-func Command(ctx context.Context, fu func(string), name string, arg ...string) error {
-	return cmd(ctx, fu, name, arg...)
-}
+//func Command(ctx context.Context, exitFun func(process *os.Process), fu func(string), name string, arg ...string) error {
+//	return Cmd(ctx, exitFun, fu, name, arg...)
+//}
+//
+//func command(exitFun func(process *os.Process), fu func(string), name string, arg ...string) error {
+//	return Cmd(context.Background(), exitFun, fu, name, arg...)
+//}
 
-func command(fu func(string), name string, arg ...string) error {
-	return cmd(context.Background(), fu, name, arg...)
-}
-
-func cmd(ctx context.Context, fu func(string), name string, arg ...string) error {
+func Command(ctx context.Context, exitFun func(process *os.Process), fu func(string), name string, arg ...string) error {
 	glog.Println(name, arg)
 	//ctx, cancel := context.WithCancel(context.Background())
 	// 创建ubus命令对象
-	cmd := exec.CommandContext(ctx, name, arg...)
-
+	ccc := exec.CommandContext(ctx, name, arg...)
+	ccc.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
 	// 创建标准输出管道
-	stdout, err := cmd.StdoutPipe()
+	stdout, err := ccc.StdoutPipe()
 	if err != nil {
 		fmt.Printf("创建管道失败: %v\n", err)
 		return err
 	}
+	if exitFun != nil {
+		exitFun(ccc.Process)
+	}
 
 	// 启动命令
-	if e := cmd.Start(); e != nil {
+	if e := ccc.Start(); e != nil {
 		fmt.Printf("启动命令失败: %v\n", e)
 		return err
 	}
-	defer cmd.Process.Kill() // 确保退出时终止进程
+	defer ccc.Process.Kill() // 确保退出时终止进程
 
 	// 实时读取输出流
 	scanner := bufio.NewScanner(stdout)
@@ -511,47 +515,14 @@ func cmd(ctx context.Context, fu func(string), name string, arg ...string) error
 		fmt.Printf("读取错误: %v\n", err)
 		return err
 	}
-	return cmd.Wait() // 等待命令退出
-}
-
-func command1(fu func(string), name string, arg ...string) error {
-	glog.Println(name, arg)
-	// 创建ubus命令对象
-	cmd := exec.Command(name, arg...)
-
-	// 创建标准输出管道
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Printf("创建管道失败: %v\n", err)
-		return err
-	}
-
-	// 启动命令
-	if e := cmd.Start(); e != nil {
-		fmt.Printf("启动命令失败: %v\n", e)
-		return err
-	}
-	defer cmd.Process.Kill() // 确保退出时终止进程
-
-	// 实时读取输出流
-	scanner := bufio.NewScanner(stdout)
-	for scanner.Scan() {
-		rawEvent := scanner.Text()
-		//fmt.Printf("原始事件: %s\n", rawEvent)
-		fu(rawEvent)
-	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("读取错误: %v\n", err)
-		return err
-	}
-	return cmd.Wait() // 等待命令退出
+	return ccc.Wait() // 等待命令退出
 }
 
 func RunCMD(name string, args ...string) ([]byte, error) {
 	//glog.Println(name, args)
 	cmd := exec.Command(name, args...)
-	output, err := cmd.CombinedOutput() // 合并stdout和stderr
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
+	output, err := cmd.CombinedOutput()                   // 合并stdout和stderr
 	if err != nil {
 		return nil, fmt.Errorf("执行失败: %v, 输出: %s", err, string(output))
 	}
@@ -564,15 +535,6 @@ func getStatusByMac(mac string) []*Status {
 	}
 	_ = u.CheckDirector(StatusDir)
 	tempFilePath := filepath.Join(StatusDir, mac)
-	//byteArray, err := os.ReadFile(tempFilePath)
-	//if err != nil {
-	//	return nil
-	//}
-	//var cfg []*Status
-	//err = ukey.GobToStruct(byteArray, &cfg)
-	//if err != nil {
-	//	return nil
-	//}
 	return readStatusByMac(tempFilePath)
 }
 

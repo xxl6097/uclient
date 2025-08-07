@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/xxl6097/glog/glog"
+	"os"
 	"time"
 )
 
@@ -20,8 +21,8 @@ type Dnsmasq struct {
 	DhcpAck *DnsmasqDevice `json:"dhcp.ack"`
 }
 
-func SubscribeDnsmasq(ctx context.Context, fn func(*DnsmasqDevice)) error {
-	return Command(ctx, func(s string) {
+func SubscribeDnsmasq(ctx context.Context, exitFun func(process *os.Process), fn func(*DnsmasqDevice)) error {
+	return Command(ctx, exitFun, func(s string) {
 		if s == "" {
 			return
 		}
