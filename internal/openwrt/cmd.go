@@ -25,23 +25,22 @@ func init() {
 	go func() {
 		<-sigs
 		for _, proc := range procs {
-			if proc != nil && proc.Pid > 0 {
+			if proc != nil {
 				_ = proc.Kill()
 			}
 		}
-		os.Exit(1)
 	}()
 }
 
 func writePid(name string, pid int) {
 	pidData := []byte(strconv.Itoa(pid))
-	if err := os.WriteFile(filepath.Join(glog.AppHome("pid"), name), pidData, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(glog.TempDir(), name), pidData, 0644); err != nil {
 		glog.Error("写入PID文件失败:", err)
 	}
 }
 
 func readPid(name string) int {
-	data, err := os.ReadFile(filepath.Join(glog.AppHome("pid"), name))
+	data, err := os.ReadFile(filepath.Join(glog.TempDir(), name))
 	if err != nil {
 		glog.Error("读取PID失败:", err)
 		return 0
@@ -72,6 +71,9 @@ func killPid(pid int) {
 
 func Command(ctx context.Context, fu func(string), name string, arg ...string) error {
 	glog.Println(name, arg)
+	procName := fmt.Sprintf("%s%s", name, strings.Join(arg, "."))
+	pid := readPid(procName)
+	killPid(pid)
 	//ctx, cancel := context.WithCancel(context.Background())
 	// 创建ubus命令对象
 	ccc := exec.CommandContext(ctx, name, arg...)
@@ -90,9 +92,6 @@ func Command(ctx context.Context, fu func(string), name string, arg ...string) e
 		return err
 	}
 	procs = append(procs, ccc.Process)
-	procName := fmt.Sprintf("%s%s", name, strings.Join(arg, "."))
-	pid := readPid(procName)
-	killPid(pid)
 	writePid(procName, ccc.Process.Pid)
 	defer ccc.Process.Kill() // 确保退出时终止进程
 
