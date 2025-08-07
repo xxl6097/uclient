@@ -52,8 +52,10 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 			this.nicks = nickMap
 			device.Nick = nickMap[macAddress]
 		}
+		this.updateDHCPLeases(device)
 		this.clients[macAddress] = device
 		cls = device
+		this.ddingWorkOffSign(cls)
 	} else {
 		//if device.Online == cls.Online {
 		//	//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)

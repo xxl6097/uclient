@@ -395,11 +395,14 @@ func GetTodaySign(mac string) *WorkEntry {
 		return &WorkEntry{}
 	}
 	tempEntry := works[day]
+	if tempEntry == nil {
+		return &WorkEntry{}
+	}
 	return tempEntry
 }
 
 func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {
-	if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
+	if tempData == nil || tempData.Nick == nil && tempData.Nick.WorkType == nil && tempData.Nick.WorkType.OnWorkTime == "" {
 		return nil, fmt.Errorf("参数不全 %+v", tempData)
 	}
 	workType := tempData.Nick.WorkType
@@ -407,6 +410,9 @@ func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {
 	timestamp := tempData.Nick.StartTime
 	if workType == nil {
 		return nil, fmt.Errorf("考勤打卡未设置")
+	}
+	if mac == "" {
+		return nil, fmt.Errorf("设备Mac空～")
 	}
 	if workType.OnWorkTime == "" || workType.OffWorkTime == "" {
 		return nil, fmt.Errorf("考勤打卡时间未设置 %+v", workType)

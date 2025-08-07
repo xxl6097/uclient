@@ -64,8 +64,9 @@ func (this *openWRT) isSignTime(tempData *DHCPLease) bool {
 
 func (this *openWRT) ddingSignByRSSI(tempData *DHCPLease) {
 	if tempData != nil {
-		if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
-			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+		nick := tempData.Nick
+		if nick != nil && nick.WorkType != nil && nick.WorkType.OnWorkTime != "" {
+			working, e1 := u.IsWorkingTime(nick.WorkType.OnWorkTime, nick.WorkType.OffWorkTime)
 			if e1 == nil {
 				switch working {
 				case 0:
