@@ -131,7 +131,7 @@ func (this *openWRT) subscribeSysLog() {
 								eve.Hostname = v.Hostname
 							}
 						}
-						this.updateDeviceStatus("Hostapd事件", eve)
+						go this.updateDeviceStatus("Hostapd事件", eve)
 					}
 				})
 				subscribeHetSysLog(s, func(event *KernelLog) {
@@ -147,7 +147,7 @@ func (this *openWRT) subscribeSysLog() {
 								eve.Hostname = v.Hostname
 							}
 						}
-						this.updateDeviceStatus("HetSysLog事件", eve)
+						go this.updateDeviceStatus("HetSysLog事件", eve)
 					}
 				})
 			})
@@ -199,7 +199,7 @@ func (this *openWRT) subscribeHostapd() {
 								dhcp.Hostname = v.Hostname
 							}
 						}
-						this.updateDeviceStatus("Hostapd事件", dhcp)
+						go this.updateDeviceStatus("Hostapd事件", dhcp)
 					}
 				}
 			})
@@ -237,7 +237,8 @@ func (this *openWRT) subscribeArpEvent() {
 					}
 				}
 				if v, ok := this.clients[mac]; ok {
-					if v.Online != (entry.Flags == 2) {
+					online := entry.Flags == 2
+					if v.Online != online {
 						//glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
@@ -268,7 +269,7 @@ func (this *openWRT) subscribeDnsmasq() {
 						Phy:       device.Interface,
 						Online:    true,
 					}
-					this.updateDeviceStatus("Dnsmasq事件", dhcp)
+					go this.updateDeviceStatus("Dnsmasq事件", dhcp)
 				}
 			})
 			if err != nil {
@@ -309,7 +310,7 @@ func (this *openWRT) subscribeAhsapdsta() {
 					if dhcp.StartTime <= 0 {
 						dhcp.StartTime = glog.Now().UnixMilli()
 					}
-					this.updateDeviceStatus("ahsapd事件", dhcp)
+					go this.updateDeviceStatus("ahsapd事件", dhcp)
 				}
 			})
 			if err != nil {
@@ -366,7 +367,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 				//	break
 				//}
 				if strings.EqualFold(event.Name, dhcpLeasesFilePath) {
-					this.updateClientsByDHCP()
+					go this.updateClientsByDHCP()
 				}
 				this.webUpdateAll(this.GetClients())
 			}
@@ -485,6 +486,9 @@ func (p *openWRT) updateDHCPLeases(dhcp *DHCPLease) {
 			dhcp.Signal = num
 			dhcp.StaType = sta.StaType
 			dhcp.Ssid = sta.Ssid
+			if sta.Timestamp != 0 {
+				dhcp.StartTime = sta.Timestamp
+			}
 		}
 	}
 }

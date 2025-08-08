@@ -38,24 +38,28 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 	defer this.mu.Unlock()
 	this.mu.Lock()
 	if device == nil {
+		glog.Debugf("device == nil %s 状态变化 %+v", typeEvent, device)
 		return
 	}
+
+	this.updateDHCPLeases(device)
 	macAddress := device.MAC
 	if macAddress == "" {
+		glog.Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, device)
 		return
 	}
-	cls := this.getClient(macAddress)
+	olderStatus := this.getClient(macAddress)
 	//glog.Debugf("新数据：%+v，老数据：%+v", device, cls)
-	if cls == nil {
+	if olderStatus == nil {
+		glog.Debugf("新设备：%+v，老数据：%+v", device, olderStatus)
 		nickMap, e2 := getNickData()
 		if e2 == nil {
 			this.nicks = nickMap
 			device.Nick = nickMap[macAddress]
 		}
-		this.updateDHCPLeases(device)
 		this.clients[macAddress] = device
-		cls = device
-		this.ddingWorkOffSign(cls)
+		olderStatus = device
+		this.ddingWorkOffSign(olderStatus)
 	} else {
 		//if device.Online == cls.Online {
 		//	//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
@@ -63,40 +67,39 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, device *DHCPLease) {
 		//}
 		//cls.Online = device.Online
 		if device.Signal != 0 {
-			cls.Signal = device.Signal
+			olderStatus.Signal = device.Signal
 		}
 		if device.Freq != 0 {
-			cls.Freq = device.Freq
+			olderStatus.Freq = device.Freq
 		}
 		if device.StartTime != 0 {
-			cls.StartTime = device.StartTime
+			olderStatus.StartTime = device.StartTime
 		}
 		if device.IP != "" {
-			cls.IP = device.IP
+			olderStatus.IP = device.IP
 		}
 		if device.Phy != "" {
-			cls.Phy = device.Phy
+			olderStatus.Phy = device.Phy
 		}
 		if device.Hostname != "" {
-			cls.Hostname = device.Hostname
+			olderStatus.Hostname = device.Hostname
 		}
-
-		this.updateDHCPLeases(device)
 		//glog.Debugf("%s 状态变化 %+v", typeEvent, device)
-		if device.Online == cls.Online {
+		if device.Online == olderStatus.Online {
 			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
 			return
 		}
-		cls.Online = device.Online
+		glog.Debugf("%s 状态变化 %+v", typeEvent, device)
+		olderStatus.Online = device.Online
 		//需要webnotify通知、钉钉notify、签到
 		//this.ddingWorkSign(cls)
-		this.ddingWorkOffSign(cls)
+		this.ddingWorkOffSign(olderStatus)
 	}
 	s := Status{}
 	s.Timestamp = device.StartTime
 	s.Connected = device.Online
-	this.ddingNotify(typeEvent, cls)
-	this.webNotify(cls)
+	this.ddingNotify(typeEvent, olderStatus)
+	this.webNotify(olderStatus)
 	this.updateUserTimeLineData(macAddress, []*Status{&s})
 	glog.Debugf("状态更新[%s] %+v", typeEvent, device)
 }
