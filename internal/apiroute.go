@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/gorilla/mux"
 	"github.com/xxl6097/go-http/pkg/ihttpserver"
+	"github.com/xxl6097/go-service/pkg/gs"
 	"net/http"
 )
 
@@ -44,10 +45,14 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 	router.HandleFunc("/api/staticip/delete", this.restApi.DeleteStaticIp).Methods(http.MethodDelete)
 	router.HandleFunc("/api/staticip/list", this.restApi.GetStaticIps).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/checkversion", this.restApi.ApiCheckVersion).Methods("GET")
-	router.HandleFunc("/api/upgrade", this.restApi.ApiUpdate).Methods("POST")
-	router.HandleFunc("/api/upgrade", this.restApi.ApiUpdate).Methods("PUT")
+	//router.HandleFunc("/api/checkversion", this.restApi.ApiCheckVersion).Methods("GET")
+	//router.HandleFunc("/api/upgrade", this.restApi.ApiUpdate).Methods("POST")
+	//router.HandleFunc("/api/upgrade", this.restApi.ApiUpdate).Methods("PUT")
 	router.HandleFunc("/api/version", this.restApi.ApiVersion).Methods("GET")
+
+	router.HandleFunc("/api/checkversion", gs.ApiCheckVersion).Methods("GET")
+	router.HandleFunc("/api/upgrade", gs.ApiUpdate(this.restApi.igs)).Methods("POST")
+	router.HandleFunc("/api/upgrade", gs.ApiUpdate(this.restApi.igs)).Methods("PUT")
 
 	router.Handle("/api/client/sse", this.restApi.GetSSE().Handler())
 	//subRouter.Handle("/api/client/sse", this.sseApi)
