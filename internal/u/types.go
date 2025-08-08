@@ -38,6 +38,7 @@ type StaDevice struct {
 	VmacAddress          string `json:"vmacAddress"`
 	UpTime               string `json:"upTime"`
 	AccessTime           string `json:"accessTime"`
+	Timestamp            int64  `json:"timestamp"`
 	Rssi                 string `json:"rssi"`
 	RxRate               string `json:"rxRate"`
 	TxRate               string `json:"txRate"`

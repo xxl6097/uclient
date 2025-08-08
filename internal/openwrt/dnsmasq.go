@@ -20,6 +20,7 @@ type Dnsmasq struct {
 	DhcpAck *DnsmasqDevice `json:"dhcp.ack"`
 }
 
+// ubus subscribe dnsmasq
 func SubscribeDnsmasq(ctx context.Context, fn func(*DnsmasqDevice)) error {
 	return Command(ctx, func(s string) {
 		if s == "" {

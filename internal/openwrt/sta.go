@@ -91,6 +91,10 @@ func GetStaInfo() map[string]*u.StaDevice {
 	devices := make(map[string]*u.StaDevice)
 	for _, device := range data.AhsapdSta.StaDevices {
 		mac := u.MacFormat(device.MacAddress)
+		t, err := u.AutoParse(device.AccessTime)
+		if err == nil && t != nil {
+			device.Timestamp = t.UnixMilli()
+		}
 		if mac != "" {
 			devices[mac] = &device
 		}

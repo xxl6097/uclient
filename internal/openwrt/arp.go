@@ -45,7 +45,6 @@ func parseARPLine(line string) (*ARPEntry, error) {
 		MAC:       mac,
 		Mask:      fields[4],
 		Interface: fields[5],
-		Timestamp: glog.Now(),
 	}, nil
 }
 

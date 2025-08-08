@@ -126,9 +126,6 @@ func (this *openWRT) subscribeSysLog() {
 							StartTime: event.Timestamp.UnixMilli(),
 							Phy:       event.Phy,
 						}
-						if eve.StartTime <= 0 {
-							eve.StartTime = glog.Now().UnixMilli()
-						}
 						if v, ok := this.leases[eve.MAC]; ok {
 							if v.Hostname != "" {
 								eve.Hostname = v.Hostname
@@ -143,7 +140,7 @@ func (this *openWRT) subscribeSysLog() {
 						eve := &DHCPLease{
 							MAC:       event.MACAddress,
 							Online:    event.Online,
-							StartTime: glog.Now().UnixMilli(),
+							StartTime: event.Timestamp,
 						}
 						if v, ok := this.leases[eve.MAC]; ok {
 							if v.Hostname != "" {
@@ -185,9 +182,6 @@ func (this *openWRT) subscribeHostapd() {
 							cls.Signal = device.Signal
 							cls.Freq = device.Freq
 							cls.StartTime = device.Timestamp.UnixMilli()
-							if cls.StartTime <= 0 {
-								cls.StartTime = glog.Now().UnixMilli()
-							}
 							//这里只是更新信号，不在web上notify通知
 							this.webUpdateOne(cls)
 						}
@@ -199,9 +193,6 @@ func (this *openWRT) subscribeHostapd() {
 							Freq:      device.Freq,
 							StartTime: device.Timestamp.UnixMilli(),
 							Online:    device.DataType == 0,
-						}
-						if dhcp.StartTime <= 0 {
-							dhcp.StartTime = glog.Now().UnixMilli()
 						}
 						if v, ok := this.leases[dhcp.MAC]; ok {
 							if v.Hostname != "" {
@@ -231,13 +222,9 @@ func (this *openWRT) subscribeArpEvent() {
 		if entrys != nil {
 			for mac, entry := range entrys {
 				dhcp := &DHCPLease{
-					MAC:       entry.MAC.String(),
-					IP:        entry.IP.String(),
-					StartTime: entry.Timestamp.UnixMilli(),
-					Phy:       entry.Interface,
-				}
-				if dhcp.StartTime <= 0 {
-					dhcp.StartTime = glog.Now().UnixMilli()
+					MAC: entry.MAC.String(),
+					IP:  entry.IP.String(),
+					Phy: entry.Interface,
 				}
 				if v, ok := this.leases[mac]; ok {
 					if v.Hostname != "" {
@@ -280,9 +267,6 @@ func (this *openWRT) subscribeDnsmasq() {
 						StartTime: device.Timestamp.UnixMilli(),
 						Phy:       device.Interface,
 						Online:    true,
-					}
-					if dhcp.StartTime <= 0 {
-						dhcp.StartTime = glog.Now().UnixMilli()
 					}
 					this.updateDeviceStatus("Dnsmasq事件", dhcp)
 				}
@@ -426,6 +410,7 @@ func (p *openWRT) updateClientsByDHCP() {
 	} else {
 		glog.Printf("DHCP变化，客户端数量 %+v\n", len(clientArray))
 		arpMap, e1 := getClientsByArp(brLanString)
+		staInfo := GetStaInfo()
 		for _, client := range clientArray {
 			mac := client.MAC
 			if e1 == nil && arpMap != nil {
@@ -441,6 +426,19 @@ func (p *openWRT) updateClientsByDHCP() {
 					client.Nick = nick
 				}
 			}
+			if staInfo != nil {
+				sta := staInfo[client.MAC]
+				if sta != nil {
+					client.Vendor = sta.StaVendor
+					if client.Hostname == "" || client.Hostname == "*" {
+						client.Hostname = sta.HostName
+					}
+					num, _ := strconv.Atoi(sta.Rssi)
+					client.Signal = num
+					client.StaType = sta.StaType
+					client.Ssid = sta.Ssid
+				}
+			}
 			if v, ok := p.clients[mac]; ok && v != nil {
 				if client.Phy != "" {
 					v.Phy = client.Phy
@@ -451,12 +449,20 @@ func (p *openWRT) updateClientsByDHCP() {
 				if client.Nick != nil {
 					v.Nick = client.Nick
 				}
-				if client.StartTime > 0 {
-					v.StartTime = client.StartTime
-				} else {
-					v.StartTime = glog.Now().UnixMilli()
-				}
+				//if client.StartTime > 0 {
+				//	v.StartTime = client.StartTime
+				//} else {
+				//	v.StartTime = glog.Now().UnixMilli()
+				//}
 				v.Online = client.Online
+
+				v.Vendor = client.Vendor
+				if v.Hostname == "" || v.Hostname == "*" {
+					v.Hostname = client.Hostname
+				}
+				v.Signal = client.Signal
+				v.StaType = client.StaType
+				v.Ssid = client.Ssid
 			} else {
 				p.clients[mac] = client
 			}

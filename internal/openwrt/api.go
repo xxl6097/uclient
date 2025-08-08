@@ -53,21 +53,38 @@ func (this *openWRT) initData() error {
 		for _, entry := range arpList {
 			mac := entry.MAC.String()
 			item := &DHCPLease{
-				IP:        entry.IP.String(),
-				MAC:       mac,
-				Phy:       entry.Interface,
-				Online:    entry.Flags == 2,
-				StartTime: entry.Timestamp.UnixMilli(),
+				IP:     entry.IP.String(),
+				MAC:    mac,
+				Phy:    entry.Interface,
+				Online: entry.Flags == 2,
 			}
 			if e2 == nil {
 				if lease, ok := dhcpMap[mac]; ok {
-					if lease.StartTime <= 0 {
-						lease.StartTime = glog.Now().UnixMilli()
-					}
-					item.StartTime = lease.StartTime
+					//if lease.StartTime <= 0 {
+					//	lease.StartTime = glog.Now().UnixMilli()
+					//}
+					//item.StartTime = lease.StartTime
 					item.Hostname = lease.Hostname
 				}
 			}
+			if staInfo != nil {
+				//glog.Debugf("---->%+v", staInfo)
+				sta := staInfo[mac]
+				if sta != nil {
+					item.Vendor = sta.StaVendor
+					if item.Hostname == "" || item.Hostname == "*" {
+						item.Hostname = sta.HostName
+					}
+					num, _ := strconv.Atoi(sta.Rssi)
+					item.Signal = num
+					item.StaType = sta.StaType
+					item.Ssid = sta.Ssid
+					if item.StartTime == 0 {
+						item.StartTime = sta.Timestamp
+					}
+				}
+			}
+
 			if sysLogMap != nil && len(sysLogMap) > 0 {
 				list := sysLogMap[mac]
 				this.updateUserTimeLineData(mac, list)
@@ -93,20 +110,6 @@ func (this *openWRT) initData() error {
 				}
 			}
 
-			if staInfo != nil {
-				//glog.Debugf("---->%+v", staInfo)
-				sta := staInfo[mac]
-				if sta != nil {
-					item.Vendor = sta.StaVendor
-					if item.Hostname == "" || item.Hostname == "*" {
-						item.Hostname = sta.HostName
-					}
-					num, _ := strconv.Atoi(sta.Rssi)
-					item.Signal = num
-					item.StaType = sta.StaType
-					item.Ssid = sta.Ssid
-				}
-			}
 			//if item.IP != "" {
 			//	item.Online = u.Ping(item.IP)
 			//}

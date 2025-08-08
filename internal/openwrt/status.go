@@ -61,6 +61,9 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 			if device.Lan != "" {
 				v.Ssid = device.Lan
 			}
+			if v.Hostname == "" || v.Hostname == "*" {
+				v.Hostname = device.HOSTNAME
+			}
 			if v.Device == nil {
 				v.Device = device
 			} else {

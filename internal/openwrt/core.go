@@ -90,7 +90,6 @@ type ARPEntry struct {
 	MAC       net.HardwareAddr //设备的 MAC 地址
 	Mask      string           // 子网掩码（通常为 *，表示未使用）
 	Interface string           // 关联的网络接口（如 br-lan、eth0）
-	Timestamp time.Time
 }
 
 func getDataFromSysLog(pattern string, args ...string) (map[string][]DHCPLease, error) {
@@ -288,21 +287,21 @@ func parseLeaseLine(line string, leasetime time.Duration) (DHCPLease, error) {
 	var startTime = now
 	startSec, e := strconv.ParseInt(fields[0], 10, 64)
 	if e != nil {
-		//beijingLoc, err := time.LoadLocation("Asia/Shanghai")
-		//if err != nil {
-		//	// 备选方案：手动创建东八区时区
-		//	//fmt.Println(err, "备选方案：手动创建东八区时区")
-		//	//beijingLoc = time.FixedZone("CST", 8*60*60) // UTC+8
-		//	beijingLoc = time.FixedZone("UTC+8", 8*60*60)
-		//}
-		//utcTime := time.Unix(startSec, 0) //// 解析为 UTC 时间
-		//startTime = utcTime.In(beijingLoc).Add(-leasetime)
-		startTime = u.UTC8ToTime(startSec)
+		beijingLoc, err := time.LoadLocation("Asia/Shanghai")
+		if err != nil {
+			// 备选方案：手动创建东八区时区
+			//fmt.Println(err, "备选方案：手动创建东八区时区")
+			//beijingLoc = time.FixedZone("CST", 8*60*60) // UTC+8
+			beijingLoc = time.FixedZone("UTC+8", 8*60*60)
+		}
+		utcTime := time.Unix(startSec, 0) //// 解析为 UTC 时间
+		startTime = utcTime.In(beijingLoc).Add(-leasetime)
+		//startTime = u.UTC8ToTime(startSec)
 	}
 	//startTime := time.Unix(startSec, 0) //// 解析为 UTC 时间
-	if startTime.UnixMilli() > now.UnixMilli() {
-		startTime = now
-	}
+	//if startTime.UnixMilli() > now.UnixMilli() {
+	//	startTime = now
+	//}
 
 	// 解析MAC地址
 	mac, err := net.ParseMAC(fields[1])
