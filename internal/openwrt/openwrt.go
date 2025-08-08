@@ -246,7 +246,7 @@ func (this *openWRT) subscribeArpEvent() {
 				}
 				if v, ok := this.clients[mac]; ok {
 					if v.Online != (entry.Flags == 2) {
-						glog.Infof("Arp事件:%+v", entry)
+						//glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
 				} else {
