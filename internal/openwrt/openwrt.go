@@ -233,7 +233,7 @@ func (this *openWRT) subscribeArpEvent() {
 				}
 				if entry.Flags == 2 {
 					if !u.Ping(entry.IP.String()) {
-						glog.Warnf("ARP缓存在线，实际已离线 %+v", entry)
+						glog.Warnf("ARP缓存在线，实际已离线%v %+v", this.getName(mac), entry)
 					}
 				}
 				if v, ok := this.clients[mac]; ok {
