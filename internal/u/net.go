@@ -18,7 +18,7 @@ func Ping(target string) bool {
 	}
 	data, _ := msg.Marshal(nil)
 
-	_ = conn.SetDeadline(time.Now().Add(2 * time.Second))
+	_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
 	_, err := conn.Write(data)
 	if err != nil {
 		return false

@@ -244,6 +244,11 @@ func (this *openWRT) subscribeArpEvent() {
 						dhcp.Hostname = v.Hostname
 					}
 				}
+				if entry.Flags == 2 {
+					if !u.Ping(entry.IP.String()) {
+						glog.Warnf("ARP缓存在线，实际已离线 %+v", entry)
+					}
+				}
 				if v, ok := this.clients[mac]; ok {
 					if v.Online != (entry.Flags == 2) {
 						//glog.Infof("Arp事件:%+v", entry)
