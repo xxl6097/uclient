@@ -64,11 +64,11 @@ func (this *Service) OnConfig() *service.Config {
 }
 
 func (this *Service) OnVersion() string {
-	pkg.Version()
-	cfg, err := load()
-	if err == nil {
-		glog.Debugf("cfg:%+v", cfg)
-	}
+	//pkg.Version()
+	//cfg, err := load()
+	//if err == nil {
+	//	glog.Debugf("cfg:%+v", cfg)
+	//}
 	return pkg.AppVersion
 }
 
