@@ -8,7 +8,7 @@ require (
 	github.com/kardianos/service v1.2.4
 	github.com/xxl6097/glog v0.1.50
 	github.com/xxl6097/go-http v0.0.35
-	github.com/xxl6097/go-service v0.6.67
+	github.com/xxl6097/go-service v0.6.68
 	github.com/xxl6097/go-sse v0.0.22
 	golang.org/x/net v0.42.0
 )
