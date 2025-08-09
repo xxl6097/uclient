@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string) error {
+func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string, wrk *WorkEntry) error {
 	cls, ok := this.clients[macAddress]
 	if !ok {
 		return fmt.Errorf("设备【%s】不存在内存", macAddress)
@@ -64,8 +64,8 @@ func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string)
 	}
 	if working == 0 {
 		msg.Title = fmt.Sprintf("【%s】上班了", name)
-		if wk != nil && wk.WorkTime1 != "" && u.IsOnWorked(wk.WorkTime1) {
-			return fmt.Errorf("上班已经打卡了 %v", wk.WorkTime1)
+		if wrk != nil && wrk.OnWorkTime > 0 {
+			return fmt.Errorf("上班已经打卡了 %v", u.TimestampToTime(wrk.OnWorkTime))
 		}
 	} else if working == 2 {
 		msg.Title = fmt.Sprintf("【%s】下班了", name)
@@ -80,16 +80,17 @@ func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string)
 		if builder == nil {
 			return
 		}
-		if wk != nil {
-			if wk.WorkTime1 != "" {
-				builder.WriteString(fmt.Sprintf("- 上班时间：%s\n ", wk.WorkTime1))
+		if wrk != nil {
+			if wrk.OnWorkTime > 0 {
+				builder.WriteString(fmt.Sprintf("- 上班时间：%s\n ", u.TimestampToTime(wrk.OnWorkTime)))
 			}
-			if wk.WorkTime2 != "" {
-				builder.WriteString(fmt.Sprintf("- 下班时间：%s\n ", wk.WorkTime2))
+			if wrk.OffWorkTime > 0 {
+				builder.WriteString(fmt.Sprintf("- 下班时间：%s\n ", u.TimestampToTime(wrk.OffWorkTime)))
 			}
-			if wk.OverWorkTimes != "" {
-				builder.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", wk.OverWorkTimes))
-			}
+
+		}
+		if wk != nil && wk.OverWorkTimes != "" {
+			builder.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", wk.OverWorkTimes))
 		}
 		if monthOverTimes != "" {
 			builder.WriteString(fmt.Sprintf("- 本月加班时长：%s\n ", monthOverTimes))

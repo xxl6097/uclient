@@ -109,7 +109,7 @@ func (this *Ntfy) subscribe(info *u.NtfyInfo) {
 		default:
 			err := this.Subscribe(info.Address, info.Topic, info.Username, info.Password)
 			if err != nil {
-				glog.Error(err)
+				//glog.Error(err)
 				if this.isClosed {
 					return
 				}

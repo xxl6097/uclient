@@ -433,7 +433,7 @@ func (this *Api) TiggerSignCardEvent(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("mac is empty"))
 		return
 	}
-	err = openwrt.GetInstance().NotifySignCardEvent(3, 0, body.Mac)
+	err = openwrt.GetInstance().NotifySignCardEvent(3, 0, body.Mac, nil)
 	if err != nil {
 		res.Err(err)
 		return
@@ -462,7 +462,7 @@ func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	glog.Printf("修改 %+v\n", body)
-	err = openwrt.UpdatetWorkTime(body.Mac, body.Day, body.Data)
+	err = openwrt.ApiUpdateWorkTime(body.Mac, body.Day, body.Data)
 	if err != nil {
 		res.Err(fmt.Errorf("UpdatetWorkTime err %v", err))
 		return

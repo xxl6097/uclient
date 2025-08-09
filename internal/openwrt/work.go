@@ -318,7 +318,7 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) (*Wo
 	return tempEntry, err
 }
 
-func UpdatetWorkTime(mac, day string, data map[string]interface{}) error {
+func ApiUpdateWorkTime(mac, day string, data map[string]interface{}) error {
 	if data == nil {
 		return fmt.Errorf("data map is empty")
 	}
@@ -400,6 +400,10 @@ func GetTodaySign(mac string) *WorkEntry {
 		return &WorkEntry{}
 	}
 	return tempEntry
+}
+
+func UpdateWorkTime(mac, todayDate string, fn func(*WorkEntry)) (*WorkEntry, error) {
+	return setWorkTime(false, mac, workDir, todayDate, fn)
 }
 
 func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {

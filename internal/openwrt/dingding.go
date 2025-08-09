@@ -14,96 +14,178 @@ func (this *openWRT) ddingNotify(eveName string, tempData *DHCPLease) {
 	}
 }
 func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
-	if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
-		_, err := sysLogUpdateWorkTime(tempData)
-		if err != nil {
-			glog.Errorf("更新时间失败 %v %+v", err, tempData)
-		} else {
-			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
-			if e1 != nil {
-				glog.Error(e1)
+	//if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
+	//	_, err := sysLogUpdateWorkTime(tempData)
+	//	if err != nil {
+	//		glog.Errorf("更新时间失败 %v %+v", err, tempData)
+	//	} else {
+	//		working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+	//		if e1 != nil {
+	//			glog.Error(e1)
+	//		}
+	//		e := this.NotifySignCardEvent(working, tempData.Signal, tempData.MAC)
+	//		if e != nil {
+	//			glog.Errorf("钉钉通知打卡失败 %v %+v", e, tempData)
+	//		}
+	//	}
+	//} else {
+	//	glog.Errorf("未设置打卡 %+v", tempData)
+	//}
+	this.updateWorkTime(tempData, func(working int, wrk *WorkEntry) {
+		e := this.NotifySignCardEvent(working, tempData.Signal, tempData.MAC, wrk)
+		if e != nil {
+			glog.Errorf("钉钉通知打卡失败 %v %+v", e, tempData)
+		}
+	})
+}
+
+func (this *openWRT) updateWorkTime(tempData *DHCPLease, canNotifyDing func(int, *WorkEntry)) {
+	if !this.isSignTime(tempData) {
+		return
+	}
+	timestamp := tempData.StartTime
+	if timestamp == 0 {
+		return
+	}
+	mac := tempData.MAC
+	ti := u.UTC8ToTime(timestamp)
+	todayDate := ti.Format(time.DateOnly)
+	workingTime, err := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+	if err != nil {
+		glog.Error("判断工作时间错误❌", err)
+	}
+	signWork, err := UpdateWorkTime(mac, todayDate, func(t *WorkEntry) {
+		t.Weekday = int(ti.Weekday())
+		if tempData.Nick.WorkType.IsSaturdayWork && ti.Weekday() == time.Saturday {
+			t.DayType = 3
+		}
+		if ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday {
+			if t.OnWorkTime == 0 {
+				t.OnWorkTime = timestamp
+				t.OnWorkSignal = tempData.Signal
+			} else {
+				t.OffWorkTime = timestamp
+				t.OffWorkSignal = tempData.Signal
 			}
-			e := this.NotifySignCardEvent(working, tempData.Signal, tempData.MAC)
-			if e != nil {
-				glog.Errorf("钉钉通知打卡失败 %v %+v", e, tempData)
+		} else {
+			if workingTime == 0 {
+				//上班打卡
+				if t.OnWorkTime <= 0 {
+					//说明上午未打卡
+					t.OnWorkTime = timestamp
+					t.OnWorkSignal = tempData.Signal
+				}
+			} else if workingTime == 2 {
+				t.OffWorkTime = timestamp
+				t.OffWorkSignal = tempData.Signal
 			}
 		}
-	} else {
-		glog.Errorf("未设置打卡 %+v", tempData)
+	})
+	if signWork != nil && err == nil && canNotifyDing != nil {
+		canNotifyDing(workingTime, signWork)
 	}
 }
 
-func (this *openWRT) ddingWorkOffSign(tempData *DHCPLease) {
-	if tempData != nil && !tempData.Online && this.isSignTime(tempData) {
-		glog.Errorf("ddingWorkOffSign %+v", tempData)
-		this.ddingWorkSign(tempData)
-	}
-}
-
-func (this *openWRT) isSignTime(tempData *DHCPLease) bool {
-	if tempData != nil {
-		if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
-			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
-			if e1 == nil {
-				switch working {
-				case 0:
-					return true
-				case 2:
-					return true
-				default:
-					t1 := glog.Now()
-					if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
-						return true
-					}
-				}
-			}
+// 判断设备具备打开条件，也就是是否设置了上线班时间
+func (this *openWRT) hasSignCondition(tempData *DHCPLease) bool {
+	if tempData != nil && tempData.MAC != "" {
+		if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" && tempData.Nick.WorkType.OffWorkTime != "" {
+			return true
 		}
 	}
 	return false
 }
 
-func (this *openWRT) ddingSignByRSSI(tempData *DHCPLease) {
-	if tempData != nil {
-		nick := tempData.Nick
-		if nick != nil && nick.WorkType != nil && nick.WorkType.OnWorkTime != "" {
-			working, e1 := u.IsWorkingTime(nick.WorkType.OnWorkTime, nick.WorkType.OffWorkTime)
+func (this *openWRT) isSignTime(tempData *DHCPLease) bool {
+	if this.hasSignCondition(tempData) {
+		t1 := glog.Now()
+		if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
+			return true
+		} else {
+			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
 			if e1 == nil {
 				switch working {
 				case 0:
-					if tempData.Online && tempData.Signal >= -80 {
-						wk := GetTodaySign(tempData.MAC)
-						if wk.OnWorkTime == 0 {
-							this.ddingWorkSign(tempData)
-						}
-					}
-					break
+					return true
 				case 2:
-					if tempData.Signal < -80 && tempData.Signal > -90 {
-						wk := GetTodaySign(tempData.MAC)
-						if wk.OffWorkTime <= 0 {
-							this.ddingWorkSign(tempData)
-						} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
-							this.ddingWorkSign(tempData)
-						}
-					}
-					break
-				default:
-					t1 := glog.Now()
-					if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
-						if (tempData.Signal < -80 && tempData.Signal > -90) || (tempData.Online && tempData.Signal >= -80) {
-							wk := GetTodaySign(tempData.MAC)
-							if wk.OnWorkTime <= 0 {
-								this.ddingWorkSign(tempData)
-							} else if wk.OffWorkTime <= 0 {
-								this.ddingWorkSign(tempData)
-							} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
-								this.ddingWorkSign(tempData)
-							}
-
-						}
-					}
+					return true
 				}
 			}
+		}
+	}
+	//不具备打卡条件，返回false
+	return false
+}
+
+func (this *openWRT) ddingSignByRSSI(tempData *DHCPLease) {
+	if !this.isSignTime(tempData) {
+		//不具备打卡条件或者不在打开时间范围内（工作时间不打卡），退出
+		return
+	}
+	if this.isWeekend() {
+		wk := GetTodaySign(tempData.MAC)
+		if wk.OnWorkTime <= 0 {
+			this.ddingWorkSign(tempData)
+		} else if wk.OffWorkTime <= 0 {
+			this.ddingWorkSign(tempData)
+		} else if wk.OffWorkTime > 0 {
+			this.ddingWorkSign(tempData)
+		}
+	} else {
+		working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
+		if e1 == nil {
+			switch working {
+			case 0:
+				//这里要设置信号门槛，不然在楼下就连上触发了打卡不行
+				//TODO 如果打卡的时候，信号确实小于-80，如何处理
+				if tempData.Online && tempData.Signal >= -80 {
+					wk := GetTodaySign(tempData.MAC)
+					if wk.OnWorkTime == 0 {
+						this.ddingWorkSign(tempData)
+					}
+				}
+				break
+			case 2:
+				wk := GetTodaySign(tempData.MAC)
+				if wk.OffWorkTime <= 0 {
+					this.ddingWorkSign(tempData)
+				} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
+					this.ddingWorkSign(tempData)
+				}
+				break
+			}
+		} else {
+			glog.Debug(e1)
+		}
+	}
+}
+
+// 判断是否为周末
+func (this *openWRT) isWeekend() bool {
+	t1 := glog.Now()
+	if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
+		return true
+	}
+	return false
+}
+
+// 具备打卡条件，而且信号变弱，故判断可能离线了
+func (this *openWRT) signalWeak(tempData *DHCPLease) {
+	if this.isSignTime(tempData) {
+		if tempData.Signal != 0 && tempData.Signal < -80 {
+			if !u.Ping(tempData.IP) {
+				//ping不通，估计离线了
+				glog.Warnf("已经离线了 %+v", tempData)
+				//wk := GetTodaySign(tempData.MAC)
+				//if wk.OnWorkTime <= 0 {
+				//	this.ddingWorkSign(tempData)
+				//} else if wk.OffWorkTime <= 0 {
+				//	this.ddingWorkSign(tempData)
+				//} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
+				//	this.ddingWorkSign(tempData)
+				//}
+			}
+
 		}
 	}
 }

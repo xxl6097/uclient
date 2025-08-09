@@ -233,7 +233,7 @@ func (this *openWRT) subscribeArpEvent() {
 				}
 				if entry.Flags == 2 {
 					if !u.Ping(entry.IP.String()) {
-						glog.Warnf("ARP缓存在线，实际已离线%v %+v", this.getName(mac), entry)
+						//glog.Warnf("ARP缓存在线，实际已离线%v %+v", this.getName(mac), entry)
 					}
 				}
 				if v, ok := this.clients[mac]; ok {
@@ -486,7 +486,7 @@ func (p *openWRT) updateDHCPLeases(dhcp *DHCPLease) {
 			dhcp.Signal = num
 			dhcp.StaType = sta.StaType
 			dhcp.Ssid = sta.Ssid
-			if sta.Timestamp != 0 {
+			if sta.Timestamp != 0 && dhcp.StartTime == 0 {
 				dhcp.StartTime = sta.Timestamp
 			}
 		}

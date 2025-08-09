@@ -42,7 +42,9 @@ func (this *openWRT) initData() error {
 			this.nicks = nickMap
 			glog.Debug("\n✅ nickMap：")
 			for _, temp := range nickMap {
-				glog.Debugf("%+v", temp)
+				if temp != nil {
+					glog.Debugf("%+v %+v", temp, temp.WorkType)
+				}
 			}
 		}
 
