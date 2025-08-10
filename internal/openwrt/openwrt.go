@@ -440,6 +440,9 @@ func (p *openWRT) updateClientsByDHCP() {
 					client.Signal = num
 					client.StaType = sta.StaType
 					client.Ssid = sta.Ssid
+					if client.StaType == "" || client.StaType == "*" {
+						client.StaType = sta.StaType
+					}
 				}
 			}
 			if v, ok := p.clients[mac]; ok && v != nil {
@@ -490,6 +493,10 @@ func (p *openWRT) updateDHCPLeases(dhcp *DHCPLease) {
 			dhcp.Ssid = sta.Ssid
 			if sta.Timestamp != 0 && dhcp.StartTime == 0 {
 				dhcp.StartTime = sta.Timestamp
+			}
+
+			if dhcp.StaType == "" || dhcp.StaType == "*" {
+				dhcp.StaType = sta.StaType
 			}
 		}
 	}
