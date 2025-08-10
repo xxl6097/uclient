@@ -79,8 +79,8 @@ func (this *openWRT) initData() error {
 					}
 					num, _ := strconv.Atoi(sta.Rssi)
 					item.Signal = num
-					if item.StaType == "" || item.StaType == "*" {
-						item.StaType = sta.StaType
+					if item.Vendor == "" || item.Vendor == "*" {
+						item.Vendor = sta.StaType
 					}
 					item.Ssid = sta.Ssid
 					if item.StartTime == 0 {
