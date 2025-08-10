@@ -9,28 +9,29 @@ import (
 	"time"
 )
 
-func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string, wrk *WorkEntry) error {
-	cls, ok := this.clients[macAddress]
-	if !ok {
-		return fmt.Errorf("设备【%s】不存在内存", macAddress)
+func (this *openWRT) TiggerSignCardEvent(macAddress string) error {
+	if v, ok := this.clients[macAddress]; ok {
+		if v.Nick != nil && v.Nick.WorkType != nil {
+			return this.NotifyDingSign(0, macAddress, glog.Now(), nil, v.Nick.WorkType)
+		}
 	}
-	if cls == nil {
-		return fmt.Errorf("设备【%s】对象不存在", macAddress)
-	}
-	if cls.Nick == nil {
-		return fmt.Errorf("设备【%s】未设置打卡", macAddress)
-	}
-	wts := cls.Nick.WorkType
+	return nil
+}
+
+func (this *openWRT) NotifyDingSign(signal int, macAddress string, now time.Time, wrk *WorkEntry, wts *WorkTypeSetting) error {
+	//if wrk == nil {
+	//	return fmt.Errorf("设备【%s】没今天打卡数据 ", macAddress)
+	//}
 	if wts == nil {
 		return fmt.Errorf("设备【%s】未设置打卡时间", macAddress)
 	}
 
-	t1 := glog.Now()
-	month := fmt.Sprintf("%d-%02d", t1.Year(), int(t1.Month()))
-	day := t1.Format(time.DateOnly)
+	//t1 := glog.Now()
+	month := fmt.Sprintf("%d-%02d", now.Year(), int(now.Month()))
+	day := now.Format(time.DateOnly)
 	var monthOverTimes string
 	var wk *WorkTime
-	works, err := getWorkTime(macAddress, wts)
+	works, err := getWorkTimeAndCaculate(macAddress, wts)
 	if err == nil && works != nil {
 		for _, work := range works {
 			if work.Month == month {
@@ -62,18 +63,28 @@ func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string,
 		MacAddress: macAddress,
 		Signal:     signal,
 	}
-	if working == 0 {
-		msg.Title = fmt.Sprintf("【%s】上班了", name)
-		if wrk != nil && wrk.OnWorkTime > 0 {
-			return fmt.Errorf("上班已经打卡了 %v", u.TimestampToTime(wrk.OnWorkTime))
+	if wrk != nil {
+		if wrk.OnWorkTime > 0 && wrk.OffWorkTime == 0 {
+			msg.Title = fmt.Sprintf("【%s】上班了", name)
+		} else {
+			msg.Title = fmt.Sprintf("【%s】下班了", name)
 		}
-	} else if working == 2 {
-		msg.Title = fmt.Sprintf("【%s】下班了", name)
-	} else if working == 3 {
-		msg.Title = fmt.Sprintf("【%s】考勤统计", name)
 	} else {
-		return fmt.Errorf("当前是异常的工作时间 %v", working)
+		msg.Title = fmt.Sprintf("【%s】考勤统计", name)
 	}
+
+	//if working == 0 {
+	//	msg.Title = fmt.Sprintf("【%s】上班了", name)
+	//	if wrk.OnWorkTime > 0 {
+	//		return fmt.Errorf("上班已经打卡了 %v", u.TimestampToTime(wrk.OnWorkTime))
+	//	}
+	//} else if working == 2 {
+	//	msg.Title = fmt.Sprintf("【%s】下班了", name)
+	//} else if working == 3 {
+	//	msg.Title = fmt.Sprintf("【%s】考勤统计", name)
+	//} else {
+	//	return fmt.Errorf("当前是异常的工作时间 %v", working)
+	//}
 	//msg.TodayOverTime = todayOverTimes
 	//msg.MonthOverTime = monthOverTimes
 	return webhook.Notify(msg, func(builder *strings.Builder) {
@@ -87,7 +98,6 @@ func (this *openWRT) NotifySignCardEvent(working, signal int, macAddress string,
 			if wrk.OffWorkTime > 0 {
 				builder.WriteString(fmt.Sprintf("- 下班时间：%s\n ", u.TimestampToTime(wrk.OffWorkTime)))
 			}
-
 		}
 		if wk != nil && wk.OverWorkTimes != "" {
 			builder.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", wk.OverWorkTimes))

@@ -321,13 +321,13 @@ func (this *openWRT) GetWebHook() string {
 	return string(data)
 }
 
-func (this *openWRT) GetWorkTime(mac string) ([]*Work, error) {
+func (this *openWRT) GetWorkTimeAndCaculate(mac string) ([]*Work, error) {
 	if mac == "" {
 		return nil, fmt.Errorf("mac is empty")
 	}
 	if v, ok := this.clients[mac]; ok {
 		if v.Nick != nil {
-			return getWorkTime(mac, v.Nick.WorkType)
+			return getWorkTimeAndCaculate(mac, v.Nick.WorkType)
 		}
 	}
 	return nil, fmt.Errorf("client not found mac")

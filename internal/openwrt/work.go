@@ -144,7 +144,7 @@ func caculetePMWorkDay(pmSignTime, workTime2 time.Time) time.Duration {
 //	return duration
 //}
 
-func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, error) {
+func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, error) {
 	if mac == "" {
 		return nil, fmt.Errorf("mac is empty")
 	}
@@ -257,10 +257,10 @@ func GetWorkTime(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, 
 	return result, nil
 }
 
-func getWorkTime(mac string, workType *WorkTypeSetting) ([]*Work, error) {
+func getWorkTimeAndCaculate(mac string, workType *WorkTypeSetting) ([]*Work, error) {
 	tempFilePath := filepath.Join(workDir, mac)
 	//glog.Debug("GetWorkTime", mac)
-	return GetWorkTime(mac, tempFilePath, workType)
+	return GetWorkTimeAndCaculate(mac, tempFilePath, workType)
 }
 
 func TestSetWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) error {
@@ -388,7 +388,28 @@ func DelWorkTime(mac string, day string) error {
 	return err
 }
 
-func GetTodaySign(mac string) *WorkEntry {
+func GetSignData(mac string) map[string]*WorkEntry {
+	tempFilePath := filepath.Join(workDir, mac)
+	works := ReadWorkTimeByMac(tempFilePath)
+	return works
+}
+func SetSignData(mac string, signs map[string]*WorkEntry) error {
+	content, err := ukey.StructToGob(signs)
+	if err != nil {
+		return err
+	}
+	err = u.CheckDirector(workDir)
+	tempFilePath := filepath.Join(workDir, mac)
+	file, err := os.Create(tempFilePath) // 文件不存在则创建，存在则截断
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	// 写入内容
+	_, err = file.Write(content)
+	return err
+}
+func GetTodaySignData(mac string) *WorkEntry {
 	day := glog.Now().Format(time.DateOnly)
 	tempFilePath := filepath.Join(workDir, mac)
 	works := ReadWorkTimeByMac(tempFilePath)
@@ -401,6 +422,22 @@ func GetTodaySign(mac string) *WorkEntry {
 	}
 	return tempEntry
 }
+
+//func setTodaySignData(mac string) *WorkEntry {
+//	content, err := ukey.StructToGob(works)
+//	if err != nil {
+//		return tempEntry, err
+//	}
+//	err = u.CheckDirector(workDir)
+//	file, err := os.Create(tempFilePath) // 文件不存在则创建，存在则截断
+//	if err != nil {
+//		return tempEntry, err
+//	}
+//	defer file.Close()
+//	// 写入内容
+//	_, err = file.Write(content)
+//	return tempEntry, err
+//}
 
 func UpdateWorkTime(mac, todayDate string, fn func(*WorkEntry)) (*WorkEntry, error) {
 	return setWorkTime(false, mac, workDir, todayDate, fn)
