@@ -21,6 +21,7 @@ var (
 
 type openWRT struct {
 	clients      map[string]*DHCPLease
+	tempOffline  map[string]*DHCPLease
 	nicks        map[string]*NickEntry
 	leases       map[string]*DHCPLease
 	mu           sync.Mutex
@@ -39,6 +40,7 @@ func GetInstance() *openWRT {
 			clients:      make(map[string]*DHCPLease),
 			nicks:        make(map[string]*NickEntry),
 			leases:       make(map[string]*DHCPLease),
+			tempOffline:  make(map[string]*DHCPLease),
 			statusRuning: false,
 		}
 		instance.init()

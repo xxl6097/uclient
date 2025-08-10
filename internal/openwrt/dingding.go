@@ -14,23 +14,6 @@ func (this *openWRT) ddingNotify(eveName string, tempData *DHCPLease) {
 	}
 }
 func (this *openWRT) ddingWorkSign(tempData *DHCPLease) {
-	//if tempData.Nick != nil && tempData.Nick.WorkType != nil && tempData.Nick.WorkType.OnWorkTime != "" {
-	//	_, err := sysLogUpdateWorkTime(tempData)
-	//	if err != nil {
-	//		glog.Errorf("更新时间失败 %v %+v", err, tempData)
-	//	} else {
-	//		working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
-	//		if e1 != nil {
-	//			glog.Error(e1)
-	//		}
-	//		e := this.NotifySignCardEvent(working, tempData.Signal, tempData.MAC)
-	//		if e != nil {
-	//			glog.Errorf("钉钉通知打卡失败 %v %+v", e, tempData)
-	//		}
-	//	}
-	//} else {
-	//	glog.Errorf("未设置打卡 %+v", tempData)
-	//}
 	this.updateWorkTime(tempData, func(working int, wrk *WorkEntry) {
 		e := this.NotifySignCardEvent(working, tempData.Signal, tempData.MAC, wrk)
 		if e != nil {
@@ -54,30 +37,41 @@ func (this *openWRT) updateWorkTime(tempData *DHCPLease, canNotifyDing func(int,
 	if err != nil {
 		glog.Error("判断工作时间错误❌", err)
 	}
-	signWork, err := UpdateWorkTime(mac, todayDate, func(t *WorkEntry) {
-		t.Weekday = int(ti.Weekday())
+	signWork, err := UpdateWorkTime(mac, todayDate, func(todayData *WorkEntry) {
+		if ti.Weekday() == time.Sunday {
+			//默认情况周日是节假日
+			if todayData.OnWorkTime == 0 &&
+				todayData.OffWorkTime == 0 &&
+				todayData.OffWorkSignal == 0 &&
+				todayData.OnWorkSignal == 0 &&
+				todayData.DayType == 0 &&
+				todayData.Weekday == 0 {
+				todayData.DayType = 1
+			}
+		}
+		todayData.Weekday = int(ti.Weekday())
 		if tempData.Nick.WorkType.IsSaturdayWork && ti.Weekday() == time.Saturday {
-			t.DayType = 3
+			todayData.DayType = 3
 		}
 		if ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday {
-			if t.OnWorkTime == 0 {
-				t.OnWorkTime = timestamp
-				t.OnWorkSignal = tempData.Signal
+			if todayData.OnWorkTime == 0 {
+				todayData.OnWorkTime = timestamp
+				todayData.OnWorkSignal = tempData.Signal
 			} else {
-				t.OffWorkTime = timestamp
-				t.OffWorkSignal = tempData.Signal
+				todayData.OffWorkTime = timestamp
+				todayData.OffWorkSignal = tempData.Signal
 			}
 		} else {
 			if workingTime == 0 {
 				//上班打卡
-				if t.OnWorkTime <= 0 {
+				if todayData.OnWorkTime <= 0 {
 					//说明上午未打卡
-					t.OnWorkTime = timestamp
-					t.OnWorkSignal = tempData.Signal
+					todayData.OnWorkTime = timestamp
+					todayData.OnWorkSignal = tempData.Signal
 				}
 			} else if workingTime == 2 {
-				t.OffWorkTime = timestamp
-				t.OffWorkSignal = tempData.Signal
+				todayData.OffWorkTime = timestamp
+				todayData.OffWorkSignal = tempData.Signal
 			}
 		}
 	})
@@ -172,20 +166,23 @@ func (this *openWRT) isWeekend() bool {
 // 具备打卡条件，而且信号变弱，故判断可能离线了
 func (this *openWRT) signalWeak(tempData *DHCPLease) {
 	if this.isSignTime(tempData) {
+		if _, ok := this.tempOffline[tempData.MAC]; ok {
+			return
+		}
 		if tempData.Signal != 0 && tempData.Signal < -80 {
 			if !u.Ping(tempData.IP) {
 				//ping不通，估计离线了
 				glog.Warnf("已经离线了 %+v", tempData)
-				//wk := GetTodaySign(tempData.MAC)
-				//if wk.OnWorkTime <= 0 {
-				//	this.ddingWorkSign(tempData)
-				//} else if wk.OffWorkTime <= 0 {
-				//	this.ddingWorkSign(tempData)
-				//} else if wk.OffWorkTime > 0 && tempData.Signal != wk.OffWorkSignal {
-				//	this.ddingWorkSign(tempData)
-				//}
+				this.tempOffline[tempData.MAC] = &DHCPLease{
+					MAC:       tempData.MAC,
+					IP:        tempData.IP,
+					Signal:    tempData.Signal,
+					Ssid:      tempData.Ssid,
+					Hostname:  tempData.Hostname,
+					StartTime: glog.Now().UnixMilli(),
+					Online:    false,
+				}
 			}
-
 		}
 	}
 }

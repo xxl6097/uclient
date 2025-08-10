@@ -75,7 +75,7 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 				v.Device = device
 			}
 			//this.ddingSignByRSSI(v)
-			this.signalWeak(v)
+			go this.signalWeak(v)
 		} else {
 			glog.Debug("mergeStatus 不存在", device)
 		}
