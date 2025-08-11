@@ -475,24 +475,85 @@ func (p *openWRT) updateClientsByDHCP() {
 	}
 }
 
-func (p *openWRT) updateDHCPLeases(dhcp *DHCPLease) {
+func (this *openWRT) refreshClients(new *DHCPLease) *DHCPLease {
+	if new == nil {
+		return nil
+	}
 	staInfo := GetStaInfo()
 	if staInfo != nil {
-		sta := staInfo[dhcp.MAC]
+		sta := staInfo[new.MAC]
 		if sta != nil {
-			dhcp.Vendor = sta.StaVendor
-			if dhcp.Hostname == "" || dhcp.Hostname == "*" {
-				dhcp.Hostname = sta.HostName
+			new.Vendor = sta.StaVendor
+			if new.Hostname == "" || new.Hostname == "*" {
+				new.Hostname = sta.HostName
 			}
 			num, _ := strconv.Atoi(sta.Rssi)
-			dhcp.Signal = num
-			dhcp.StaType = sta.StaType
-			dhcp.Ssid = sta.Ssid
-			if sta.Timestamp != 0 && dhcp.StartTime == 0 {
-				dhcp.StartTime = sta.Timestamp
+			new.Signal = num
+			new.StaType = sta.StaType
+			new.Ssid = sta.Ssid
+			if sta.Timestamp != 0 && new.StartTime == 0 {
+				new.StartTime = sta.Timestamp
 			}
 		}
 	}
+	old := this.getClient(new.MAC)
+	if old != nil {
+		if new.IP != "" {
+			old.IP = new.IP
+		}
+		if new.Ssid != "" {
+			old.Ssid = new.Ssid
+		}
+		if new.Phy != "" {
+			old.Phy = new.Phy
+		}
+		if new.Hostname != "" {
+			old.Hostname = new.Hostname
+		}
+		if new.StartTime > 0 {
+			old.StartTime = new.StartTime
+		}
+		if new.Signal != 0 {
+			old.Signal = new.Signal
+		}
+		if new.Vendor != "" {
+			old.Vendor = new.Vendor
+		}
+		if new.Freq != 0 {
+			old.Freq = new.Freq
+		}
+		if new.StaType != "" {
+			old.StaType = new.StaType
+		}
+		if new.UpRate != "" {
+			old.UpRate = new.UpRate
+		}
+		if new.DownRate != "" {
+			old.DownRate = new.DownRate
+		}
+		if new.Device != nil {
+			old.Device = new.Device
+		}
+		if new.Nick != nil {
+			old.Nick = new.Nick
+		}
+		if new.Static != nil {
+			old.Static = new.Static
+		}
+	} else {
+		glog.Debugf("新设备：%+v", new)
+		if this.nicks == nil {
+			nickMap, e2 := getNickData()
+			if e2 == nil {
+				this.nicks = nickMap
+			}
+		}
+		if this.nicks != nil {
+			new.Nick = this.nicks[new.MAC]
+		}
+		this.clients[new.MAC] = new
+	}
+	return old
 }
 
 func (this *openWRT) updateUserTimeLineData(macAddr string, newList []*Status) {

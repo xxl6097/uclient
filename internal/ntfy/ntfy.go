@@ -141,7 +141,7 @@ func (this *Ntfy) Publish(data *u.NtfyEventData) error {
 	}
 	defer resp.Body.Close()
 	this.resp = resp
-	glog.Debug("Ntfy publish: ", resp.Status)
+	//glog.Debug("Ntfy publish: ", resp.Status)
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
 	}

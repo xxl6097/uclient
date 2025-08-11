@@ -3,6 +3,7 @@ package webhook
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/ntfy"
@@ -22,6 +23,7 @@ type WebHookMessage struct {
 	IpAddress  string `json:"ipAddress"`
 	MacAddress string `json:"macAddress"`
 	Signal     int    `json:"signal"`
+	Vendor     string `json:"vendor"`
 	//WorkTime      *time.Time `json:"dutyTime"`
 	//TodayOverTime string `json:"todayOverTime"`
 	//MonthOverTime string `json:"monthOverTime"`
@@ -45,14 +47,18 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	if msg.EventName != "" {
 		text.WriteString(fmt.Sprintf("- 类型：%s\n ", msg.EventName))
 	}
-
+	if msg.Signal != 0 {
+		text.WriteString(fmt.Sprintf("- 信号：%d\n ", msg.Signal))
+	}
+	if msg.Vendor != "" {
+		text.WriteString(fmt.Sprintf("- 品牌：%v\n ", msg.Vendor))
+	}
 	if msg.IpAddress != "" {
 		text.WriteString(fmt.Sprintf("- IP地址：%s\n ", msg.IpAddress))
 	}
 	if msg.MacAddress != "" {
 		text.WriteString(fmt.Sprintf("- Mac地址：%s\n ", msg.MacAddress))
 	}
-	text.WriteString(fmt.Sprintf("- 信号：%d\n ", msg.Signal))
 	//if msg.TodayOverTime != "" {
 	//	text.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", msg.TodayOverTime))
 	//}
@@ -65,7 +71,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	//if msg.WorkTime != nil {
 	//	text.WriteString(fmt.Sprintf("- 打卡时间：%s\n ", msg.WorkTime.Format(time.DateTime)))
 	//}
-	text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", u.TimestampToTime(glog.Now().UnixMilli())))
+	text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", u.TimestampToMilliTime(glog.Now().UnixMilli())))
 	markdown := make(map[string]interface{})
 	markdown["title"] = msg.Title
 	markdown["text"] = text.String()
@@ -107,6 +113,9 @@ func WebHook(webhookUrl string, payload any) error {
 		fmt.Println("无法读取响应内容:", err)
 		return err
 	}
-	glog.Println("响应内容:", resp.StatusCode, string(respBody))
+	if resp.StatusCode != 200 {
+		return errors.New(fmt.Sprintf("%s %s", resp.Status, string(respBody)))
+	}
+	//glog.Println("响应内容:", resp.StatusCode, string(respBody))
 	return err
 }
