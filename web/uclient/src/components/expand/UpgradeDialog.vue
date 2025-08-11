@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="showUpgradeDialog" class="upgrade-popup-overlay">
-      <div class="upgrade-popup">
+      <div class="upgrade-popup" :style="{ width: dialogWidth + 'px' }">
         <div class="upgrade-popup-header">
           <h3>❤️ 发现新版本</h3>
           <button @click="handleClose" class="close-button">×</button>
@@ -26,10 +26,15 @@
 
 <script setup lang="ts">
 import { ref, defineExpose } from 'vue'
-import { markdownToHtml, showLoading, showSucessTips, showTips } from '../../utils/utils.ts'
+import {
+  markdownToHtml,
+  showLoading,
+  showSucessTips,
+  showTips,
+} from '../../utils/utils.ts'
 
 const showUpgradeDialog = ref(false)
-
+const dialogWidth = ref('30%')
 const binUrl = ref<string>()
 const updateContent = ref<string>()
 const patchUrl = ref<string>()
@@ -38,6 +43,7 @@ const showUpdateDialog = (
   binurl: string,
   message: string,
 ) => {
+  updateLayout()
   showUpgradeDialog.value = true
   updateContent.value = markdownToHtml(message)
   binUrl.value = binurl
@@ -92,11 +98,19 @@ const checkVersion = () => {
         showSucessTips(json.msg)
       }
     })
+    .finally(() => {
+      // showUpdateDialog('', '', {})
+    })
 }
 
+const updateDialogWidth = () => {
+  console.log('打开对话框，updateDialogWidth')
+  updateLayout()
+}
 // 暴露方法供父组件调用
 defineExpose({
   openUpgradeDialog: checkVersion,
+  updateDialogWidth: updateDialogWidth,
 })
 
 const handleConfirm = () => {
@@ -105,6 +119,33 @@ const handleConfirm = () => {
     upgradeByUrl(patchUrl.value as string)
   } else {
     upgradeByUrl(binUrl.value as string)
+  }
+}
+
+const updateLayout = () => {
+  const width = window.innerWidth
+  console.log('====>updateLayout', width)
+  if (width < 640) {
+    // 小屏：简化布局
+    dialogWidth.value = '80%'
+  } else if (width < 1024) {
+    // 中屏：增加跳转功能
+    dialogWidth.value = '60%'
+  } else {
+    if (width < 1500) {
+      dialogWidth.value = '40%'
+      if (width < 1280) {
+        dialogWidth.value = '45%'
+      }
+      if (width < 1140) {
+        dialogWidth.value = '48%'
+      }
+      if (width < 1080) {
+        dialogWidth.value = '50%'
+      }
+    } else {
+      dialogWidth.value = '35%'
+    }
   }
 }
 
@@ -128,9 +169,9 @@ const handleClose = () => {
   z-index: 9999; /* 设置较高的 z-index 值，确保在最顶部 */
 }
 
+//width: 30%;
 .upgrade-popup {
   border-radius: 4px;
-  width: 30%;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 

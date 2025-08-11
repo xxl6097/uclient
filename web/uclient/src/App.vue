@@ -42,6 +42,9 @@
                 <el-dropdown-item @click="handleGithub"
                   >Github
                 </el-dropdown-item>
+                <el-dropdown-item @click="handleTest" v-if="false"
+                  >test
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -100,7 +103,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
-          <el-table-column prop="vendor" label="品牌" sortable >
+          <el-table-column prop="vendor" label="品牌" sortable>
             <template #default="props">
               {{ props.row.vendor }}({{ props.row.staType }})
             </template>
@@ -382,6 +385,9 @@ const getVersion = () => {
 }
 const handleGithub = () => {
   window.open('https://github.com/xxl6097/uclient/releases')
+}
+const handleTest = () => {
+  handleShowCheckVersionDialog()
 }
 const handleWebhookSetting = () => {
   // Prompt('请输入WebHook地址', 'webhook设置', '').then((result) => {
@@ -719,6 +725,9 @@ const updateDialogWidth = () => {
   dialogWidth.value = mobileLayout.value ? '90%' : '500px'
   if (clientTimeLineDialogRef.value) {
     clientTimeLineDialogRef.value.updateDialogWidth()
+  }
+  if (upgradeRef.value) {
+    upgradeRef.value.updateDialogWidth()
   }
 }
 

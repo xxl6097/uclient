@@ -6,6 +6,7 @@ appname=$(basename $module)
 options=("linux:arm64")
 #options=("linux:amd64" "windows:amd64")
 version=$(git tag -l "v[0-99]*.[0-99]*.[0-99]*" --sort=-creatordate | head -n 1)
+#version="v0.1.14"
 versionDir="$module/pkg"
 #appname="uclient"
 root=./cmd
