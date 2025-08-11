@@ -79,6 +79,9 @@ const upgradeByUrl = (binurl: string) => {
     })
     .finally(() => {
       loading.close()
+      setTimeout(function () {
+        window.location.reload()
+      }, 5000)
     })
 }
 
@@ -124,7 +127,6 @@ const handleConfirm = () => {
 
 const updateLayout = () => {
   const width = window.innerWidth
-  console.log('====>updateLayout', width)
   if (width < 640) {
     // 小屏：简化布局
     dialogWidth.value = '80%'

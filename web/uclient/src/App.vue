@@ -105,7 +105,7 @@
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
           <el-table-column prop="vendor" label="品牌" sortable>
             <template #default="props">
-              {{ props.row.vendor }}({{ props.row.staType }})
+              {{ props.row.vendor }}
             </template>
           </el-table-column>
           <el-table-column prop="staType" label="类型" sortable />
