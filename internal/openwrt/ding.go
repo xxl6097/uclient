@@ -7,9 +7,11 @@ import (
 )
 
 func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
-	err := this.notifyWebhookMessage(eveName, tempData)
-	if err != nil {
-		glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
+	if this.hasNotifyCondition(tempData) {
+		err := this.notifyWebhookMessage(eveName, tempData)
+		if err != nil {
+			glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
+		}
 	}
 	//1. 判断具备打卡条件
 	hasSignCondition, working, now := this.isSignTime(tempData)
@@ -86,6 +88,15 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 		}
 	}
 
+}
+
+func (this *openWRT) hasNotifyCondition(tempData *DHCPLease) bool {
+	if tempData != nil && tempData.MAC != "" {
+		if tempData.Nick != nil && tempData.Nick.IsPush {
+			return true
+		}
+	}
+	return false
 }
 
 // 判断设备具备打开条件，也就是是否设置了上线班时间
