@@ -8,10 +8,12 @@ import (
 
 func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 	if this.hasNotifyCondition(tempData) {
-		err := this.notifyWebhookMessage(eveName, tempData)
-		if err != nil {
-			glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
-		}
+		go func() {
+			err := this.notifyWebhookMessage(eveName, tempData)
+			if err != nil {
+				glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
+			}
+		}()
 	}
 	//1. 判断具备打卡条件
 	hasSignCondition, working, now := this.isSignTime(tempData)
@@ -42,6 +44,7 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 			//默认情况周日是节假日
 			todaySignData.DayType = 1
 		}
+		signDatas[now.Format(time.DateOnly)] = todaySignData
 	}
 
 	//设置周几
@@ -76,6 +79,7 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 		}
 	}
 	if needUpdateSign {
+		signDatas[now.Format(time.DateOnly)] = todaySignData
 		e := SetSignData(mac, signDatas)
 		if e != nil {
 			glog.Errorf("打卡更新失败 %v %+v", e, tempData)

@@ -20,12 +20,13 @@ type Dnsmasq struct {
 	DhcpAck *DnsmasqDevice `json:"dhcp.ack"`
 }
 
-// ubus subscribe dnsmasq
+// SubscribeDnsmasq ubus subscribe dnsmasq
 func SubscribeDnsmasq(ctx context.Context, fn func(*DnsmasqDevice)) error {
 	return Command(ctx, func(s string) {
 		if s == "" {
 			return
 		}
+		glog.LogToFile("dnsmasq", s)
 		var tempData Dnsmasq
 		err := json.Unmarshal([]byte(s), &tempData)
 		if err == nil && tempData.DhcpAck != nil {

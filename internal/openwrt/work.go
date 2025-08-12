@@ -407,6 +407,7 @@ func SetSignData(mac string, signs map[string]*WorkEntry) error {
 	defer file.Close()
 	// 写入内容
 	_, err = file.Write(content)
+	glog.Errorf(" %v %+v", mac, tempFilePath)
 	return err
 }
 func GetTodaySignData(mac string) *WorkEntry {

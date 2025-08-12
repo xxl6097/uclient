@@ -49,6 +49,7 @@ func SubscribeSta(ctx context.Context, fn func(*StaUpDown)) error {
 		if s == "" {
 			return
 		}
+		glog.LogToFile("ahsapd.sta", s)
 		var tempData Sta
 		err := json.Unmarshal([]byte(s), &tempData)
 		if err == nil && tempData.StaUpDown != nil {

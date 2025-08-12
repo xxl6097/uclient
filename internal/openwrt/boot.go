@@ -57,6 +57,7 @@ func (this *openWRT) init() {
 	this.initClients()
 	go this.subscribeSysLog()
 	go this.subscribeArpEvent()
+	go this.subscribeArpPing()
 	go this.subscribeFsnotify()
 	go this.subscribeStatus()
 	if strings.Contains(this.ulistString, "hostapd") {
@@ -137,6 +138,7 @@ func (this *openWRT) subscribeSysLog() {
 					}
 				})
 				subscribeHetSysLog(s, func(event *KernelLog) {
+					glog.LogToFile("HetSysLog", s)
 					if event != nil && event.MACAddress != "" {
 						glog.Infof("HetSysLog事件:%+v", event)
 						eve := &DHCPLease{
@@ -233,15 +235,10 @@ func (this *openWRT) subscribeArpEvent() {
 						dhcp.Hostname = v.Hostname
 					}
 				}
-				if entry.Flags == 2 {
-					if !u.Ping(entry.IP.String()) {
-						//glog.Warnf("ARP缓存在线，实际已离线%v %+v", this.getName(mac), entry)
-					}
-				}
 				if v, ok := this.clients[mac]; ok {
 					online := entry.Flags == 2
 					if v.Online != online {
-						//glog.Infof("Arp事件:%+v", entry)
+						glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
 				} else {
@@ -252,6 +249,24 @@ func (this *openWRT) subscribeArpEvent() {
 		}
 	})
 }
+
+func (this *openWRT) subscribeArpPing() {
+	SubscribeArpCache(this.ctx, time.Second*10, func(entrys map[string]*ARPEntry) {
+		if entrys != nil {
+			for mac, entry := range entrys {
+				if v, ok := this.clients[mac]; ok {
+					if v.Online {
+						if entry.Flags == 2 {
+							u.Ping(entry.IP.String())
+						}
+					}
+				}
+
+			}
+		}
+	})
+}
+
 func (this *openWRT) subscribeDnsmasq() {
 	tryCount := 0
 	for {
