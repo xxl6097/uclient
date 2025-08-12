@@ -359,7 +359,7 @@ func tee6() {
 	statusDir := "/Users/uuxia/Downloads/192.168.1.1"
 	mac := "work"
 	tempFilePath := filepath.Join(statusDir, mac)
-	d, err := openwrt.GetWorkTime(mac, tempFilePath, &openwrt.WorkTypeSetting{
+	d, err := openwrt.GetWorkTimeAndCaculate(mac, tempFilePath, &openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",
 	})
@@ -377,7 +377,7 @@ func tee6() {
 func tee7() {
 	mac := "16:00:6f:83:35:e1"
 	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202508072016", mac)
-	d, err := openwrt.GetWorkTime(mac, tempFilePath, &openwrt.WorkTypeSetting{
+	d, err := openwrt.GetWorkTimeAndCaculate(mac, tempFilePath, &openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",
 	})

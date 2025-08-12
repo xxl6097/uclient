@@ -21,9 +21,9 @@ var (
 
 type openWRT struct {
 	clients      map[string]*DHCPLease
-	tempOffline  map[string]*WorkEntry
 	nicks        map[string]*NickEntry
 	leases       map[string]*DHCPLease
+	task         map[string]*u.CountdownTask[*SignData]
 	mu           sync.Mutex
 	fnEvent      func(int, any)
 	webhookUrl   string
@@ -40,7 +40,7 @@ func GetInstance() *openWRT {
 			clients:      make(map[string]*DHCPLease),
 			nicks:        make(map[string]*NickEntry),
 			leases:       make(map[string]*DHCPLease),
-			tempOffline:  make(map[string]*WorkEntry),
+			task:         make(map[string]*u.CountdownTask[*SignData]),
 			statusRuning: false,
 		}
 		instance.init()

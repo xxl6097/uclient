@@ -77,7 +77,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	markdown["title"] = msg.Title
 	markdown["text"] = text.String()
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
-	glog.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp))
+	glog.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp), msg.Signal, msg.EventName)
 
 	e := ntfy.GetInstance().Publish(&u.NtfyEventData{
 		Topic:    "work",

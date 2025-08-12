@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+type SignData struct {
+	TempData  *DHCPLease
+	EveName   string
+	Now       time.Time
+	SignDatas map[string]*WorkEntry
+}
+
 func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 	if this.hasNotifyCondition(tempData) {
 		go func() {
@@ -15,6 +22,10 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 			}
 		}()
 	}
+	this.dingSign(eveName, tempData)
+}
+
+func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 	//1. 判断具备打卡条件
 	hasSignCondition, working, now := this.isSignTime(tempData)
 	if !hasSignCondition {
@@ -45,6 +56,14 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 			todaySignData.DayType = 1
 		}
 		signDatas[now.Format(time.DateOnly)] = todaySignData
+	} else {
+		//if forceSign {
+		//	if !u.IsWithinDuration(todaySignData.OnWorkTime, tempData.StartTime, time.Minute*5) {
+		//		//如果不在5分钟内，不满足sign
+		//		glog.Warnf("超过5分钟了，不允许签到，%+v,%+v", tempData, todaySignData)
+		//		return
+		//	}
+		//}
 	}
 
 	//设置周几
@@ -66,7 +85,7 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 	} else {
 		if working == 0 {
 			//上班打卡
-			if todaySignData.OnWorkTime <= 0 {
+			if todaySignData.OnWorkTime <= 0 && tempData.Online {
 				//说明上午未打卡
 				todaySignData.OnWorkTime = timestamp
 				todaySignData.OnWorkSignal = tempData.Signal
@@ -91,7 +110,6 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 			}
 		}
 	}
-
 }
 
 func (this *openWRT) hasNotifyCondition(tempData *DHCPLease) bool {
@@ -117,7 +135,7 @@ func (this *openWRT) isSignTime(tempData *DHCPLease) (bool, int, time.Time) {
 	if this.hasSignCondition(tempData) {
 		now := glog.Now()
 		if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
-			return true, -1, now
+			return true, 3, now
 		} else {
 			working, e1 := u.IsWorkingTime(tempData.Nick.WorkType.OnWorkTime, tempData.Nick.WorkType.OffWorkTime)
 			if e1 == nil {
@@ -149,89 +167,4 @@ func (this *openWRT) isWeekend() bool {
 
 // 具备打卡条件，而且信号变弱，故判断可能离线了
 func (this *openWRT) signalWeak(tempData *DHCPLease) {
-	hasSignCondition, working, now := this.isSignTime(tempData)
-	if !hasSignCondition {
-		//不具备打卡条件或者不在打开时间范围内（工作时间不打卡），退出
-		if working == 1 {
-			staInfo := GetStaInfo()
-			if staInfo != nil {
-				sta := staInfo[tempData.MAC]
-				if sta != nil {
-					glog.Debug(tempData.Hostname, tempData.IP, tempData.MAC, tempData.Signal)
-					glog.Debugf("sta %+v", sta)
-				}
-			}
-
-			delete(this.tempOffline, tempData.MAC)
-		}
-		return
-	}
-
-	if working == 0 {
-		//上班时间
-		if tempData.Signal != 0 && tempData.Signal >= -81 {
-			if v, ok := this.tempOffline[tempData.MAC]; ok {
-				if v.OnWorkTime > 0 {
-					if !u.IsTimestampToday(v.OnWorkTime) {
-						v.OnWorkTime = tempData.StartTime
-						v.OnWorkSignal = tempData.Signal
-					}
-				} else {
-					v.OnWorkTime = tempData.StartTime
-					v.OnWorkSignal = tempData.Signal
-				}
-			} else {
-				this.tempOffline[tempData.MAC] = &WorkEntry{
-					OnWorkTime:   tempData.StartTime,
-					OnWorkSignal: tempData.Signal,
-				}
-			}
-		}
-	} else if working == 2 {
-		//下班时间
-		if tempData.Signal != 0 && tempData.Signal < -81 {
-			if v, ok := this.tempOffline[tempData.MAC]; ok {
-				if v.OffWorkTime > 0 {
-					if u.IsTimestampToday(v.OffWorkTime) {
-						v.OffWorkTime = tempData.StartTime
-						v.OffWorkSignal = tempData.Signal
-					}
-				} else {
-					v.OffWorkTime = tempData.StartTime
-					v.OffWorkSignal = tempData.Signal
-				}
-			} else {
-				this.tempOffline[tempData.MAC] = &WorkEntry{
-					OffWorkTime:   tempData.StartTime,
-					OffWorkSignal: tempData.Signal,
-				}
-			}
-		}
-	} else {
-		if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
-			if tempData.Signal != 0 && tempData.Signal < -80 && tempData.Signal > -90 {
-				if v, ok := this.tempOffline[tempData.MAC]; ok {
-					if v.OnWorkTime > 0 {
-						if !u.IsTimestampToday(v.OnWorkTime) {
-							v.OnWorkTime = tempData.StartTime
-							v.OnWorkSignal = tempData.Signal
-						} else {
-							v.OffWorkTime = tempData.StartTime
-							v.OffWorkSignal = tempData.Signal
-						}
-					} else {
-						v.OnWorkTime = tempData.StartTime
-						v.OnWorkSignal = tempData.Signal
-					}
-				} else {
-					this.tempOffline[tempData.MAC] = &WorkEntry{
-						OnWorkTime:   tempData.StartTime,
-						OnWorkSignal: tempData.Signal,
-					}
-				}
-			}
-		} else {
-			delete(this.tempOffline, tempData.MAC)
-		}
-	}
 }

@@ -1,6 +1,8 @@
 package u
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -489,3 +491,33 @@ func MacFormat(mac string) string {
 //	}
 //	return c.Stdout(), err
 //}
+
+// IsWithinDuration 判断两个时间戳是否在指定时间间隔内
+// ts1, ts2: 秒级时间戳
+// duration: 时间间隔（如5*time.Minute表示5分钟内）
+func IsWithinDuration(ts1, ts2 int64, duration time.Duration) bool {
+	diff := ts1 - ts2
+	if diff < 0 {
+		diff = -diff
+	}
+	return time.Duration(diff)*time.Second <= duration
+}
+
+// IsWithinDurationMilli 毫秒级时间戳判断
+func IsWithinDurationMilli(ms1, ms2 int64, duration time.Duration) bool {
+	return IsWithinDuration(ms1/1000, ms2/1000, duration)
+}
+
+func DeepCopyGob[T any](src *T) *T {
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	dec := gob.NewDecoder(buf)
+	if err := enc.Encode(src); err != nil {
+		return src
+	}
+	var dst T
+	if err := dec.Decode(&dst); err != nil {
+		return src
+	}
+	return &dst
+}

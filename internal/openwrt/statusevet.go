@@ -56,11 +56,11 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 		}
 		statusOne.Online = new.Online
 	}
+	glog.Debugf("状态更新[%s] %+v", typeEvent, statusOne)
 	s := Status{Timestamp: new.StartTime, Connected: new.Online}
 	this.ding(typeEvent, statusOne)
 	this.webNotify(statusOne)
 	this.updateUserTimeLineData(macAddress, []*Status{&s})
-	glog.Debugf("状态更新[%s] %+v", typeEvent, statusOne)
 }
 
 //func (this *openWRT) updateStatusByHostapd(device *HostapdDevice) {

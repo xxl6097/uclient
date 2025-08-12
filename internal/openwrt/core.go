@@ -82,6 +82,7 @@ type DHCPLease struct {
 	Device    *u.Device  `json:"device,omitempty"`
 	Nick      *NickEntry `json:"nick"` //
 	Static    *DHCPHost  `json:"static"`
+	Task      *u.CountdownTask[*DHCPLease]
 }
 type ARPEntry struct {
 	IP        net.IP           //设备的 IPv4 地址

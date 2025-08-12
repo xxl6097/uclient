@@ -5,6 +5,7 @@ import (
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/uclient/internal/u"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -99,24 +100,63 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 	}
 }
 
-func (this *openWRT) readStatus() {
+func (this *openWRT) getStatus() *u.DeviceStatus {
 	_, err := os.Stat(hetsysinfoFilePath)
 	// 判断是否为文件不存在的错误
 	if os.IsNotExist(err) {
-		return
+		return nil
 	}
 
 	data, err := os.ReadFile(hetsysinfoFilePath)
 	if err != nil {
-		return
+		return nil
 	}
 	var res u.DeviceStatus
 	err = json.Unmarshal(data, &res)
 	if err != nil {
+		return nil
+	}
+	return &res
+}
+
+func (this *openWRT) readStatus() {
+	//_, err := os.Stat(hetsysinfoFilePath)
+	//// 判断是否为文件不存在的错误
+	//if os.IsNotExist(err) {
+	//	return
+	//}
+	//
+	//data, err := os.ReadFile(hetsysinfoFilePath)
+	//if err != nil {
+	//	return
+	//}
+	//var res u.DeviceStatus
+	//err = json.Unmarshal(data, &res)
+	//if err != nil {
+	//	return
+	//}
+	res := this.getStatus()
+	if res == nil {
 		return
 	}
+	this.mergeStatus(this.decodeStatus(res))
+}
 
-	this.mergeStatus(this.decodeStatus(&res))
+func (this *openWRT) getSta(mac string) *u.Device {
+	res := this.getStatus()
+	if res == nil {
+		return nil
+	}
+	list := this.decodeStatus(res)
+	if list == nil {
+		return nil
+	}
+	for _, v := range list {
+		if strings.EqualFold(mac, v.MacAddress) {
+			return v
+		}
+	}
+	return nil
 }
 
 func (this *openWRT) DecodeDevice(data []byte) []*u.Device {
