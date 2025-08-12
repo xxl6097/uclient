@@ -51,12 +51,12 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 		if device.MacAddress == "" {
 			continue
 		}
-
 		mac := u.MacFormat(device.MacAddress)
 		//if mac == "16:00:6f:83:35:e1" {
 		//	glog.Debug(device.HOSTNAME, device.RSSI)
 		//}
-		if v, ok := this.clients[mac]; ok {
+		v := this.getClient(mac)
+		if v != nil {
 			v.Signal = device.RSSI
 			if device.Lan != "" {
 				v.Ssid = device.Lan
@@ -75,10 +75,27 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 				v.Device = device
 			}
 			//this.dingSignByRSSI(v)
-			go this.signalWeak(v)
 		} else {
 			glog.Debug("mergeStatus 不存在", device)
+			if this.nicks == nil {
+				nickMap, e2 := getNickData()
+				if e2 == nil {
+					this.nicks = nickMap
+				}
+			}
+			newOne := &DHCPLease{
+				MAC:      mac,
+				Device:   device,
+				IP:       device.IPADDR,
+				Signal:   device.RSSI,
+				Hostname: device.HOSTNAME,
+			}
+			if this.nicks != nil {
+				newOne.Nick = this.nicks[device.MacAddress]
+			}
+			this.clients[mac] = newOne
 		}
+		this.signalWeak(v)
 	}
 }
 

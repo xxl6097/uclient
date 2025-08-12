@@ -24,6 +24,7 @@ type WebHookMessage struct {
 	MacAddress string `json:"macAddress"`
 	Signal     int    `json:"signal"`
 	Vendor     string `json:"vendor"`
+	Timestamp  int64  `json:"timestamp"`
 	//WorkTime      *time.Time `json:"dutyTime"`
 	//TodayOverTime string `json:"todayOverTime"`
 	//MonthOverTime string `json:"monthOverTime"`
@@ -76,7 +77,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	markdown["title"] = msg.Title
 	markdown["text"] = text.String()
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
-	glog.Debug("webhook", msg.Title)
+	glog.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp))
 
 	e := ntfy.GetInstance().Publish(&u.NtfyEventData{
 		Topic:    "work",

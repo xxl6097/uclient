@@ -183,6 +183,21 @@ func UTC8ToTime(timestamp int64) time.Time {
 	return time.Unix(timestamp, 0)
 }
 
+func IsTimestampToday(timestamp int64) bool {
+	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
+	if err != nil {
+		loc = time.FixedZone("CST", 8*3600) // 东八区
+	}
+	t := time.UnixMilli(timestamp)
+	if loc != nil {
+		t = time.UnixMilli(timestamp).In(loc)
+	}
+	now := glog.Now()
+	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	tomorrowStart := todayStart.AddDate(0, 0, 1)
+	return t.After(todayStart) || t.Equal(todayStart) && t.Before(tomorrowStart)
+}
+
 func TimestampToSecondTime(timestamp int64) string {
 	loc, err := time.LoadLocation("Asia/Shanghai") // 等价于 UTC+8
 	if err != nil {

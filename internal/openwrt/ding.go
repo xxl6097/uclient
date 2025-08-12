@@ -147,27 +147,74 @@ func (this *openWRT) isWeekend() bool {
 
 // 具备打卡条件，而且信号变弱，故判断可能离线了
 func (this *openWRT) signalWeak(tempData *DHCPLease) {
-	hasSignCondition, _, _ := this.isSignTime(tempData)
+	hasSignCondition, working, now := this.isSignTime(tempData)
 	if !hasSignCondition {
 		//不具备打卡条件或者不在打开时间范围内（工作时间不打卡），退出
 		return
 	}
-	if _, ok := this.tempOffline[tempData.MAC]; ok {
-		return
-	}
-	if tempData.Signal != 0 && tempData.Signal < -80 {
-		if !u.Ping(tempData.IP) {
-			//ping不通，估计离线了
-			glog.Warnf("已经离线了 %+v", tempData)
-			this.tempOffline[tempData.MAC] = &DHCPLease{
-				MAC:       tempData.MAC,
-				IP:        tempData.IP,
-				Signal:    tempData.Signal,
-				Ssid:      tempData.Ssid,
-				Hostname:  tempData.Hostname,
-				StartTime: glog.Now().UnixMilli(),
-				Online:    false,
+	glog.Debug(tempData.Hostname, tempData.IP, tempData.MAC, tempData.Signal)
+	if working == 0 {
+		//上班时间
+		if tempData.Signal != 0 && tempData.Signal >= -80 {
+			if v, ok := this.tempOffline[tempData.MAC]; ok {
+				if v.OnWorkTime > 0 {
+					if !u.IsTimestampToday(v.OnWorkTime) {
+						v.OnWorkTime = tempData.StartTime
+						v.OnWorkSignal = tempData.Signal
+					}
+				} else {
+					v.OnWorkTime = tempData.StartTime
+					v.OnWorkSignal = tempData.Signal
+				}
+			} else {
+				this.tempOffline[tempData.MAC] = &WorkEntry{
+					OnWorkTime:   tempData.StartTime,
+					OnWorkSignal: tempData.Signal,
+				}
 			}
+		}
+	} else if working == 2 {
+		//下班时间
+		if tempData.Signal != 0 && tempData.Signal < -80 {
+			if v, ok := this.tempOffline[tempData.MAC]; ok {
+				if v.OffWorkTime > 0 {
+					if u.IsTimestampToday(v.OffWorkTime) {
+						v.OffWorkTime = tempData.StartTime
+						v.OffWorkSignal = tempData.Signal
+					}
+				} else {
+					v.OffWorkTime = tempData.StartTime
+					v.OffWorkSignal = tempData.Signal
+				}
+			} else {
+				this.tempOffline[tempData.MAC] = &WorkEntry{
+					OffWorkTime:   tempData.StartTime,
+					OffWorkSignal: tempData.Signal,
+				}
+			}
+		}
+	} else {
+		if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
+			if tempData.Signal != 0 && tempData.Signal < -80 && tempData.Signal > -90 {
+				if v, ok := this.tempOffline[tempData.MAC]; ok {
+					if v.OnWorkTime > 0 {
+						if !u.IsTimestampToday(v.OnWorkTime) {
+							v.OnWorkTime = tempData.StartTime
+							v.OnWorkSignal = tempData.Signal
+						} else {
+							v.OffWorkTime = tempData.StartTime
+							v.OffWorkSignal = tempData.Signal
+						}
+					}
+				} else {
+					this.tempOffline[tempData.MAC] = &WorkEntry{
+						OnWorkTime:   tempData.StartTime,
+						OnWorkSignal: tempData.Signal,
+					}
+				}
+			}
+		} else {
+			delete(this.tempOffline, tempData.MAC)
 		}
 	}
 }

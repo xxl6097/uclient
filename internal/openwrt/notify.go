@@ -74,44 +74,13 @@ func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now tim
 		Signal:     signal,
 		EventName:  eveName,
 		Vendor:     tempData.Vendor,
+		Timestamp:  tempData.StartTime,
 	}
 	if wrk != nil {
 		if wrk.OnWorkTime > 0 && wrk.OffWorkTime == 0 {
-			switch wrk.DayType {
-			case 0:
-				msg.Title = fmt.Sprintf("【%s】上班了(工作日)", name)
-				break
-			case 1:
-				msg.Title = fmt.Sprintf("【%s】上班了(节假日)", name)
-				break
-			case 2:
-				msg.Title = fmt.Sprintf("【%s】上班了(补班日)", name)
-				break
-			case 3:
-				msg.Title = fmt.Sprintf("【%s】上班了(加班日)", name)
-				break
-			default:
-				msg.Title = fmt.Sprintf("【%s】上班了", name)
-				break
-			}
+			msg.Title = fmt.Sprintf("【%s】上班了", name)
 		} else {
-			switch wrk.DayType {
-			case 0:
-				msg.Title = fmt.Sprintf("【%s】下班了(工作日)", name)
-				break
-			case 1:
-				msg.Title = fmt.Sprintf("【%s】下班了(节假日)", name)
-				break
-			case 2:
-				msg.Title = fmt.Sprintf("【%s】下班了(补班日)", name)
-				break
-			case 3:
-				msg.Title = fmt.Sprintf("【%s】下班了(加班日)", name)
-				break
-			default:
-				msg.Title = fmt.Sprintf("【%s】下班了", name)
-				break
-			}
+			msg.Title = fmt.Sprintf("【%s】下班了", name)
 		}
 	} else {
 		msg.Title = fmt.Sprintf("【%s】考勤统计", name)
@@ -182,6 +151,7 @@ func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) err
 		EventName:  eveName,
 		Signal:     client.Signal,
 		Vendor:     client.Vendor,
+		Timestamp:  client.StartTime,
 	}
 	if client.Nick != nil && client.Nick.Name != "" {
 		msg.DeviceName = client.Nick.Name
@@ -194,6 +164,6 @@ func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) err
 	} else {
 		msg.Title = fmt.Sprintf("【%s】离线了", msg.DeviceName)
 	}
-	glog.Debug("ding通知", eveName, client.Hostname, client.IP, client.MAC, client.Signal, client.Online)
+	glog.Debug("ding通知", eveName, client.Hostname, client.IP, client.MAC, client.Signal, client.Online, client.StartTime, u.TimestampToSecondTime(client.StartTime))
 	return webhook.Notify(msg, nil)
 }
