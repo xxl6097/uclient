@@ -126,6 +126,8 @@ func (this *openWRT) isSignTime(tempData *DHCPLease) (bool, int, time.Time) {
 					return true, working, now
 				case 2:
 					return true, working, now
+				default:
+					return false, working, now
 				}
 			} else {
 				glog.Error("判断工作时间错误❌", e1)
@@ -150,9 +152,13 @@ func (this *openWRT) signalWeak(tempData *DHCPLease) {
 	hasSignCondition, working, now := this.isSignTime(tempData)
 	if !hasSignCondition {
 		//不具备打卡条件或者不在打开时间范围内（工作时间不打卡），退出
+		if working == 1 {
+			glog.Debug(tempData.Hostname, tempData.IP, tempData.MAC, tempData.Signal)
+			delete(this.tempOffline, tempData.MAC)
+		}
 		return
 	}
-	glog.Debug(tempData.Hostname, tempData.IP, tempData.MAC, tempData.Signal)
+
 	if working == 0 {
 		//上班时间
 		if tempData.Signal != 0 && tempData.Signal >= -80 {
@@ -205,6 +211,9 @@ func (this *openWRT) signalWeak(tempData *DHCPLease) {
 							v.OffWorkTime = tempData.StartTime
 							v.OffWorkSignal = tempData.Signal
 						}
+					} else {
+						v.OnWorkTime = tempData.StartTime
+						v.OnWorkSignal = tempData.Signal
 					}
 				} else {
 					this.tempOffline[tempData.MAC] = &WorkEntry{
