@@ -153,7 +153,15 @@ func (this *openWRT) signalWeak(tempData *DHCPLease) {
 	if !hasSignCondition {
 		//不具备打卡条件或者不在打开时间范围内（工作时间不打卡），退出
 		if working == 1 {
-			glog.Debug(tempData.Hostname, tempData.IP, tempData.MAC, tempData.Signal)
+			staInfo := GetStaInfo()
+			if staInfo != nil {
+				sta := staInfo[tempData.MAC]
+				if sta != nil {
+					glog.Debug(tempData.Hostname, tempData.IP, tempData.MAC, tempData.Signal)
+					glog.Debugf("sta %+v", sta)
+				}
+			}
+
 			delete(this.tempOffline, tempData.MAC)
 		}
 		return
@@ -161,7 +169,7 @@ func (this *openWRT) signalWeak(tempData *DHCPLease) {
 
 	if working == 0 {
 		//上班时间
-		if tempData.Signal != 0 && tempData.Signal >= -80 {
+		if tempData.Signal != 0 && tempData.Signal >= -81 {
 			if v, ok := this.tempOffline[tempData.MAC]; ok {
 				if v.OnWorkTime > 0 {
 					if !u.IsTimestampToday(v.OnWorkTime) {
@@ -181,7 +189,7 @@ func (this *openWRT) signalWeak(tempData *DHCPLease) {
 		}
 	} else if working == 2 {
 		//下班时间
-		if tempData.Signal != 0 && tempData.Signal < -80 {
+		if tempData.Signal != 0 && tempData.Signal < -81 {
 			if v, ok := this.tempOffline[tempData.MAC]; ok {
 				if v.OffWorkTime > 0 {
 					if u.IsTimestampToday(v.OffWorkTime) {
