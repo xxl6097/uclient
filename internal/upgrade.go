@@ -12,7 +12,19 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 )
+
+func (this *Api) ApiHeap(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	var memStats runtime.MemStats
+	runtime.ReadMemStats(&memStats)
+	res.Ok(fmt.Sprintf("当前堆内存: %v MB", memStats.HeapAlloc/1024/1024))
+	//glog.Println("操作系统:", runtime.GOOS)     // 如 "linux", "windows"
+	//glog.Println("CPU 架构:", runtime.GOARCH) // 如 "amd64", "arm64"
+	//glog.Println("CPU 核心数:", runtime.NumCPU())
+}
 
 func (this *Api) ApiVersion(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
