@@ -79,12 +79,14 @@ func (this *Service) OnRun(service igs.Service) error {
 		return err
 	}
 	glog.Debug("程序运行", os.Args)
-	httpserver.New().
+	server := httpserver.New().
 		CORSMethodMiddleware().
 		AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
 		AddRoute(assets.NewRoute()).
 		BasicAuth(cfg.Username, cfg.Password).
 		Done(cfg.ServerPort)
+	defer server.Stop()
+	server.Wait()
 	return nil
 }
 

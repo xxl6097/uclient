@@ -37,7 +37,9 @@ func init() {
 			AddRoute(internal.NewRoute(internal.NewApi(nil, "admin", "admin"))).
 			AddRoute(assets.NewRoute())
 		//router.Handle("/metrics", promhttp.Handler())
-		router.Done(7000)
+		server := router.Done(7000)
+		defer server.Stop()
+		server.Wait()
 	}
 }
 

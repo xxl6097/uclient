@@ -8,7 +8,6 @@ import (
 	"github.com/xxl6097/go-service/pkg/utils/util"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -16,20 +15,20 @@ import (
 	"syscall"
 )
 
-var procs = make([]*os.Process, 0)
-
-func init() {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigs
-		for _, proc := range procs {
-			if proc != nil {
-				_ = proc.Kill()
-			}
-		}
-	}()
-}
+//var procs = make([]*os.Process, 0)
+//
+//func init() {
+//	sigs := make(chan os.Signal, 1)
+//	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+//	go func() {
+//		<-sigs
+//		for _, proc := range procs {
+//			if proc != nil {
+//				_ = proc.Kill()
+//			}
+//		}
+//	}()
+//}
 
 func writePid(name string, pid int) {
 	pidData := []byte(strconv.Itoa(pid))
@@ -90,7 +89,7 @@ func Command(ctx context.Context, fu func(string), name string, arg ...string) e
 		fmt.Printf("启动命令失败: %v\n", e)
 		return err
 	}
-	procs = append(procs, ccc.Process)
+	//procs = append(procs, ccc.Process)
 	writePid(procName, ccc.Process.Pid)
 	defer ccc.Process.Kill() // 确保退出时终止进程
 
