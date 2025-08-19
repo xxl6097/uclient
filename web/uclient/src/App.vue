@@ -112,12 +112,12 @@
           <el-table-column prop="signal" label="信号强度" sortable />
           <el-table-column prop="upRate" label="上传" sortable />
           <el-table-column prop="downRate" label="下载" sortable />
-<!--          <el-table-column-->
-<!--            prop="ssid"-->
-<!--            label="wifi名称"-->
-<!--            sortable-->
-<!--            v-if="!isMobile()"-->
-<!--          />-->
+          <!--          <el-table-column-->
+          <!--            prop="ssid"-->
+          <!--            label="wifi名称"-->
+          <!--            sortable-->
+          <!--            v-if="!isMobile()"-->
+          <!--          />-->
           <el-table-column
             prop="mac"
             label="Mac地址"
@@ -131,7 +131,9 @@
             v-if="!isMobile()"
           >
             <template #default="props">
-              {{ formatTimeStamp(props.row.starTime) }}
+              <div class="no-wrap">
+                {{ formatTimeStamp(props.row.starTime) }}
+              </div>
             </template>
           </el-table-column>
           <el-table-column prop="online" label="状态" sortable align="center">
@@ -901,5 +903,11 @@ html.dark .header-color {
   .main-width {
     width: 80%;
   }
+}
+
+.no-wrap {
+  white-space: nowrap; /* 禁止换行 */
+  overflow: hidden; /* 隐藏溢出内容 */
+  text-overflow: ellipsis; /* 溢出显示省略号 */
 }
 </style>
