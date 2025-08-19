@@ -103,21 +103,21 @@
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="IP" sortable min-width="135" />
-          <el-table-column prop="vendor" label="品牌" sortable>
-            <template #default="props">
-              {{ props.row.vendor }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="staType" label="类型" sortable />
+          <!--          <el-table-column prop="vendor" label="品牌" sortable>-->
+          <!--            <template #default="props">-->
+          <!--              {{ props.row.vendor }}-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column prop="staType" label="类型" sortable />-->
           <el-table-column prop="signal" label="信号强度" sortable />
           <el-table-column prop="upRate" label="上传" sortable />
           <el-table-column prop="downRate" label="下载" sortable />
-          <el-table-column
-            prop="ssid"
-            label="wifi名称"
-            sortable
-            v-if="!isMobile()"
-          />
+<!--          <el-table-column-->
+<!--            prop="ssid"-->
+<!--            label="wifi名称"-->
+<!--            sortable-->
+<!--            v-if="!isMobile()"-->
+<!--          />-->
           <el-table-column
             prop="mac"
             label="Mac地址"
@@ -127,7 +127,6 @@
           <el-table-column
             prop="starTime"
             label="连接时间"
-            min-width="110"
             sortable
             v-if="!isMobile()"
           >
@@ -135,13 +134,7 @@
               {{ formatTimeStamp(props.row.starTime) }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="online"
-            label="状态"
-            sortable
-            min-width="80"
-            align="center"
-          >
+          <el-table-column prop="online" label="状态" sortable align="center">
             <template #default="scope">
               <el-tag v-if="scope.row.online" type="success">在线</el-tag>
               <el-tag v-else type="danger">离线</el-tag>

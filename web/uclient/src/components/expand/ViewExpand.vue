@@ -7,6 +7,15 @@
       <el-form-item label="名称">
         <span>{{ row.hostname }}</span>
       </el-form-item>
+      <el-form-item label="品牌">
+        <span>{{ row.vendor }}</span>
+      </el-form-item>
+      <el-form-item label="类型">
+        <span>{{ row.staType }}</span>
+      </el-form-item>
+      <el-form-item label="wifi名称">
+        <span>{{ row.ssid }}</span>
+      </el-form-item>
       <el-form-item label="信号强度">
         <el-tooltip
           content="信号强度（单位：dBm）：负值（越接近0表示信号越强）。`-44`为优秀信号（通常`-50`以上为良好）"
