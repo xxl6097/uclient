@@ -137,9 +137,7 @@
                 <el-table
                   :data="paginatedTableData"
                   border
-                  row-key="id"
-                  :expand-row-keys="defaultExpandedKeys"
-                  @expand-change="handleExpandChange"
+                  :preserve-expanded-content="false"
                 >
                   <el-table-column type="expand">
                     <template #default="props">
@@ -147,7 +145,7 @@
                         <el-table
                           :data="props.row.workTime"
                           border
-                          row-key="id"
+                          :preserve-expanded-content="false"
                         >
                           <el-table-column label="日期" prop="date" sortable />
                           <el-table-column label="上班" prop="workTime1">
@@ -500,17 +498,17 @@ const handleDeleteWorkTime = (row: WorkTime) => {
     })
 }
 // 默认展开的行
-const defaultExpandedKeys = ref(['1001'])
-
-// 处理展开/折叠事件
-const handleExpandChange = (row: any, expanded: any) => {
-  console.log('展开状态变化:', row, '是否展开:', expanded)
-  // 可以在这里处理展开/折叠时的额外逻辑
-  if (expanded) {
-    // 展开时的操作，如加载子表格数据
-    // loadChildrenData(row.id)
-  }
-}
+// const defaultExpandedKeys = ref(['1001'])
+//
+// // 处理展开/折叠事件
+// const handleExpandChange = (row: any, expanded: any) => {
+//   console.log('展开状态变化:', row, '是否展开:', expanded)
+//   // 可以在这里处理展开/折叠时的额外逻辑
+//   if (expanded) {
+//     // 展开时的操作，如加载子表格数据
+//     // loadChildrenData(row.id)
+//   }
+// }
 
 function initOnWorkTime() {
   formData.value.client = {} as Client
