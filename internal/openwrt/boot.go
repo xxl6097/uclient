@@ -55,20 +55,20 @@ func (this *openWRT) init() {
 	this.ctx, this.cancel = context.WithCancel(context.Background())
 	this.ulistString = UbusList()
 	this.initClients()
-	go this.subscribeSysLog()
-	go this.subscribeArpEvent()
-	go this.subscribeArpPing()
-	go this.subscribeFsnotify()
-	go this.subscribeStatus()
-	if strings.Contains(this.ulistString, "hostapd") {
-		go this.subscribeHostapd()
-	}
-	if strings.Contains(this.ulistString, "dnsmasq") {
-		go this.subscribeDnsmasq()
-	}
-	if strings.Contains(this.ulistString, "ahsapd.sta") {
-		go this.subscribeAhsapdsta()
-	}
+	//go this.subscribeSysLog()
+	//go this.subscribeArpEvent()
+	//go this.subscribeArpPing()
+	//go this.subscribeFsnotify()
+	//go this.subscribeStatus()
+	//if strings.Contains(this.ulistString, "hostapd") {
+	//	go this.subscribeHostapd()
+	//}
+	//if strings.Contains(this.ulistString, "dnsmasq") {
+	//	go this.subscribeDnsmasq()
+	//}
+	//if strings.Contains(this.ulistString, "ahsapd.sta") {
+	//	go this.subscribeAhsapdsta()
+	//}
 	this.initNtfy()
 }
 
