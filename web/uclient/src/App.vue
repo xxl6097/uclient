@@ -907,7 +907,5 @@ html.dark .header-color {
 
 .no-wrap {
   white-space: nowrap; /* 禁止换行 */
-  overflow: hidden; /* 隐藏溢出内容 */
-  text-overflow: ellipsis; /* 溢出显示省略号 */
 }
 </style>

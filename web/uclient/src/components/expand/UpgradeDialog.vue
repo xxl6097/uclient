@@ -171,7 +171,6 @@ const handleClose = () => {
   z-index: 9999; /* 设置较高的 z-index 值，确保在最顶部 */
 }
 
-//width: 30%;
 .upgrade-popup {
   border-radius: 4px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
