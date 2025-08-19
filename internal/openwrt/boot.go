@@ -227,9 +227,10 @@ func (this *openWRT) subscribeArpEvent() {
 		if entrys != nil {
 			for mac, entry := range entrys {
 				dhcp := &DHCPLease{
-					MAC: entry.MAC.String(),
-					IP:  entry.IP.String(),
-					Phy: entry.Interface,
+					MAC:       entry.MAC.String(),
+					IP:        entry.IP.String(),
+					Phy:       entry.Interface,
+					StartTime: glog.Now().UnixMilli(),
 				}
 				if v, ok := this.leases[mac]; ok {
 					if v.Hostname != "" {
