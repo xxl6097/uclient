@@ -81,8 +81,9 @@
           <el-table-column
             prop="hostname"
             label="名称"
+            class-name="no-wrap-column"
+            show-overflow-tooltip
             sortable
-            min-width="130"
           >
             <template #default="props">
               <el-text
@@ -133,6 +134,9 @@
             sortable
             v-if="!isMobile()"
           >
+            <template #default="props">
+              {{ formatTimeStamp(props.row.starTime) }}
+            </template>
           </el-table-column>
           <el-table-column prop="online" label="状态" sortable align="center">
             <template #default="scope">
@@ -273,6 +277,7 @@ import {
   showTips,
   showWarmDialog,
   showWarmTips,
+  formatTimeStamp,
   xhrPromise,
   formatToUTC8,
 } from './utils/utils.ts'
@@ -902,10 +907,7 @@ html.dark .header-color {
   }
 }
 
-.no-wrap {
-  white-space: nowrap; /* 禁止换行 */
-}
-
+/* 确保内容不换行 */
 .no-wrap-column .cell {
   white-space: nowrap;
 }
