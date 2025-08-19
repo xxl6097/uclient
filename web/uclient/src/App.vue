@@ -121,20 +121,18 @@
           <el-table-column
             prop="mac"
             label="Mac地址"
+            show-overflow-tooltip
             sortable
             v-if="!isMobile()"
           />
           <el-table-column
             prop="starTime"
             label="连接时间"
+            class-name="no-wrap-column"
+            show-overflow-tooltip
             sortable
             v-if="!isMobile()"
           >
-            <template #default="props">
-              <div class="no-wrap">
-                {{ formatTimeStamp(props.row.starTime) }}
-              </div>
-            </template>
           </el-table-column>
           <el-table-column prop="online" label="状态" sortable align="center">
             <template #default="scope">
@@ -275,7 +273,6 @@ import {
   showTips,
   showWarmDialog,
   showWarmTips,
-  formatTimeStamp,
   xhrPromise,
   formatToUTC8,
 } from './utils/utils.ts'
@@ -370,7 +367,7 @@ const getVersion = () => {
         appinfo.value = json.data
         if (json.data && json.data.appVersion) {
           title.value = `uclient ${json.data.hostName} ${json.data.appVersion}`
-          document.title = title.value
+          document.title = `uclient ${json.data.hostName}`
         }
       }
     })
@@ -907,5 +904,9 @@ html.dark .header-color {
 
 .no-wrap {
   white-space: nowrap; /* 禁止换行 */
+}
+
+.no-wrap-column .cell {
+  white-space: nowrap;
 }
 </style>
