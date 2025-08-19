@@ -557,3 +557,17 @@ func AppandText(filename, content string) {
 	}
 	//glog.Println("内容追加成功！")
 }
+
+func ReadFile(fpath string) ([]byte, error) {
+	_, err := os.Stat(fpath)
+	// 判断是否为文件不存在的错误
+	if os.IsNotExist(err) {
+		return nil, err
+	}
+
+	data, err := os.ReadFile(fpath)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}

@@ -62,7 +62,7 @@ func subscribeLedLog(s string) {
 	pattern := `led_ctl.sh*`
 	re := regexp.MustCompile(pattern)
 	if re.MatchString(s) {
-		u.AppandText(ledEventLog, s)
+		u.AppandText(LedEventLog, s)
 	}
 }
 

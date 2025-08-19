@@ -274,6 +274,16 @@ func (this *Api) GetStaticIps(w http.ResponseWriter, r *http.Request) {
 	//res.Any(ips)
 }
 
+func (this *Api) GetLedLog(w http.ResponseWriter, r *http.Request) {
+	data, err := u.ReadFile(openwrt.LedEventLog)
+	if err != nil {
+		glog.Error(err)
+		w.WriteHeader(400)
+		return
+	}
+	_, _ = w.Write(data)
+}
+
 func (this *Api) ResetNetwork(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)

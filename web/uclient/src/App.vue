@@ -42,6 +42,7 @@
                 <el-dropdown-item @click="handleGithub"
                   >Github
                 </el-dropdown-item>
+                <el-dropdown-item @click="showtmp">temp </el-dropdown-item>
                 <el-dropdown-item @click="handleTest" v-if="false"
                   >test
                 </el-dropdown-item>
@@ -399,6 +400,10 @@ const handleGithub = () => {
 }
 const handleTest = () => {
   handleShowCheckVersionDialog()
+}
+const showtmp = () => {
+  const host = window.origin
+  window.open(`${host}/tmp/`)
 }
 const handleWebhookSetting = () => {
   // Prompt('请输入WebHook地址', 'webhook设置', '').then((result) => {
