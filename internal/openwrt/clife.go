@@ -59,7 +59,7 @@ func subscribeHetSysLog(s string, fn func(*KernelLog)) {
 }
 
 func subscribeLedLog(s string) {
-	pattern := `*led_ctl.sh*`
+	pattern := `led_ctl.sh*`
 	re := regexp.MustCompile(pattern)
 	if re.MatchString(s) {
 		u.AppandText(ledEventLog, s)

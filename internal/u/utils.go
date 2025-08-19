@@ -555,5 +555,5 @@ func AppandText(filename, content string) {
 	if _, err := file.WriteString(EnsureNewline(content)); err != nil {
 		glog.Error(err)
 	}
-	glog.Println("内容追加成功！")
+	//glog.Println("内容追加成功！")
 }
