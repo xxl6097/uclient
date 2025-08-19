@@ -105,7 +105,15 @@
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="ip" label="IP" sortable min-width="135" />
+          <el-table-column
+            prop="ip"
+            label="IP"
+            class-name="no-wrap-column"
+            :header-cell-class-name="() => 'no-wrap-header'"
+            :cell-class-name="() => 'no-wrap-cell'"
+            show-overflow-tooltip
+            sortable
+          />
           <!--          <el-table-column prop="vendor" label="品牌" sortable>-->
           <!--            <template #default="props">-->
           <!--              {{ props.row.vendor }}-->
