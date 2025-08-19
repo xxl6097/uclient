@@ -82,6 +82,8 @@
             prop="hostname"
             label="名称"
             class-name="no-wrap-column"
+            :header-cell-class-name="() => 'no-wrap-header'"
+            :cell-class-name="() => 'no-wrap-cell'"
             show-overflow-tooltip
             sortable
           >
@@ -130,12 +132,16 @@
             prop="starTime"
             label="连接时间"
             class-name="no-wrap-column"
+            :header-cell-class-name="() => 'no-wrap-header'"
+            :cell-class-name="() => 'no-wrap-cell'"
             show-overflow-tooltip
             sortable
             v-if="!isMobile()"
           >
             <template #default="props">
-              {{ formatTimeStamp(props.row.starTime) }}
+              <div class="no-wrap">
+                {{ formatTimeStamp(props.row.starTime) }}
+              </div>
             </template>
           </el-table-column>
           <el-table-column prop="online" label="状态" sortable align="center">
@@ -910,5 +916,14 @@ html.dark .header-color {
 /* 确保内容不换行 */
 .no-wrap-column .cell {
   white-space: nowrap;
+}
+
+.no-wrap {
+  white-space: nowrap; /* 禁止换行 */
+}
+
+.no-wrap-header,
+.no-wrap-cell {
+  white-space: nowrap !important;
 }
 </style>
