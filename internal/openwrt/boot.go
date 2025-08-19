@@ -154,6 +154,7 @@ func (this *openWRT) subscribeSysLog() {
 						go this.updateDeviceStatus("HetSysLog事件", eve)
 					}
 				})
+				subscribeLedLog(s)
 			})
 			if err != nil {
 				glog.Error(fmt.Errorf("logread 监听失败 %v", err))

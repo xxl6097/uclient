@@ -21,6 +21,7 @@ import (
 var (
 	arpFilePath           = "/proc/net/arp"
 	dhcpLeasesFilePath    = "/tmp/dhcp.leases"
+	ledEventLog           = "/tmp/led_eve.txt"
 	hetsysinfoFilePath    = "/tmp/hetsysinfo.json"
 	dhcpCfgFilePath       = "/etc/config/dhcp"
 	brLanString           = "br-lan"

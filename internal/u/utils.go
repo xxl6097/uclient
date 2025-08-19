@@ -521,3 +521,39 @@ func DeepCopyGob[T any](src *T) *T {
 	}
 	return &dst
 }
+
+// EnsureNewline 确保字符串以换行符结尾
+func EnsureNewline(s string) string {
+	// 判断是否包含任何换行符
+	hasNewline := strings.ContainsAny(s, "\n\r")
+
+	// 无换行符时追加系统默认换行符
+	if !hasNewline {
+		switch runtime.GOOS {
+		case "windows":
+			s += "\r\n" // Windows 换行符
+		default:
+			s += "\n" // Unix/Linux/macOS 换行符
+		}
+	}
+	return s
+}
+
+func AppandText(filename, content string) {
+	// 以追加模式打开文件（不存在则创建）
+	file, err := os.OpenFile(
+		filename,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY, // 关键：追加+创建+只写
+		0644,                                // 权限：所有者读写，其他用户只读
+	)
+	if err != nil {
+		glog.Error(err)
+	}
+	defer file.Close() // 确保关闭文件[1,3,4](@ref)
+
+	// 写入内容
+	if _, err := file.WriteString(EnsureNewline(content)); err != nil {
+		glog.Error(err)
+	}
+	glog.Println("内容追加成功！")
+}

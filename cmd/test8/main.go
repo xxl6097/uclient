@@ -15,4 +15,7 @@ func main() {
 	fmt.Printf("--->%p %+v\n", a, a)
 	b := u.DeepCopyGob[openwrt.DHCPLease](a)
 	fmt.Printf("--->%p %+v\n", b, b)
+
+	u.AppandText("./a.txt", "aaaaaa")
+	u.AppandText("./a.txt", "bbbbbbb")
 }

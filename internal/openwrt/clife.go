@@ -2,6 +2,7 @@ package openwrt
 
 import (
 	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/uclient/internal/u"
 	"regexp"
 	"strings"
 )
@@ -54,6 +55,14 @@ func subscribeHetSysLog(s string, fn func(*KernelLog)) {
 				fn(tempData)
 			}
 		}
+	}
+}
+
+func subscribeLedLog(s string) {
+	pattern := `*led_ctl.sh*`
+	re := regexp.MustCompile(pattern)
+	if re.MatchString(s) {
+		u.AppandText(ledEventLog, s)
 	}
 }
 
