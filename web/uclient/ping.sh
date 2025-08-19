@@ -6,8 +6,8 @@ LOG_FILE="network_monitor.log" # 日志路径
 INTERVAL=1                   # 检测间隔(秒)
 
 # 颜色定义
-RED=""
-GREEN=""
+RED="🔴"
+GREEN="🟢"
 YELLOW=""
 RESET=""
 
