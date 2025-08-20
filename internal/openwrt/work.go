@@ -219,6 +219,7 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 		}
 		work.WorkTime = append(work.WorkTime, wrokTimeTemp)
 		months[month] = work
+		glog.Debugf("%s %+v", day, *w)
 	}
 
 	//sort.Slice(result, func(i, j int) bool {
@@ -254,6 +255,7 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 	//	temp.OverTimeDuration += w.OverWorkTimesDuration
 	//}
 	//fmt.Println(temp.Month, temp.OverTimeDuration.String())
+
 	return result, nil
 }
 
