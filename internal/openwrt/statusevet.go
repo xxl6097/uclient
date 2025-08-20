@@ -46,7 +46,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 		glog.Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, new)
 		return
 	}
-	statusOne := this.refreshClients(new)
+	statusOne, sta := this.refreshClients(new)
 	if statusOne == nil {
 		statusOne = new
 	} else {
@@ -57,6 +57,9 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 		statusOne.Online = new.Online
 	}
 	glog.Debugf("状态更新[%s] %+v", typeEvent, statusOne)
+	if sta != nil {
+		glog.Debugf("sta信息[%s] %+v", new.Hostname, sta[macAddress])
+	}
 	s := Status{Timestamp: new.StartTime, Connected: new.Online}
 	this.ding(typeEvent, statusOne)
 	this.webNotify(statusOne)

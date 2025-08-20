@@ -492,9 +492,9 @@ func (p *openWRT) updateClientsByDHCP() {
 	}
 }
 
-func (this *openWRT) refreshClients(new *DHCPLease) *DHCPLease {
+func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.StaDevice) {
 	if new == nil {
-		return nil
+		return nil, nil
 	}
 	staInfo := GetStaInfo()
 	if staInfo != nil {
@@ -570,7 +570,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) *DHCPLease {
 		}
 		this.clients[new.MAC] = new
 	}
-	return old
+	return old, staInfo
 }
 
 func (this *openWRT) updateUserTimeLineData(macAddr string, newList []*Status) {
