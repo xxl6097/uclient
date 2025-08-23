@@ -77,11 +77,12 @@ func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 		if todaySignData.OnWorkTime == 0 {
 			todaySignData.OnWorkTime = timestamp
 			todaySignData.OnWorkSignal = tempData.Signal
-		} else {
+			needUpdateSign = true
+		} else if !tempData.Online {
 			todaySignData.OffWorkTime = timestamp
 			todaySignData.OffWorkSignal = tempData.Signal
+			needUpdateSign = true
 		}
-		needUpdateSign = true
 	} else {
 		if working == 0 {
 			//上班打卡
@@ -91,7 +92,7 @@ func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 				todaySignData.OnWorkSignal = tempData.Signal
 				needUpdateSign = true
 			}
-		} else if working == 2 {
+		} else if working == 2 && !tempData.Online {
 			todaySignData.OffWorkTime = timestamp
 			todaySignData.OffWorkSignal = tempData.Signal
 			needUpdateSign = true

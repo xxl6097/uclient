@@ -55,7 +55,7 @@ func (this *openWRT) init() {
 	this.ctx, this.cancel = context.WithCancel(context.Background())
 	this.ulistString = UbusList()
 	this.initClients()
-	go this.subscribeSysLog()
+	//go this.subscribeSysLog()
 	go this.subscribeArpEvent()
 	go this.subscribeArpPing()
 	go this.subscribeFsnotify()
@@ -63,9 +63,9 @@ func (this *openWRT) init() {
 	if strings.Contains(this.ulistString, "hostapd") {
 		go this.subscribeHostapd()
 	}
-	if strings.Contains(this.ulistString, "dnsmasq") {
-		go this.subscribeDnsmasq()
-	}
+	//if strings.Contains(this.ulistString, "dnsmasq") {
+	//	go this.subscribeDnsmasq()
+	//}
 	if strings.Contains(this.ulistString, "ahsapd.sta") {
 		go this.subscribeAhsapdsta()
 	}
@@ -231,6 +231,7 @@ func (this *openWRT) subscribeArpEvent() {
 					IP:        entry.IP.String(),
 					Phy:       entry.Interface,
 					StartTime: glog.Now().UnixMilli(),
+					Flags:     entry.Flags,
 				}
 				if v, ok := this.leases[mac]; ok {
 					if v.Hostname != "" {
@@ -238,8 +239,11 @@ func (this *openWRT) subscribeArpEvent() {
 					}
 				}
 				if v, ok := this.clients[mac]; ok {
-					online := entry.Flags == 2
-					if v.Online != online {
+					isOnline := false
+					if entry.Flags == 2 {
+						isOnline = true
+					}
+					if v.Online != isOnline {
 						glog.Infof("Arp事件:%+v", entry)
 						this.updateDeviceStatus("Arp事件", dhcp)
 					}
@@ -511,6 +515,8 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 			if sta.Timestamp != 0 && new.StartTime == 0 {
 				new.StartTime = sta.Timestamp
 			}
+		} else {
+			new.Signal = 0
 		}
 	}
 	old := this.getClient(new.MAC)
@@ -530,9 +536,9 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		if new.StartTime > 0 {
 			old.StartTime = new.StartTime
 		}
-		if new.Signal != 0 {
-			old.Signal = new.Signal
-		}
+		//if new.Signal != 0 {
+		//	old.Signal = new.Signal
+		//}
 		if new.Vendor != "" {
 			old.Vendor = new.Vendor
 		}
@@ -557,6 +563,8 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		if new.Static != nil {
 			old.Static = new.Static
 		}
+		old.Flags = new.Flags
+		old.Signal = new.Signal
 	} else {
 		glog.Debugf("新设备：%+v", new)
 		if this.nicks == nil {

@@ -73,6 +73,7 @@ type DHCPLease struct {
 	Hostname  string     `json:"hostname"` //客户端上报的主机名（可能为空或 *）
 	StartTime int64      `json:"starTime"` //租约失效的精确时间（秒级精度）
 	Online    bool       `json:"online"`
+	Flags     uint8      `json:"flags"` // ARP 表项状态标志：0x0：无效（离线）;0x2：有效（在线），表示设备可达。
 	Signal    int        `json:"signal"`
 	Vendor    string     `json:"vendor"`
 	Freq      int        `json:"freq"`
