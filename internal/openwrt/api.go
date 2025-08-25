@@ -15,7 +15,7 @@ import (
 )
 
 func (this *openWRT) initData() error {
-	staInfo := GetStaInfo()
+	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
 	this.webhookUrl = this.GetWebHook()
 	arpList, e1 := getClientsByArp(brLanString)
 	if e1 == nil {

@@ -81,7 +81,10 @@ func getStaInfo() *u.StaInfo {
 	return &sta
 }
 
-func GetStaInfo() map[string]*u.StaDevice {
+func GetStaInfo(canRun bool) map[string]*u.StaDevice {
+	if !canRun {
+		return make(map[string]*u.StaDevice)
+	}
 	data := getStaInfo()
 	if data == nil {
 		return nil

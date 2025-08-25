@@ -434,7 +434,7 @@ func (p *openWRT) updateClientsByDHCP() {
 	} else {
 		glog.Printf("DHCP变化，客户端数量 %+v\n", len(clientArray))
 		arpMap, e1 := getClientsByArp(brLanString)
-		staInfo := GetStaInfo()
+		staInfo := GetStaInfo(strings.Contains(p.ulistString, "ahsapd.sta"))
 		for _, client := range clientArray {
 			mac := client.MAC
 			if e1 == nil && arpMap != nil {
@@ -500,7 +500,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 	if new == nil {
 		return nil, nil
 	}
-	staInfo := GetStaInfo()
+	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
 	if staInfo != nil {
 		sta := staInfo[new.MAC]
 		if sta != nil {
