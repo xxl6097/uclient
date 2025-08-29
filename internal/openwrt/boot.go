@@ -333,6 +333,7 @@ func (this *openWRT) subscribeAhsapdsta() {
 					if dhcp.StartTime <= 0 {
 						dhcp.StartTime = glog.Now().UnixMilli()
 					}
+					glog.Infof("ahsapd.sta dhcp:%+v", dhcp)
 					go this.updateDeviceStatus("ahsapd事件", dhcp)
 				}
 			})
@@ -501,6 +502,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		return nil, nil
 	}
 	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
+	//glog.Infof("1-----refreshClients typeEvent:%s new:%+v", new, staInfo)
 	if staInfo != nil {
 		sta := staInfo[new.MAC]
 		if sta != nil {
@@ -520,6 +522,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		}
 	}
 	old := this.getClient(new.MAC)
+	//glog.Infof("2-----refreshClients typeEvent:%s new:%+v", old, staInfo)
 	if old != nil {
 		if new.IP != "" {
 			old.IP = new.IP

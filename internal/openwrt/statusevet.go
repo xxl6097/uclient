@@ -35,23 +35,28 @@ import (
 //}
 
 func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
+	glog.Infof("updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	defer this.mu.Unlock()
 	this.mu.Lock()
+	//glog.Infof("1------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	if new == nil {
 		glog.Debugf("new == nil %s 状态变化 %+v", typeEvent, new)
 		return
 	}
+	//glog.Infof("2------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	macAddress := new.MAC
 	if macAddress == "" {
 		glog.Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, new)
 		return
 	}
+	//glog.Infof("3------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	statusOne, sta := this.refreshClients(new)
+	//glog.Infof("4------updateDeviceStatus typeEvent:%s new:%+v", sta, statusOne)
 	if statusOne == nil {
 		statusOne = new
 	} else {
 		if new.Online == statusOne.Online {
-			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, cls.Hostname, cls.MAC, cls.Online, device.Online)
+			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, new.Hostname, new.MAC, new.Online, new.Online)
 			return
 		}
 		statusOne.Online = new.Online
