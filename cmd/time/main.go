@@ -183,16 +183,16 @@ func tee5() {
 
 }
 
-func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTypeSetting) []*openwrt.Work {
+func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTypeSetting) []*openwrt.MonthData {
 	on := u.GetTime(workType.OnWorkTime, u.GetLocation())
 	off := u.GetTime(workType.OffWorkTime, u.GetLocation())
 	if on == nil || off == nil {
 		return nil
 	}
 	// 初始化分组Map
-	works := make([]*openwrt.Work, 0)
+	works := make([]*openwrt.MonthData, 0)
 	//groups := make(map[int64]map[int64][]int64)
-	months := make(map[string]*openwrt.Work)
+	months := make(map[string]*openwrt.MonthData)
 	days := make(map[string][]int64)
 	var day string
 	for idx, ts := range timestamps {
@@ -204,7 +204,7 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 		work, monthOk := months[month]
 		if !monthOk {
 			//monthMap = make(map[int64][]int64)
-			work = &openwrt.Work{Month: month}
+			work = &openwrt.MonthData{Month: month}
 			works = append(works, work)
 		}
 		//fmt.Println(t.Format(time.DateTime))
@@ -224,12 +224,12 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 					tempItem := timestamps[idx-1]
 					if tempItem != nil {
 						//tmpTime := time.UnixMilli(tempItem.Timestamp).Format(time.TimeOnly)
-						workTimeSize := len(tempWork.WorkTime)
+						workTimeSize := len(tempWork.DayDatas)
 						//fmt.Println(workTimeSize)
 						//if workTimeSize == 0 {
 						//	fmt.Println(workTimeSize)
 						//}
-						tempWorkTime := tempWork.WorkTime[workTimeSize-1]
+						tempWorkTime := tempWork.DayDatas[workTimeSize-1]
 						if tempWorkTime.Date != "" {
 							tempDay := days[tempWorkTime.Date]
 							t1 := time.UnixMilli(tempDay[len(tempDay)-1])
@@ -261,12 +261,12 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 							if offWorkOverTime > 0 {
 								duration += offWorkOverTime
 							}
-							tempWorkTime.OverWorkTimes = duration.String()
-							tempWorkTime.OverWorkTimesDuration = duration
-							tempWork.OverTimeDuration += duration
-							tempWork.OverTime = tempWork.OverTimeDuration.String()
+							//tempWorkTime.OverWorkTimes = duration.String()
+							tempWorkTime.OverHours = duration
+							tempWork.TotalOverHours += duration
+							//tempWork.OverTime = tempWork.OverTimeDuration.String()
 						}
-						tempWork.WorkTime[workTimeSize-1] = tempWorkTime
+						tempWork.DayDatas[workTimeSize-1] = tempWorkTime
 					}
 				}
 				if tempWork == nil {
@@ -274,10 +274,10 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 				}
 			}
 
-			if work.WorkTime == nil {
-				work.WorkTime = make([]openwrt.WorkTime, 0)
+			if work.DayDatas == nil {
+				work.DayDatas = make([]openwrt.DayData, 0)
 			}
-			work.WorkTime = append(work.WorkTime, openwrt.WorkTime{
+			work.DayDatas = append(work.DayDatas, openwrt.DayData{
 				Date:      day,
 				Weekday:   int(t.Weekday()),
 				WorkTime2: t.Format(time.TimeOnly),
@@ -303,7 +303,7 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 
 		tempWork := works[len(works)-1]
 		if tempWork != nil {
-			tempWorkTime := tempWork.WorkTime[len(tempWork.WorkTime)-1]
+			tempWorkTime := tempWork.DayDatas[len(tempWork.DayDatas)-1]
 			tempWorkTime.WorkTime1 = t1.Format(time.TimeOnly)
 			tempWorkTime.WorkTime2 = t2.Format(time.TimeOnly)
 			tempWorkTime.Weekday = int(t2.Weekday())
@@ -314,10 +314,11 @@ func groupTimestampsByDay(timestamps []*openwrt.Status, workType openwrt.WorkTyp
 			if offWorkOverTime > 0 {
 				duration += offWorkOverTime
 			}
-			tempWorkTime.OverWorkTimes = duration.String()
-			tempWork.OverTimeDuration += duration
-			tempWork.OverTime = tempWork.OverTimeDuration.String()
-			tempWork.WorkTime[len(tempWork.WorkTime)-1] = tempWorkTime
+			//tempWorkTime.OverWorkTimes = duration.String()
+			tempWorkTime.OverHours = duration
+			tempWork.TotalOverHours += duration
+			//tempWork.OverTime = tempWork.OverTimeDuration.String()
+			tempWork.DayDatas[len(tempWork.DayDatas)-1] = tempWorkTime
 		}
 	}
 	return works
@@ -376,7 +377,7 @@ func tee6() {
 
 func tee7() {
 	mac := "16:00:6f:83:35:e1"
-	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202508072016", mac)
+	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202509031041", mac)
 	d, err := openwrt.GetWorkTimeAndCaculate(mac, tempFilePath, &openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",
@@ -387,10 +388,14 @@ func tee7() {
 		//jsonBytes, _ := json.MarshalIndent(d, "", " ")
 		//fmt.Println(string(jsonBytes))
 		for _, work := range d {
-			fmt.Printf("%+v %+v\n", len(work.WorkTime), work)
+			fmt.Printf("%+v %+v\n", len(work.DayDatas), work)
 		}
 	}
 	fmt.Println("size", len(d))
+	bb, err := json.Marshal(d)
+	if err == nil {
+		fmt.Println(string(bb))
+	}
 }
 
 //	{

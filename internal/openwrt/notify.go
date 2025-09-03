@@ -45,14 +45,14 @@ func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now tim
 	month := fmt.Sprintf("%d-%02d", now.Year(), int(now.Month()))
 	day := now.Format(time.DateOnly)
 	var monthOverTimes string
-	var signData *WorkTime
+	var signData *DayData
 	works, err := getWorkTimeAndCaculate(macAddress, settings)
 	if err == nil && works != nil {
 		for _, work := range works {
 			if work.Month == month {
-				monthOverTimes = work.OverTime
-				if work.WorkTime != nil {
-					for _, t := range work.WorkTime {
+				monthOverTimes = work.TotalOverHours.String()
+				if work.DayDatas != nil {
+					for _, t := range work.DayDatas {
 						if t.Date == day {
 							//todayOverTimes = t.OverWorkTimes
 							signData = &t
@@ -120,8 +120,8 @@ func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now tim
 				}
 			}
 		}
-		if signData != nil && signData.OverWorkTimes != "" {
-			builder.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", signData.OverWorkTimes))
+		if signData != nil && signData.OverHours.String() != "" {
+			builder.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", signData.OverHours.String()))
 		}
 		if monthOverTimes != "" {
 			builder.WriteString(fmt.Sprintf("- 本月加班时长：%s\n ", monthOverTimes))

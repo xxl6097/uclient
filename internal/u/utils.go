@@ -571,3 +571,26 @@ func ReadFile(fpath string) ([]byte, error) {
 	}
 	return data, nil
 }
+
+// CountWeekendsInMonth 统计指定年份和月份的周末天数（周六和周日）
+func CountWeekendsInMonth(year int, month time.Month) int {
+	// 获取指定月份的第一天（00:00:00）
+	firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+	// 获取下个月的第一天，然后减去一秒，得到当前月份的最后一天
+	nextMonth := firstDay.AddDate(0, 1, 0)
+	lastDay := nextMonth.Add(-time.Second)
+
+	weekendCount := 0
+	// 从月份的第一天开始遍历，直到处理完该月的所有天
+	for current := firstDay; !current.After(lastDay); current = current.AddDate(0, 0, 1) {
+		// 获取当前日期是星期几
+		weekday := current.Weekday()
+		// 如果当前是周六或周日，则增加周末计数
+		//if weekday == time.Saturday || weekday == time.Sunday {
+		if weekday == time.Saturday {
+			weekendCount++
+		}
+	}
+
+	return weekendCount
+}

@@ -27,22 +27,52 @@ type WorkTypeSetting struct {
 	WebhookUrl     string `json:"webhookUrl"`
 	IsSaturdayWork bool   `json:"isSaturdayWork"` //默认false，意思是周六休息
 }
-type WorkTime struct {
-	Date                  string        `json:"date"`
-	Weekday               int           `json:"weekday"`
-	WorkTime1             string        `json:"workTime1"`
-	WorkTime2             string        `json:"workTime2"`
-	OverWorkTimes         string        `json:"overWorkTimes"`
-	DayType               int           `json:"dayType"` //0工作日，1节假日，2补班日，3加班日
-	OverWorkTimesDuration time.Duration `json:"-"`
+
+//type WorkTime struct {
+//	Date                  string        `json:"date"`
+//	Weekday               int           `json:"weekday"`
+//	WorkTime1             string        `json:"workTime1"`
+//	WorkTime2             string        `json:"workTime2"`
+//	OverWorkTimes         string        `json:"overWorkTimes"` //统计加班时间
+//	DayType               int           `json:"dayType"`       //0工作日，1节假日，2补班日，3加班日
+//	OverWorkTimesDuration time.Duration `json:"-"`             //统计加班时间 Duration
+//}
+//
+//type Work struct {
+//	Month            string        `json:"month"`
+//	OverTime         string        `json:"overtime"` //统计总加班时间（工作日+周六）
+//	WorkTime         []WorkTime    `json:"workTime"`
+//	OverTimeDuration time.Duration `json:"-"`
+//}
+
+type DayData struct {
+	Date      string        `json:"date"`
+	Weekday   int           `json:"weekday"`
+	DayType   int           `json:"dayType"` //0工作日，1节假日，2补班日，3加班日
+	WorkTime1 string        `json:"workTime1"`
+	WorkTime2 string        `json:"workTime2"`
+	OverHours time.Duration `json:"overHours"` //统计加班时间
 }
 
-type Work struct {
-	Month            string        `json:"month"`
-	OverTime         string        `json:"overtime"`
-	WorkTime         []WorkTime    `json:"workTime"`
-	OverTimeDuration time.Duration `json:"-"`
+type MonthData struct {
+	WeekCount            int           `json:"weekCount"`
+	Month                string        `json:"month"`
+	TotalOverHours       time.Duration `json:"totalOverHours"`       //统计总加班时间（工作日+周六）
+	WorkDayOverHours     time.Duration `json:"workDayOverHours"`     //统计工作日加班时间
+	WorkDayAveOverHours  time.Duration `json:"workDayAveOverHours"`  //统计工作日平均加班时间
+	SaturdayOverHours    time.Duration `json:"saturdayOverHours"`    //统计周六加班时间
+	SaturdayAveOverHours time.Duration `json:"saturdayAveOverHours"` //统计周六平均加班时间
+	SaturdayCount        []string      `json:"saturdayCount"`
+	DayDatas             []DayData     `json:"dayDatas"`
 }
+
+//type MonthReport struct {
+//	Month             string        `json:"month"`
+//	TotalOverHours    time.Duration `json:"totalOverHours"`    //统计总加班时间（工作日+周六）
+//	WorkDayOverHours  time.Duration `json:"WorkDayOverHours"`  //统计工作日加班时间
+//	SaturdayOverHours time.Duration `json:"saturdayOverHours"` //统计周六加班时间
+//	WorkTime          []WorkTime    `json:"workTime"`
+//}
 
 func groupTimestampsByDay(timestamps []*Status) map[time.Time][]int64 {
 	// 初始化分组Map
@@ -144,7 +174,122 @@ func caculetePMWorkDay(pmSignTime, workTime2 time.Time) time.Duration {
 //	return duration
 //}
 
-func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, error) {
+//func GetWorkTimeAndCaculateBAK(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Work, error) {
+//	if mac == "" {
+//		return nil, fmt.Errorf("mac is empty")
+//	}
+//	if tempFilePath == "" {
+//		return nil, fmt.Errorf("tempFilePath is empty")
+//	}
+//	if workType == nil {
+//		return nil, fmt.Errorf("workType is empty")
+//	}
+//	amSignTime, err := u.TimeParse(workType.OnWorkTime)
+//	if amSignTime == nil || err != nil {
+//		return nil, fmt.Errorf("on work time is nill %+v", workType)
+//	}
+//	pmSignTime, e2 := u.TimeParse(workType.OffWorkTime)
+//	if pmSignTime == nil || e2 != nil {
+//		return nil, fmt.Errorf("off work time is nill")
+//	}
+//	works := ReadWorkTimeByMac(tempFilePath)
+//	if works == nil {
+//		return nil, fmt.Errorf("works is empty")
+//	}
+//
+//	result := make([]*Work, 0)
+//	months := make(map[string]*Work)
+//	for day, w := range works {
+//		workTime1 := u.UTC8ToTime(w.OnWorkTime)  //time1.Format(time.TimeOnly)
+//		workTime2 := u.UTC8ToTime(w.OffWorkTime) //time2.Format(time.TimeOnly)
+//		month := fmt.Sprintf("%d-%02d", workTime1.Year(), int(workTime1.Month()))
+//		d, e := u.AutoParse(day)
+//		if e == nil && d != nil {
+//			month = d.Format("2006-01")
+//		}
+//		var duration time.Duration
+//		//0工作日，1节假日，2补班日
+//		//如果是周六，且标记周六加班，那么加班时间不按照打开时间计算
+//		if w.Weekday == int(time.Saturday) && workType.IsSaturdayWork && w.DayType != 2 {
+//			if w.OnWorkTime > 0 && w.OffWorkTime > 0 {
+//				duration = time.Duration(u.CompareTime(workTime2, workTime1)) * time.Second
+//			}
+//		} else if w.DayType == 0 || w.DayType == 2 {
+//			if w.OnWorkTime > 0 {
+//				duration += caculeteAMWorkDay(*amSignTime, workTime1)
+//			}
+//			if w.OffWorkTime > 0 {
+//				duration += caculetePMWorkDay(*pmSignTime, workTime2)
+//			}
+//		}
+//		wrokTimeTemp := WorkTime{
+//			Date:                  day,
+//			DayType:               w.DayType,
+//			Weekday:               w.Weekday,
+//			OverWorkTimes:         duration.String(),
+//			OverWorkTimesDuration: duration,
+//		}
+//
+//		if w.OnWorkTime > 0 {
+//			wrokTimeTemp.WorkTime1 = workTime1.Format(time.TimeOnly)
+//		}
+//		if w.OffWorkTime > 0 {
+//			wrokTimeTemp.WorkTime2 = workTime2.Format(time.TimeOnly)
+//		}
+//		work, monthOk := months[month]
+//		if !monthOk {
+//			work = &Work{
+//				Month: month,
+//			}
+//			result = append(result, work)
+//		}
+//
+//		if work.WorkTime == nil {
+//			work.WorkTime = make([]WorkTime, 0)
+//		}
+//		work.WorkTime = append(work.WorkTime, wrokTimeTemp)
+//		months[month] = work
+//		glog.Debugf("%s %+v", day, *w)
+//	}
+//
+//	//sort.Slice(result, func(i, j int) bool {
+//	//	a, b := result[i], result[j]
+//	//	sort.Slice(a.WorkTime, func(i, j int) bool {
+//	//		aa, ab := a.WorkTime[i], a.WorkTime[j]
+//	//		return aa.Date < ab.Date
+//	//	})
+//	//	sort.Slice(b.WorkTime, func(i, j int) bool {
+//	//		ba, bb := b.WorkTime[i], b.WorkTime[j]
+//	//		return ba.Date < bb.Date
+//	//	})
+//	//	return a.Month < b.Month
+//	//})
+//
+//	for _, w := range result {
+//		sort.Slice(w.WorkTime, func(i, j int) bool {
+//			aa, ab := w.WorkTime[i], w.WorkTime[j]
+//			return aa.Date > ab.Date
+//		})
+//		for _, workTime := range w.WorkTime {
+//			w.OverTimeDuration += workTime.OverWorkTimesDuration
+//		}
+//		w.OverTime = w.OverTimeDuration.String()
+//	}
+//	sort.Slice(result, func(i, j int) bool {
+//		a, b := result[i], result[j]
+//		return a.Month > b.Month
+//	})
+//
+//	//temp := result[0]
+//	//for _, w := range temp.WorkTime {
+//	//	temp.OverTimeDuration += w.OverWorkTimesDuration
+//	//}
+//	//fmt.Println(temp.Month, temp.OverTimeDuration.String())
+//
+//	return result, nil
+//}
+
+func getWorkRawData(mac, tempFilePath string, workType *WorkTypeSetting) ([]*MonthData, error) {
 	if mac == "" {
 		return nil, fmt.Errorf("mac is empty")
 	}
@@ -166,25 +311,29 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 	if works == nil {
 		return nil, fmt.Errorf("works is empty")
 	}
-
-	result := make([]*Work, 0)
-	months := make(map[string]*Work)
+	result := make([]*MonthData, 0)
+	months := make(map[string]*MonthData)
 	for day, w := range works {
-		workTime1 := u.UTC8ToTime(w.OnWorkTime)  //time1.Format(time.TimeOnly)
-		workTime2 := u.UTC8ToTime(w.OffWorkTime) //time2.Format(time.TimeOnly)
+		//1、将上下班时间转换成UTC8时间戳
+		workTime1 := u.UTC8ToTime(w.OnWorkTime)
+		workTime2 := u.UTC8ToTime(w.OffWorkTime)
+		//2、获取当前月
 		month := fmt.Sprintf("%d-%02d", workTime1.Year(), int(workTime1.Month()))
 		d, e := u.AutoParse(day)
 		if e == nil && d != nil {
 			month = d.Format("2006-01")
 		}
+		//if day == "2025-07-19" {
+		//	fmt.Printf("%+v %+v\n", day, works)
+		//}
 		var duration time.Duration
-		//0工作日，1节假日，2补班日
-		//如果是周六，且标记周六加班，那么加班时间不按照打开时间计算
-		if w.Weekday == int(time.Saturday) && workType.IsSaturdayWork && w.DayType != 2 {
+		//如果是周六&&标记周六是加班，那么加班时间不按照打开时间计算 (0工作日，1节假日，2补班日)
+		if w.Weekday == int(time.Saturday) && w.DayType == 3 {
 			if w.OnWorkTime > 0 && w.OffWorkTime > 0 {
 				duration = time.Duration(u.CompareTime(workTime2, workTime1)) * time.Second
 			}
 		} else if w.DayType == 0 || w.DayType == 2 {
+			//工作日 || 补班日
 			if w.OnWorkTime > 0 {
 				duration += caculeteAMWorkDay(*amSignTime, workTime1)
 			}
@@ -192,74 +341,78 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 				duration += caculetePMWorkDay(*pmSignTime, workTime2)
 			}
 		}
-		wrokTimeTemp := WorkTime{
-			Date:                  day,
-			DayType:               w.DayType,
-			Weekday:               w.Weekday,
-			OverWorkTimes:         duration.String(),
-			OverWorkTimesDuration: duration,
+		dayDataTemp := DayData{
+			Date:      day,
+			DayType:   w.DayType,
+			Weekday:   w.Weekday,
+			OverHours: duration,
 		}
 
 		if w.OnWorkTime > 0 {
-			wrokTimeTemp.WorkTime1 = workTime1.Format(time.TimeOnly)
+			dayDataTemp.WorkTime1 = workTime1.Format(time.TimeOnly)
 		}
 		if w.OffWorkTime > 0 {
-			wrokTimeTemp.WorkTime2 = workTime2.Format(time.TimeOnly)
+			dayDataTemp.WorkTime2 = workTime2.Format(time.TimeOnly)
 		}
 		work, monthOk := months[month]
 		if !monthOk {
-			work = &Work{
-				Month: month,
+			work = &MonthData{
+				WeekCount:     u.CountWeekendsInMonth(workTime1.Year(), workTime1.Month()),
+				Month:         month,
+				SaturdayCount: make([]string, 0),
 			}
 			result = append(result, work)
 		}
 
-		if work.WorkTime == nil {
-			work.WorkTime = make([]WorkTime, 0)
+		if work.DayDatas == nil {
+			work.DayDatas = make([]DayData, 0)
 		}
-		work.WorkTime = append(work.WorkTime, wrokTimeTemp)
+		work.DayDatas = append(work.DayDatas, dayDataTemp)
 		months[month] = work
 		glog.Debugf("%s %+v", day, *w)
 	}
-
-	//sort.Slice(result, func(i, j int) bool {
-	//	a, b := result[i], result[j]
-	//	sort.Slice(a.WorkTime, func(i, j int) bool {
-	//		aa, ab := a.WorkTime[i], a.WorkTime[j]
-	//		return aa.Date < ab.Date
-	//	})
-	//	sort.Slice(b.WorkTime, func(i, j int) bool {
-	//		ba, bb := b.WorkTime[i], b.WorkTime[j]
-	//		return ba.Date < bb.Date
-	//	})
-	//	return a.Month < b.Month
-	//})
-
-	for _, w := range result {
-		sort.Slice(w.WorkTime, func(i, j int) bool {
-			aa, ab := w.WorkTime[i], w.WorkTime[j]
-			return aa.Date > ab.Date
-		})
-		for _, workTime := range w.WorkTime {
-			w.OverTimeDuration += workTime.OverWorkTimesDuration
-		}
-		w.OverTime = w.OverTimeDuration.String()
-	}
-	sort.Slice(result, func(i, j int) bool {
-		a, b := result[i], result[j]
-		return a.Month > b.Month
-	})
-
-	//temp := result[0]
-	//for _, w := range temp.WorkTime {
-	//	temp.OverTimeDuration += w.OverWorkTimesDuration
-	//}
-	//fmt.Println(temp.Month, temp.OverTimeDuration.String())
-
 	return result, nil
 }
 
-func getWorkTimeAndCaculate(mac string, workType *WorkTypeSetting) ([]*Work, error) {
+func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting) ([]*MonthData, error) {
+	monthData, err := getWorkRawData(mac, tempFilePath, workType)
+	if err != nil {
+		return nil, err
+	}
+	for _, w := range monthData {
+		sort.Slice(w.DayDatas, func(i, j int) bool {
+			aa, ab := w.DayDatas[i], w.DayDatas[j]
+			return aa.Date > ab.Date
+		})
+		workDateCount := 0
+		for _, day := range w.DayDatas {
+			//1、统计总加班时长（工作日+周六）
+			w.TotalOverHours += day.OverHours
+			//2、统计工作日的日均
+			if day.DayType == 0 || day.DayType == 2 {
+				//工作日 || 补班日
+				w.WorkDayOverHours += day.OverHours
+				workDateCount++
+			} else if day.Weekday == int(time.Saturday) {
+				w.SaturdayOverHours += day.OverHours
+				w.SaturdayCount = append(w.SaturdayCount, day.Date)
+			}
+		}
+		if workDateCount > 0 {
+			w.WorkDayAveOverHours = w.WorkDayOverHours / time.Duration(workDateCount)
+		}
+		if w.SaturdayCount != nil {
+			w.SaturdayAveOverHours = w.SaturdayOverHours / time.Duration(w.WeekCount)
+		}
+		//fmt.Println(w.TotalOverHours.Nanoseconds()) //3600000000000
+	}
+	sort.Slice(monthData, func(i, j int) bool {
+		a, b := monthData[i], monthData[j]
+		return a.Month > b.Month
+	})
+	return monthData, err
+}
+func getWorkTimeAndCaculate(mac string, workType *WorkTypeSetting) ([]*MonthData, error) {
 	tempFilePath := filepath.Join(workDir, mac)
 	//glog.Debug("GetWorkTime", mac)
 	return GetWorkTimeAndCaculate(mac, tempFilePath, workType)

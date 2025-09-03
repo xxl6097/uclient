@@ -321,7 +321,7 @@ func (this *openWRT) GetWebHook() string {
 	return string(data)
 }
 
-func (this *openWRT) GetWorkTimeAndCaculate(mac string) ([]*Work, error) {
+func (this *openWRT) GetWorkTimeAndCaculate(mac string) ([]*MonthData, error) {
 	if mac == "" {
 		return nil, fmt.Errorf("mac is empty")
 	}

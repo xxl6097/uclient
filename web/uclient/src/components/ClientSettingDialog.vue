@@ -143,7 +143,7 @@
                     <template #default="props">
                       <div m="4">
                         <el-table
-                          :data="props.row.workTime"
+                          :data="props.row.dayDatas"
                           border
                           :preserve-expanded-content="false"
                         >
@@ -169,9 +169,18 @@
                             </template>
                           </el-table-column>
                           <el-table-column
+                            prop="overHours"
                             label="加班时长"
-                            prop="overWorkTimes"
-                          />
+                            align="center"
+                          >
+                            <template #default="scope">
+                              <el-tag type="primary" size="default"
+                                >{{
+                                  formatNanosecondsToHours(scope.row.overHours)
+                                }}h
+                              </el-tag>
+                            </template>
+                          </el-table-column>
                           <el-table-column label="星期" prop="weekday">
                             <template #default="scope">
                               {{ getWeekDay(scope.row.weekday) }}
@@ -234,13 +243,89 @@
                   </el-table-column>
                   <el-table-column prop="month" label="月份"></el-table-column>
                   <el-table-column
-                    prop="overtime"
-                    label="累计时长"
+                    prop="totalOverHours"
+                    label="总时长"
                     align="center"
                   >
                     <template #default="scope">
                       <el-tag type="danger" size="large"
-                        >{{ scope.row.overtime }}
+                        >{{
+                          formatNanosecondsToHours(scope.row.totalOverHours)
+                        }}h
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column
+                    prop="workDayOverHours"
+                    label="工作日累计"
+                    align="center"
+                  >
+                    <template #default="scope">
+                      <el-tag type="warning"
+                        >{{
+                          formatNanosecondsToHours(scope.row.workDayOverHours)
+                        }}h
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column
+                    prop="workDayAveOverHours"
+                    label="日平均"
+                    align="center"
+                  >
+                    <template #default="scope">
+                      <el-tag type="primary"
+                        >{{
+                          formatNanosecondsToHours(
+                            scope.row.workDayAveOverHours,
+                          )
+                        }}h
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column
+                    prop="saturdayOverHours"
+                    label="周累计"
+                    align="center"
+                  >
+                    <template #default="scope">
+                      <el-tag type="success"
+                        >{{
+                          formatNanosecondsToHours(scope.row.saturdayOverHours)
+                        }}h
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column
+                    prop="saturdayAveOverHours"
+                    label="周平均"
+                    align="center"
+                  >
+                    <template #default="scope">
+                      <el-tag type="primary"
+                        >{{
+                          formatNanosecondsToHours(
+                            scope.row.saturdayAveOverHours,
+                          )
+                        }}h
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column
+                    prop="saturdayCount"
+                    label="周加班次数"
+                    align="center"
+                  >
+                    <template #default="scope">
+                      <el-tag type="warning"
+                        >{{ scope.row.saturdayCount.length }}次({{
+                          scope.row.weekCount
+                        }})
                       </el-tag>
                     </template>
                   </el-table-column>
@@ -254,7 +339,7 @@
                   layout="sizes,prev, pager, next"
                   background
                   :size="size"
-                  :total="activities.length"
+                  :total="monthData.length"
                   @size-change="handleSizeChange"
                   @current-change="handlePageChange"
                 />
@@ -289,9 +374,9 @@ import { Eleme } from '@element-plus/icons-vue'
 import { ref, defineExpose, computed } from 'vue'
 import {
   Client,
+  DayData,
+  MonthData,
   NickEntry,
-  WorkStatics,
-  WorkTime,
   WorkType,
 } from '../utils/type.ts'
 import {
@@ -301,6 +386,7 @@ import {
   showLoading,
   showSucessTips,
   showTips,
+  formatNanosecondsToHours,
 } from '../utils/utils.ts'
 import { ComponentSize, ElMessageBox, TabsPaneContext } from 'element-plus'
 
@@ -332,10 +418,10 @@ const formData = ref({
     } as NickEntry,
   } as Client,
 })
-const handleShowSelect = (row: WorkTime) => {
+const handleShowSelect = (row: DayData) => {
   row.showSelect = !row.showSelect
 }
-const handleSelectChange = (row: WorkTime) => {
+const handleSelectChange = (row: DayData) => {
   row.showSelect = false
   // showWarmDialog(`${JSON.stringify(row)}`, {}, {})
 }
@@ -404,15 +490,15 @@ const options = [
 ]
 const value3 = ref<number>(0)
 const width = ref<string>('30%')
-const activities = ref<WorkStatics[]>([])
+const monthData = ref<MonthData[]>([])
 const currentPage = ref<number>(1)
 const pageSize = ref<number>(10)
 const size = ref<ComponentSize>('default')
 // 分页后的表格数
-const paginatedTableData = computed<WorkStatics[]>(() => {
+const paginatedTableData = computed<MonthData[]>(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
-  return activities.value.slice(start, end)
+  return monthData.value.slice(start, end)
 })
 //  分页切换
 const handlePageChange = (page: number) => {
@@ -441,7 +527,7 @@ const handleClick = (tab: TabsPaneContext) => {
   }
 }
 
-const handleChangeWorkTime = (row: WorkTime) => {
+const handleChangeWorkTime = (row: DayData) => {
   const loadings = showLoading('修改中...')
   const body = {
     mac: formData.value.client.mac,
@@ -470,7 +556,7 @@ const handleChangeWorkTime = (row: WorkTime) => {
     })
 }
 
-const handleDeleteWorkTime = (row: WorkTime) => {
+const handleDeleteWorkTime = (row: DayData) => {
   const loadings = showLoading('修改中...')
   const body = {
     mac: formData.value.client.mac,
@@ -604,7 +690,7 @@ function fetchWorkData() {
     .then((json) => {
       console.log('fetchWorkData', json)
       if (json.code === 0 && json.data) {
-        activities.value = json.data
+        monthData.value = json.data
       } else {
         //showTips(json.code, json.msg)
       }

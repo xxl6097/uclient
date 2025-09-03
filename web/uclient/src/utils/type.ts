@@ -5,7 +5,23 @@ export interface WorkType {
   isSaturdayWork: boolean
 }
 
-export interface WorkTime {
+// export interface WorkTime {
+//   date: string
+//   workTime1: string
+//   workTime2: string
+//   isWeekDay: boolean
+//   showSelect: boolean
+//   weekday: number
+//   dayType: number //0工作日，1休息日，2补班日
+//   overWorkTimes: string
+// }
+//
+// export interface WorkStatics1 {
+//   month: string
+//   overtime: string
+//   workTime: WorkTime[]
+// }
+export interface DayData {
   date: string
   workTime1: string
   workTime2: string
@@ -13,13 +29,19 @@ export interface WorkTime {
   showSelect: boolean
   weekday: number
   dayType: number //0工作日，1休息日，2补班日
-  overWorkTimes: string
+  overHours: number
 }
 
-export interface WorkStatics {
+export interface MonthData {
   month: string
-  overtime: string
-  workTime: WorkTime[]
+  weekCount: number
+  totalOverHours: number
+  workDayOverHours: number
+  workDayAveOverHours: number
+  saturdayOverHours: number
+  saturdayAveOverHours: number
+  saturdayCount: string[]
+  dayDatas: DayData[]
 }
 
 export interface Status {

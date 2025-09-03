@@ -382,3 +382,17 @@ export function updateOrAdd<T>(arr: T[], target: T, newValue: T): T[] {
   }
   return arr
 }
+
+/**
+ * 将纳秒数转换为小时并格式化为指定小数位数的字符串
+ * @param nanoseconds 纳秒数
+ * @param decimalPlaces 要保留的小数位数，默认为2
+ * @returns 格式化后的小数字符串
+ */
+export function formatNanosecondsToHours(
+  nanoseconds: number,
+  decimalPlaces: number = 2,
+): string {
+  const hours = nanoseconds / 3600000000000
+  return hours.toFixed(decimalPlaces)
+}
