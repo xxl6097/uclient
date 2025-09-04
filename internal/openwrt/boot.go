@@ -2,6 +2,7 @@ package openwrt
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/glog"
@@ -100,6 +101,29 @@ func (this *openWRT) initClients() {
 	}
 }
 
+func (this *openWRT) ntfyMessage(message string) {
+	if message == "" {
+		return
+	}
+	var res u.NtfyEventData
+	err := json.Unmarshal([]byte(message), &res)
+	if err != nil {
+		glog.Errorf("ntfyMessage Error:%v", err)
+		return
+	}
+	if res.Topic == "uclient" && res.Title == "sign" {
+		glog.Info("ntfyMessage sign", res)
+		mac := res.Message
+		cls := this.getClient(mac)
+		glog.Info("ntfyMessage cls", cls)
+		if cls != nil {
+			cls.StartTime = glog.Now().UnixMilli()
+			this.dingSign("ntfyMessage", cls)
+			_ = this.TiggerSignCardEvent(mac)
+		}
+	}
+}
+
 func (this *openWRT) initNtfy() {
 	if u.IsFileExist(ntfyFilePath) {
 		info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
@@ -107,6 +131,7 @@ func (this *openWRT) initNtfy() {
 			glog.Errorf("initNtfy Error:%v", err)
 		} else {
 			go ntfy.GetInstance().Start(info)
+			ntfy.GetInstance().AddFunc(this.ntfyMessage)
 		}
 	}
 }
