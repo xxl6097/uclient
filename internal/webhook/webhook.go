@@ -80,6 +80,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	glog.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp), msg.Signal, msg.EventName)
 
 	e := ntfy.GetInstance().Publish(&u.NtfyEventData{
+		Id:       msg.MacAddress,
 		Topic:    "work",
 		Title:    msg.Title,
 		Message:  text.String(),
