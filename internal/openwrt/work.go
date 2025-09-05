@@ -57,6 +57,7 @@ type DayData struct {
 type MonthData struct {
 	WeekCount            int           `json:"weekCount"`
 	Month                string        `json:"month"`
+	DayCount             int           `json:"dayCount"`
 	TotalOverHours       time.Duration `json:"totalOverHours"`       //统计总加班时间（工作日+周六）
 	WorkDayOverHours     time.Duration `json:"workDayOverHours"`     //统计工作日加班时间
 	WorkDayAveOverHours  time.Duration `json:"workDayAveOverHours"`  //统计工作日平均加班时间
@@ -384,7 +385,7 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 			aa, ab := w.DayDatas[i], w.DayDatas[j]
 			return aa.Date > ab.Date
 		})
-		workDateCount := 0
+		w.DayCount = 0
 		for _, day := range w.DayDatas {
 			//1、统计总加班时长（工作日+周六）
 			w.TotalOverHours += day.OverHours
@@ -392,14 +393,14 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 			if day.DayType == 0 || day.DayType == 2 {
 				//工作日 || 补班日
 				w.WorkDayOverHours += day.OverHours
-				workDateCount++
+				w.DayCount++
 			} else if day.Weekday == int(time.Saturday) {
 				w.SaturdayOverHours += day.OverHours
 				w.SaturdayCount = append(w.SaturdayCount, day.Date)
 			}
 		}
-		if workDateCount > 0 {
-			w.WorkDayAveOverHours = w.WorkDayOverHours / time.Duration(workDateCount)
+		if w.DayCount > 0 {
+			w.WorkDayAveOverHours = w.WorkDayOverHours / time.Duration(w.DayCount)
 		}
 		if w.SaturdayCount != nil {
 			w.SaturdayAveOverHours = w.SaturdayOverHours / time.Duration(w.WeekCount)

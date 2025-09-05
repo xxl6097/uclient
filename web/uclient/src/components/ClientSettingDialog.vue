@@ -287,6 +287,16 @@
                   </el-table-column>
 
                   <el-table-column
+                    prop="dayCount"
+                    label="工作日次"
+                    align="center"
+                  >
+                    <template #default="scope">
+                      <el-tag type="warning">{{ scope.row.dayCount }} </el-tag>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column
                     prop="saturdayOverHours"
                     label="周累计"
                     align="center"

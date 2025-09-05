@@ -35,6 +35,7 @@ export interface DayData {
 export interface MonthData {
   month: string
   weekCount: number
+  dayCount: number
   totalOverHours: number
   workDayOverHours: number
   workDayAveOverHours: number
