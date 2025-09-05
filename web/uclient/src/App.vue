@@ -37,7 +37,7 @@
                   >静态列表
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleWebhookSetting"
-                  >推送设置
+                  >信息配置
                 </el-dropdown-item>
                 <el-dropdown-item @click="handleGithub"
                   >Github

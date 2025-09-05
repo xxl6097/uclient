@@ -59,6 +59,20 @@
                 >提交</el-button
               >
             </el-tab-pane>
+
+            <el-tab-pane label="微信设置" name="1">
+              <el-form>
+                <el-form-item label="OpenID：">
+                  <el-input
+                    v-model="formData.openid"
+                    placeholder="请输入微信的openid"
+                  />
+                </el-form-item>
+              </el-form>
+              <el-button type="primary" @click="handleOpenIDSetting"
+              >提交
+              </el-button>
+            </el-tab-pane>
           </el-tabs>
         </div>
       </template>
@@ -76,6 +90,7 @@ const formData = ref({
   loading: false,
   activeName: '1',
   webhookUrl: '',
+  openid: '',
   ntfy: {
     address: '',
     topic: '',
@@ -95,6 +110,33 @@ const handleClick = (tab: TabsPaneContext) => {
     case 'thrid':
       break
   }
+}
+
+const handleOpenIDSetting = () => {
+  if (formData.value.openid === '') {
+    showErrorTips('请正确输入openid')
+    return
+  }
+  console.log('handleOpenIDSetting', formData.value.openid)
+  const body = {
+    authcode: formData.value.openid,
+  }
+  fetch('../api/auth/add', {
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      if (json) {
+        showTips(json.code, json.msg)
+      }
+    })
+    .catch((error) => {
+      showErrorTips(`失败:${JSON.stringify(error)}`)
+    })
 }
 
 const handleWebhookSetting = () => {
