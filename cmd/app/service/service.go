@@ -83,7 +83,7 @@ func (this *Service) OnRun(service igs.Service) error {
 		CORSMethodMiddleware().
 		AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
 		AddRoute(assets.NewRoute()).
-		BasicAuth(cfg.Username, cfg.Password).
+		BasicAuth(cfg.Username, cfg.Password, "oIin3168TLKg1X8OU2xBBWLlMEdI").
 		Done(cfg.ServerPort)
 	defer server.Stop()
 	server.Wait()
