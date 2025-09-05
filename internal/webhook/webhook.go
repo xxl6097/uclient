@@ -82,7 +82,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	e := ntfy.GetInstance().Publish(&u.NtfyEventData{
 		Id:       msg.MacAddress,
 		Topic:    "work",
-		Title:    msg.Title,
+		Title:    strings.ReplaceAll(msg.Title, "#", ""),
 		Message:  text.String(),
 		Markdown: true,
 	})
