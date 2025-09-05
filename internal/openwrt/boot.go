@@ -57,7 +57,7 @@ func (this *openWRT) init() {
 	this.ctx, this.cancel = context.WithCancel(context.Background())
 	this.ulistString = UbusList()
 	this.initClients()
-	this.loadAuth()
+	this.LoadAuth()
 	//go this.subscribeSysLog()
 	go this.subscribeArpEvent()
 	go this.subscribeArpPing()
