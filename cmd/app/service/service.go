@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"github.com/kardianos/service"
 	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/go-http/pkg/httpserver"
 	_ "github.com/xxl6097/go-service/assets/buffer"
 	"github.com/xxl6097/go-service/pkg/gs/igs"
 	"github.com/xxl6097/go-service/pkg/ukey"
 	"github.com/xxl6097/go-service/pkg/utils"
-	assets "github.com/xxl6097/uclient/assets/openwrt"
 	"github.com/xxl6097/uclient/internal"
 	"github.com/xxl6097/uclient/internal/openwrt"
+	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/pkg"
 	"os"
 )
@@ -31,19 +30,13 @@ func (this *Service) OnStop() {
 func (this *Service) OnShutdown() {
 }
 
-type Config struct {
-	ServerPort int    `json:"serverPort"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-}
-
-func load() (*Config, error) {
+func load() (*u.Config, error) {
 	defer glog.Flush()
 	byteArray, err := ukey.Load()
 	if err != nil {
 		return nil, err
 	}
-	var cfg Config
+	var cfg u.Config
 	err = ukey.GobToStruct(byteArray, &cfg)
 	//err = json.Unmarshal(byteArray, &cfg)
 	if err != nil {
@@ -79,14 +72,15 @@ func (this *Service) OnRun(service igs.Service) error {
 		return err
 	}
 	glog.Debug("程序运行", os.Args)
-	server := httpserver.New().
-		CORSMethodMiddleware().
-		AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
-		AddRoute(assets.NewRoute()).
-		BasicAuth(cfg.Username, cfg.Password, "oIin3168TLKg1X8OU2xBBWLlMEdI").
-		Done(cfg.ServerPort)
-	defer server.Stop()
-	server.Wait()
+	//server := httpserver.New().
+	//	CORSMethodMiddleware().
+	//	AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
+	//	AddRoute(assets.NewRoute()).
+	//	BasicAuth(cfg.Username, cfg.Password, "oIin3168TLKg1X8OU2xBBWLlMEdI").
+	//	Done(cfg.ServerPort)
+	//defer server.Stop()
+	//server.Wait()
+	internal.Bootstrap(cfg, service)
 	return nil
 }
 
@@ -98,7 +92,7 @@ func (this *Service) menu() []byte {
 	port := utils.InputIntDefault(fmt.Sprintf("输入服务端口(%d)：", 7000), 7000)
 	username := utils.InputStringEmpty(fmt.Sprintf("输入管理用户名(%s)：", "admin"), "admin")
 	password := utils.InputStringEmpty(fmt.Sprintf("输入管理密码(%s)：", "admin"), "admin")
-	cfg := &Config{ServerPort: port, Username: username, Password: password}
+	cfg := &u.Config{ServerPort: port, Username: username, Password: password}
 	bb, e := ukey.StructToGob(cfg)
 	if e != nil {
 		return nil

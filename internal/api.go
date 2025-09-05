@@ -8,6 +8,7 @@ import (
 	"github.com/xxl6097/go-service/pkg/gs/igs"
 	"github.com/xxl6097/go-sse/pkg/sse"
 	"github.com/xxl6097/go-sse/pkg/sse/isse"
+	"github.com/xxl6097/uclient/internal/auth"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
@@ -217,6 +218,34 @@ func (this *Api) SetNtfy(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		res.Ok("设置成功")
+	}
+}
+
+func (this *Api) AddAuthCode(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[struct {
+		Authcode string `json:"authcode"`
+	}](r)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	}
+	if body.Authcode == "" {
+		glog.Error("Authcode is empty")
+		res.Error("Authcode is empty")
+		return
+	}
+
+	err = auth.AddAuthData(body.Authcode)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	} else {
+		res.Ok("设置成功")
+		openwrt.GetInstance().LoadAuth()
 	}
 }
 

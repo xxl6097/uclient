@@ -32,6 +32,7 @@ type openWRT struct {
 	ctx          context.Context
 	cancel       context.CancelFunc
 	statusRuning bool
+	authcode     []string
 }
 
 // GetInstance 返回单例实例
@@ -56,6 +57,7 @@ func (this *openWRT) init() {
 	this.ctx, this.cancel = context.WithCancel(context.Background())
 	this.ulistString = UbusList()
 	this.initClients()
+	this.loadAuth()
 	//go this.subscribeSysLog()
 	go this.subscribeArpEvent()
 	go this.subscribeArpPing()

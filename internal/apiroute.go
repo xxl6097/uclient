@@ -61,6 +61,8 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 	router.HandleFunc("/api/upgrade", gs.ApiUpdate(this.restApi.igs)).Methods("POST")
 	router.HandleFunc("/api/upgrade", gs.ApiUpdate(this.restApi.igs)).Methods("PUT")
 
+	router.HandleFunc("/api/auth/add", this.restApi.AddAuthCode).Methods(http.MethodPost)
+
 	router.HandleFunc("/api/led/log", this.restApi.GetLedLog).Methods("GET")
 
 	router.Handle("/api/client/sse", this.restApi.GetSSE().Handler())
