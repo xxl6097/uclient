@@ -1,6 +1,7 @@
 package openwrt
 
 import (
+	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-http/pkg/util"
 	"github.com/xxl6097/uclient/internal/auth"
 )
@@ -13,8 +14,12 @@ func (this *openWRT) LoadAuth() {
 }
 
 func (this *openWRT) CheckAuth(authcode string) bool {
-	if this.authcode != nil && util.Contains1[string](this.authcode, authcode) {
-		return true
+	glog.Info("Basic Auth:", authcode, this.authcode)
+	if this.authcode != nil {
+		if util.Contains1[string](this.authcode, authcode) {
+			glog.Info("Basic Auth OK:", authcode, this.authcode)
+			return true
+		}
 	}
 	return false
 }
