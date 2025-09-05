@@ -2,12 +2,19 @@ package auth
 
 import (
 	"github.com/xxl6097/go-service/pkg/ukey"
+	"github.com/xxl6097/uclient/internal/u"
 	"os"
 )
 
 var (
 	authFilePath = "/etc/config/uclient/auth"
 )
+
+func init() {
+	if u.IsMacOs() {
+		authFilePath = "./auth"
+	}
+}
 
 func GetAuthData() ([]string, error) {
 	data, err := os.ReadFile(authFilePath)

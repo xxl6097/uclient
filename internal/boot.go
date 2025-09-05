@@ -8,6 +8,7 @@ import (
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
+	"net/url"
 )
 
 func Bootstrap(cfg *u.Config, service igs.Service) {
@@ -18,7 +19,16 @@ func Bootstrap(cfg *u.Config, service igs.Service) {
 		//BasicAuth(cfg.Username, cfg.Password, "oIin3168TLKg1X8OU2xBBWLlMEdI").
 		BasicAuthFunc(cfg.Username, cfg.Password, func(r *http.Request) bool {
 			glog.Info("Basic Auth:", r.URL.String())
-			return openwrt.GetInstance().CheckAuth(r.URL.Query().Get("auth_code"))
+			autoCode := r.URL.Query().Get("auth_code")
+			if autoCode == "" {
+				query, err := url.Parse(r.Referer())
+				if err == nil && query != nil {
+					if query.Query().Has("auth_code") {
+						autoCode = query.Query().Get("auth_code")
+					}
+				}
+			}
+			return openwrt.GetInstance().CheckAuth(autoCode)
 		}).
 		Done(cfg.ServerPort)
 	defer server.Stop()

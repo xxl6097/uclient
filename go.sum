@@ -12,8 +12,8 @@ github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PK
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/xxl6097/glog v0.1.57 h1:JeBqH4qi4rR+H7yG2bgScTLqXP7uZW55x/8yqukTe9E=
 github.com/xxl6097/glog v0.1.57/go.mod h1:v5J5FG6rnsHhv74uO9GRdqKsdvthvnQqjBooYP0V5Dg=
-github.com/xxl6097/go-http v0.0.54 h1:nhPiOqxO/bb4dWinFlZo+hcELjaanrV76A9xhaO9ZeY=
-github.com/xxl6097/go-http v0.0.54/go.mod h1:TulD3wTHC9hXgOM6mYZOJnmFSIpSOxptNIoDj+8f47c=
+github.com/xxl6097/go-http v0.0.57 h1:5W/wk66YYKEA7ssnGpMyu3KdG3JwarOWmjQuTK5bq6k=
+github.com/xxl6097/go-http v0.0.57/go.mod h1:TulD3wTHC9hXgOM6mYZOJnmFSIpSOxptNIoDj+8f47c=
 github.com/xxl6097/go-service v0.6.89 h1:7QA2Ge/g5qTdOncQV2moStDyQ7Un01iXO5LQvrrYNNE=
 github.com/xxl6097/go-service v0.6.89/go.mod h1:vNJBL7eGWYzAkhyTGwoicoirvSwvhU790NANTh7DmnA=
 github.com/xxl6097/go-sse v0.0.23 h1:IE79l1QvI/GqFbBcGEfUB51a3sQMosBkFgY6/qxrJW4=
