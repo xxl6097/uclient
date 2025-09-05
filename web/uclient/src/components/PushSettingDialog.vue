@@ -60,7 +60,7 @@
               >
             </el-tab-pane>
 
-            <el-tab-pane label="微信设置" name="1">
+            <el-tab-pane label="微信设置" name="3">
               <el-form>
                 <el-form-item label="OpenID：">
                   <el-input
