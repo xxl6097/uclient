@@ -79,16 +79,18 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
 	glog.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp), msg.Signal, msg.EventName)
 
-	e := ntfy.GetInstance().Publish(&u.NtfyEventData{
-		Id:       msg.MacAddress,
-		Topic:    "work",
-		Title:    strings.ReplaceAll(msg.Title, "#", ""),
-		Message:  text.String(),
-		Markdown: true,
-	})
-	if e != nil {
-		glog.Error("ntfy", e)
-	}
+	go func() {
+		e := ntfy.GetInstance().Publish(&u.NtfyEventData{
+			Id:       msg.MacAddress,
+			Topic:    "work",
+			Title:    strings.ReplaceAll(msg.Title, "#", ""),
+			Message:  text.String(),
+			Markdown: true,
+		})
+		if e != nil {
+			glog.Error("ntfy", e)
+		}
+	}()
 
 	return WebHook(msg.Url, payload)
 }

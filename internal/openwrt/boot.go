@@ -25,7 +25,7 @@ type openWRT struct {
 	nicks        map[string]*NickEntry
 	leases       map[string]*DHCPLease
 	task         map[string]*u.CountdownTask[*SignData]
-	mu           sync.Mutex
+	signMutex    sync.Mutex
 	fnEvent      func(int, any)
 	webhookUrl   string
 	ulistString  string
@@ -272,7 +272,7 @@ func (this *openWRT) subscribeArpEvent() {
 					}
 					if v.Online != isOnline && !isOnline {
 						glog.Infof("Arp事件:%+v", entry)
-						this.updateDeviceStatus("Arp事件", dhcp)
+						go this.updateDeviceStatus("Arp事件", dhcp)
 					}
 				} else {
 					glog.Infof("Arp事件(新增):%+v", entry)
@@ -519,7 +519,7 @@ func (p *openWRT) updateClientsByDHCP() {
 				p.clients[mac] = client
 			}
 			p.leases[mac] = client
-			p.updateDeviceStatus("dhcp", client)
+			go p.updateDeviceStatus("dhcp", client)
 		}
 	}
 }
@@ -529,7 +529,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		return nil, nil
 	}
 	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
-	//glog.Infof("1-----refreshClients typeEvent:%s new:%+v", new, staInfo)
+	glog.Infof("1-----refreshClients typeEvent:%v new:%+v", new, staInfo)
 	if staInfo != nil {
 		sta := staInfo[new.MAC]
 		if sta != nil {
@@ -549,7 +549,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		}
 	}
 	old := this.getClient(new.MAC)
-	//glog.Infof("2-----refreshClients typeEvent:%s new:%+v", old, staInfo)
+	glog.Infof("2-----refreshClients old:%v sta:%+v", old, staInfo)
 	if old != nil {
 		if new.IP != "" {
 			old.IP = new.IP

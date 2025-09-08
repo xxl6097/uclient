@@ -5,8 +5,8 @@ import (
 )
 
 //func (this *openWRT) checkMessage(macAddress string, s *Status) bool {
-//	defer this.mu.Unlock()
-//	this.mu.Lock()
+//	defer this.signMutex.Unlock()
+//	this.signMutex.Lock()
 //	if macAddress == "" {
 //		glog.Error("openWRT checkMessage - macAddress is empty")
 //		return false
@@ -35,9 +35,9 @@ import (
 //}
 
 func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
-	glog.Infof("updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
-	defer this.mu.Unlock()
-	this.mu.Lock()
+	glog.Infof("updateDeviceStatus %s new:%+v", typeEvent, new)
+	defer this.signMutex.Unlock()
+	this.signMutex.Lock()
 	//glog.Infof("1------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	if new == nil {
 		glog.Debugf("new == nil %s 状态变化 %+v", typeEvent, new)
@@ -49,26 +49,28 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 		glog.Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, new)
 		return
 	}
-	//glog.Infof("3------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
-	statusOne, sta := this.refreshClients(new)
-	//glog.Infof("4------updateDeviceStatus typeEvent:%s new:%+v", sta, statusOne)
-	if statusOne == nil {
-		statusOne = new
+	glog.Infof("3------%s new:%+v", typeEvent, new)
+	oldStatus, sta := this.refreshClients(new)
+	glog.Infof("4------%s old:%+v", typeEvent, oldStatus)
+	if oldStatus == nil {
+		oldStatus = new
 	} else {
-		if new.Online == statusOne.Online {
-			//glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, new.Hostname, new.MAC, new.Online, new.Online)
+		if new.Online == oldStatus.Online {
+			glog.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, new.Hostname, new.MAC, new.Online, new.Online)
 			return
 		}
-		statusOne.Online = new.Online
+		oldStatus.Online = new.Online
 	}
-	glog.Debugf("状态更新[%s] %+v", typeEvent, statusOne)
+	glog.Debugf("状态更新[%s] %+v", typeEvent, oldStatus)
 	if sta != nil {
 		glog.Debugf("sta信息[%s] %+v", new.Hostname, sta[macAddress])
 	}
-	s := Status{Timestamp: new.StartTime, Connected: new.Online}
-	this.ding(typeEvent, statusOne)
-	this.webNotify(statusOne)
-	this.updateUserTimeLineData(macAddress, []*Status{&s})
+	go func() {
+		s := Status{Timestamp: new.StartTime, Connected: new.Online}
+		this.ding(typeEvent, oldStatus)
+		this.webNotify(oldStatus)
+		this.updateUserTimeLineData(macAddress, []*Status{&s})
+	}()
 }
 
 //func (this *openWRT) updateStatusByHostapd(device *HostapdDevice) {
