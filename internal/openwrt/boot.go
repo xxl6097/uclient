@@ -58,7 +58,7 @@ func (this *openWRT) init() {
 	this.ulistString = UbusList()
 	this.initClients()
 	this.LoadAuth()
-	//go this.subscribeSysLog()
+	go this.subscribeSysLog()
 	go this.subscribeArpEvent()
 	go this.subscribeArpPing()
 	go this.subscribeFsnotify()
@@ -66,12 +66,12 @@ func (this *openWRT) init() {
 	if strings.Contains(this.ulistString, "hostapd") {
 		go this.subscribeHostapd()
 	}
-	//if strings.Contains(this.ulistString, "dnsmasq") {
-	//	go this.subscribeDnsmasq()
-	//}
-	if strings.Contains(this.ulistString, "ahsapd.sta") {
-		go this.subscribeAhsapdsta()
+	if strings.Contains(this.ulistString, "dnsmasq") {
+		go this.subscribeDnsmasq()
 	}
+	//if strings.Contains(this.ulistString, "ahsapd.sta") {
+	//	go this.subscribeAhsapdsta()
+	//}
 	this.initNtfy()
 }
 
@@ -452,7 +452,7 @@ func (this *openWRT) subscribeFsnotify() {
 }
 
 func (p *openWRT) updateClientsByDHCP() {
-	clientArray, err := getClientsByDhcp()
+	dhcpArray, err := getClientsByDhcp()
 	nickMap, e2 := getNickData()
 	if e2 == nil {
 		p.nicks = nickMap
@@ -460,10 +460,10 @@ func (p *openWRT) updateClientsByDHCP() {
 	if err != nil {
 		glog.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
 	} else {
-		glog.Printf("DHCP变化，客户端数量 %+v\n", len(clientArray))
+		glog.Printf("DHCP变化，客户端数量 %+v\n", len(dhcpArray))
 		arpMap, e1 := getClientsByArp(brLanString)
 		staInfo := GetStaInfo(strings.Contains(p.ulistString, "ahsapd.sta"))
-		for _, client := range clientArray {
+		for _, client := range dhcpArray {
 			mac := client.MAC
 			if e1 == nil && arpMap != nil {
 				arp := arpMap[mac]
@@ -506,7 +506,7 @@ func (p *openWRT) updateClientsByDHCP() {
 				//} else {
 				//	v.StartTime = glog.Now().UnixMilli()
 				//}
-				v.Online = client.Online
+				//v.Online = client.Online //这里不能改变状态，应该到updateDeviceStatus变更状态
 
 				v.Vendor = client.Vendor
 				if v.Hostname == "" || v.Hostname == "*" {
