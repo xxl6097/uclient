@@ -49,7 +49,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 		glog.Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, new)
 		return
 	}
-	glog.Infof("3------%s new:%+v", typeEvent, new)
+	//glog.Infof("3------%s new:%+v", typeEvent, new)
 	oldStatus, sta := this.refreshClients(new)
 	glog.Infof("4------%s old:%+v", typeEvent, oldStatus)
 	if oldStatus == nil {
