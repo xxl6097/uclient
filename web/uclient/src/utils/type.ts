@@ -29,18 +29,24 @@ export interface DayData {
   showSelect: boolean
   weekday: number
   dayType: number //0工作日，1休息日，2补班日
-  overHours: number
+  // overHours: number
+  soverHours: string
 }
 
 export interface MonthData {
   month: string
   weekCount: number
   dayCount: number
-  totalOverHours: number
-  workDayOverHours: number
-  workDayAveOverHours: number
-  saturdayOverHours: number
-  saturdayAveOverHours: number
+  // totalOverHours: number
+  // workDayOverHours: number
+  // workDayAveOverHours: number
+  // saturdayOverHours: number
+  // saturdayAveOverHours: number
+  stotalOverHours: number
+  sworkDayOverHours: number
+  sworkDayAveOverHours: number
+  ssaturdayOverHours: number
+  ssaturdayAveOverHours: number
   saturdayCount: string[]
   dayDatas: DayData[]
 }

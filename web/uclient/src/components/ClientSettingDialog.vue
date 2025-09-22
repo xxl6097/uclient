@@ -169,15 +169,16 @@
                             </template>
                           </el-table-column>
                           <el-table-column
-                            prop="overHours"
+                            prop="soverHours"
                             label="加班时长"
                             align="center"
                           >
                             <template #default="scope">
                               <el-tag type="primary" size="default"
                                 >{{
-                                  formatNanosecondsToHours(scope.row.overHours)
-                                }}h
+                                  // formatNanosecondsToHours(scope.row.overHours)
+                                  scope.row.soverHours
+                                }}
                               </el-tag>
                             </template>
                           </el-table-column>
@@ -243,45 +244,48 @@
                   </el-table-column>
                   <el-table-column prop="month" label="月份"></el-table-column>
                   <el-table-column
-                    prop="totalOverHours"
+                    prop="stotalOverHours"
                     label="总时长"
                     align="center"
                   >
                     <template #default="scope">
                       <el-tag type="danger" size="large"
                         >{{
-                          formatNanosecondsToHours(scope.row.totalOverHours)
-                        }}h
+                          // formatNanosecondsToHours(scope.row.totalOverHours)
+                          scope.row.stotalOverHours
+                        }}
                       </el-tag>
                     </template>
                   </el-table-column>
 
                   <el-table-column
-                    prop="workDayOverHours"
+                    prop="sworkDayOverHours"
                     label="工作日累计"
                     align="center"
                   >
                     <template #default="scope">
                       <el-tag type="warning"
                         >{{
-                          formatNanosecondsToHours(scope.row.workDayOverHours)
-                        }}h
+                          // formatNanosecondsToHours(scope.row.workDayOverHours)
+                          scope.row.sworkDayOverHours
+                        }}
                       </el-tag>
                     </template>
                   </el-table-column>
 
                   <el-table-column
-                    prop="workDayAveOverHours"
+                    prop="sworkDayAveOverHours"
                     label="日平均"
                     align="center"
                   >
                     <template #default="scope">
                       <el-tag type="primary"
                         >{{
-                          formatNanosecondsToHours(
-                            scope.row.workDayAveOverHours,
-                          )
-                        }}h
+                          // formatNanosecondsToHours(
+                          //   scope.row.workDayAveOverHours,
+                          // )
+                          scope.row.sworkDayAveOverHours
+                        }}
                       </el-tag>
                     </template>
                   </el-table-column>
@@ -292,36 +296,38 @@
                     align="center"
                   >
                     <template #default="scope">
-                      <el-tag type="warning">{{ scope.row.dayCount }} </el-tag>
+                      <el-tag type="warning">{{ scope.row.dayCount }}</el-tag>
                     </template>
                   </el-table-column>
 
                   <el-table-column
-                    prop="saturdayOverHours"
+                    prop="ssaturdayOverHours"
                     label="周累计"
                     align="center"
                   >
                     <template #default="scope">
                       <el-tag type="success"
                         >{{
-                          formatNanosecondsToHours(scope.row.saturdayOverHours)
-                        }}h
+                          // formatNanosecondsToHours(scope.row.saturdayOverHours)
+                          scope.row.ssaturdayOverHours
+                        }}
                       </el-tag>
                     </template>
                   </el-table-column>
 
                   <el-table-column
-                    prop="saturdayAveOverHours"
+                    prop="ssaturdayAveOverHours"
                     label="周平均"
                     align="center"
                   >
                     <template #default="scope">
                       <el-tag type="primary"
                         >{{
-                          formatNanosecondsToHours(
-                            scope.row.saturdayAveOverHours,
-                          )
-                        }}h
+                          // formatNanosecondsToHours(
+                          //   scope.row.saturdayAveOverHours,
+                          // )
+                          scope.row.ssaturdayAveOverHours
+                        }}
                       </el-tag>
                     </template>
                   </el-table-column>
@@ -396,7 +402,6 @@ import {
   showLoading,
   showSucessTips,
   showTips,
-  formatNanosecondsToHours,
 } from '../utils/utils.ts'
 import { ComponentSize, ElMessageBox, TabsPaneContext } from 'element-plus'
 

@@ -594,3 +594,30 @@ func CountWeekendsInMonth(year int, month time.Month) int {
 
 	return weekendCount
 }
+
+// FormatDurationWithoutSeconds 将 time.Duration 格式化为字符串，不包含秒及更小单位
+func FormatDurationWithoutSeconds(d time.Duration) string {
+	// 获取总分钟数
+	totalMinutes := int64(d.Minutes())
+	// 计算天数：总分钟数 / (24 * 60)
+	days := totalMinutes / (24 * 60)
+	// 计算剩余分钟数：总分钟数对 (24 * 60) 取模
+	remainingMinutes := totalMinutes % (24 * 60)
+	// 计算小时数：剩余分钟数 / 60
+	hours := remainingMinutes / 60
+	// 计算分钟数：剩余分钟数 % 60
+	minutes := remainingMinutes % 60
+
+	// 根据是否有天数、小时、分钟来构建字符串
+	result := ""
+	if days > 0 {
+		result += fmt.Sprintf("%dd", days)
+	}
+	if hours > 0 {
+		result += fmt.Sprintf("%dh", hours)
+	}
+	if minutes > 0 || (days == 0 && hours == 0 && minutes == 0) { // 如果所有单位都是0，则至少显示0m
+		result += fmt.Sprintf("%dm", minutes)
+	}
+	return result
+}

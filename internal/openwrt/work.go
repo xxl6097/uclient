@@ -46,25 +46,31 @@ type WorkTypeSetting struct {
 //}
 
 type DayData struct {
-	Date      string        `json:"date"`
-	Weekday   int           `json:"weekday"`
-	DayType   int           `json:"dayType"` //0工作日，1节假日，2补班日，3加班日
-	WorkTime1 string        `json:"workTime1"`
-	WorkTime2 string        `json:"workTime2"`
-	OverHours time.Duration `json:"overHours"` //统计加班时间
+	Date       string        `json:"date"`
+	Weekday    int           `json:"weekday"`
+	DayType    int           `json:"dayType"` //0工作日，1节假日，2补班日，3加班日
+	WorkTime1  string        `json:"workTime1"`
+	WorkTime2  string        `json:"workTime2"`
+	OverHours  time.Duration `json:"overHours"`  //统计加班时间
+	SOverHours string        `json:"soverHours"` //统计加班时间
 }
 
 type MonthData struct {
-	WeekCount            int           `json:"weekCount"`
-	Month                string        `json:"month"`
-	DayCount             int           `json:"dayCount"`
-	TotalOverHours       time.Duration `json:"totalOverHours"`       //统计总加班时间（工作日+周六）
-	WorkDayOverHours     time.Duration `json:"workDayOverHours"`     //统计工作日加班时间
-	WorkDayAveOverHours  time.Duration `json:"workDayAveOverHours"`  //统计工作日平均加班时间
-	SaturdayOverHours    time.Duration `json:"saturdayOverHours"`    //统计周六加班时间
-	SaturdayAveOverHours time.Duration `json:"saturdayAveOverHours"` //统计周六平均加班时间
-	SaturdayCount        []string      `json:"saturdayCount"`
-	DayDatas             []DayData     `json:"dayDatas"`
+	WeekCount             int           `json:"weekCount"`
+	Month                 string        `json:"month"`
+	DayCount              int           `json:"dayCount"`
+	TotalOverHours        time.Duration `json:"totalOverHours"`        //统计总加班时间（工作日+周六）
+	STotalOverHours       string        `json:"stotalOverHours"`       //统计总加班时间（工作日+周六）
+	WorkDayOverHours      time.Duration `json:"workDayOverHours"`      //统计工作日加班时间
+	SWorkDayOverHours     string        `json:"sworkDayOverHours"`     //统计工作日加班时间
+	WorkDayAveOverHours   time.Duration `json:"workDayAveOverHours"`   //统计工作日平均加班时间
+	SWorkDayAveOverHours  string        `json:"sworkDayAveOverHours"`  //统计工作日平均加班时间
+	SaturdayOverHours     time.Duration `json:"saturdayOverHours"`     //统计周六加班时间
+	SSaturdayOverHours    string        `json:"ssaturdayOverHours"`    //统计周六加班时间
+	SaturdayAveOverHours  time.Duration `json:"saturdayAveOverHours"`  //统计周六平均加班时间
+	SSaturdayAveOverHours string        `json:"ssaturdayAveOverHours"` //统计周六平均加班时间
+	SaturdayCount         []string      `json:"saturdayCount"`
+	DayDatas              []DayData     `json:"dayDatas"`
 }
 
 //type MonthReport struct {
@@ -343,10 +349,11 @@ func getWorkRawData(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Mon
 			}
 		}
 		dayDataTemp := DayData{
-			Date:      day,
-			DayType:   w.DayType,
-			Weekday:   w.Weekday,
-			OverHours: duration,
+			Date:       day,
+			DayType:    w.DayType,
+			Weekday:    w.Weekday,
+			OverHours:  duration,
+			SOverHours: duration.String(),
 		}
 
 		if w.OnWorkTime > 0 {
@@ -389,22 +396,28 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 		for _, day := range w.DayDatas {
 			//1、统计总加班时长（工作日+周六）
 			w.TotalOverHours += day.OverHours
+			w.STotalOverHours = w.TotalOverHours.String()
 			//2、统计工作日的日均
 			if day.DayType == 0 || day.DayType == 2 {
 				//工作日 || 补班日
 				w.WorkDayOverHours += day.OverHours
+				w.SWorkDayOverHours = w.WorkDayOverHours.String()
 				w.DayCount++
 			} else if day.Weekday == int(time.Saturday) {
 				w.SaturdayOverHours += day.OverHours
+				w.SSaturdayOverHours = w.SaturdayOverHours.String()
 				w.SaturdayCount = append(w.SaturdayCount, day.Date)
 			}
 		}
 		if w.DayCount > 0 {
 			w.WorkDayAveOverHours = w.WorkDayOverHours / time.Duration(w.DayCount)
 		}
+
+		w.SWorkDayAveOverHours = u.FormatDurationWithoutSeconds(w.WorkDayAveOverHours) //w.WorkDayAveOverHours.String()
 		if w.SaturdayCount != nil {
 			w.SaturdayAveOverHours = w.SaturdayOverHours / time.Duration(w.WeekCount)
 		}
+		w.SSaturdayAveOverHours = w.SaturdayAveOverHours.String()
 		//fmt.Println(w.TotalOverHours.Nanoseconds()) //3600000000000
 	}
 	sort.Slice(monthData, func(i, j int) bool {

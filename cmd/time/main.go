@@ -377,7 +377,10 @@ func tee6() {
 
 func tee7() {
 	mac := "16:00:6f:83:35:e1"
-	tempFilePath := filepath.Join("/Users/uuxia/Downloads/192.168.1.1/202509031041", mac)
+	mac = "4a:f0:df:35:43:9e"
+	path := "/Users/uuxia/Downloads/192.168.1.1/202509221744/uclient/work"
+	//path = "/Users/uuxia/Downloads/192.168.1.1/202509221444/uclient/work"
+	tempFilePath := filepath.Join(path, mac)
 	d, err := openwrt.GetWorkTimeAndCaculate(mac, tempFilePath, &openwrt.WorkTypeSetting{
 		OnWorkTime:  "09:00:00",
 		OffWorkTime: "18:30:00",

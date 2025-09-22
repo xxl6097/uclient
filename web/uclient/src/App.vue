@@ -42,7 +42,7 @@
                 <el-dropdown-item @click="handleGithub"
                   >Github
                 </el-dropdown-item>
-                <el-dropdown-item @click="showtmp">temp </el-dropdown-item>
+                <el-dropdown-item @click="showtmp">temp</el-dropdown-item>
                 <el-dropdown-item @click="handleTest" v-if="false"
                   >test
                 </el-dropdown-item>
@@ -355,8 +355,13 @@ const filteredTableData = computed<Client[]>(() => {
   return tableData.value.filter(() => !searchKeyword.value)
 })
 
-function renderTable(data: any) {
-  tableData.value = data as Client[]
+function renderTable(data: Client[]) {
+  //tableData.value = data as Client[]
+  //tableData.value = data
+  tableData.value.length = 0
+  tableData.value.push(...data)
+  // console.log('tableData', tableData)
+  // console.log('data', data)
 }
 
 function getClientName(row: Client): string {
@@ -530,7 +535,7 @@ const fetchData = () => {
     .then((json) => {
       console.log('fetchData', json)
       if (json && json.code === 0 && json.data) {
-        console.log(json)
+        console.log('api/clients/get', json)
         renderTable(json.data)
       }
     })

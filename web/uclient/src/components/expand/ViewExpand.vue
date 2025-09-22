@@ -2,7 +2,7 @@
   <div class="main">
     <el-form label-position="left" label-width="auto">
       <el-form-item label="昵称">
-        <span>{{ row.nick.name }}</span>
+        <span>{{ getClientName(row) }}</span>
       </el-form-item>
       <el-form-item label="名称">
         <span>{{ row.hostname }}</span>
@@ -69,6 +69,23 @@ import { Client } from '../../utils/type.ts'
 defineProps<{
   row: Client
 }>()
+
+function getClientName(row: Client): string {
+  // row.nickName === ''
+  //   ? row.hostname
+  //   : row.hostname === '*'
+  //     ? row.nickName
+  //     : `${row.hostname}(${row.nickName})`
+  if (row.nick) {
+    if (row.nick?.name === '') {
+      return row.hostname
+    } else {
+      return row.nick?.name
+    }
+  } else {
+    return row.hostname
+  }
+}
 </script>
 
 <style>
