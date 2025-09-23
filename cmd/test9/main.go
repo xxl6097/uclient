@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/xxl6097/uclient/internal/u"
 	"time"
 )
 
@@ -36,4 +37,11 @@ func main() {
 	fmt.Println(year, month)
 	count := CountWeekendsInMonth(year, month)
 	fmt.Printf("%d年%d月有%d个周末天\n", year, month, count) // 输出：2024年1月有8个周末天
+	sec := time.Second * 12397234
+	sec /= 346
+	//wa := int64(sec.Seconds())
+	b := time.Duration(sec.Seconds()) * time.Second
+	fmt.Println("===", b.String())
+	a := u.FormatDurationWithoutSeconds(time.Duration(sec))
+	fmt.Println(a)
 }

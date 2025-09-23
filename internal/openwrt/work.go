@@ -412,8 +412,9 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 		if w.DayCount > 0 {
 			w.WorkDayAveOverHours = w.WorkDayOverHours / time.Duration(w.DayCount)
 		}
+		tempDu := time.Duration(w.WorkDayAveOverHours.Seconds()) * time.Second
+		w.SWorkDayAveOverHours = tempDu.String() //w.WorkDayAveOverHours.String()
 
-		w.SWorkDayAveOverHours = u.FormatDurationWithoutSeconds(w.WorkDayAveOverHours) //w.WorkDayAveOverHours.String()
 		if w.SaturdayCount != nil {
 			w.SaturdayAveOverHours = w.SaturdayOverHours / time.Duration(w.WeekCount)
 		}

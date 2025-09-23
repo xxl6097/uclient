@@ -597,6 +597,7 @@ func CountWeekendsInMonth(year int, month time.Month) int {
 
 // FormatDurationWithoutSeconds 将 time.Duration 格式化为字符串，不包含秒及更小单位
 func FormatDurationWithoutSeconds(d time.Duration) string {
+	fmt.Println(d.Seconds())
 	// 获取总分钟数
 	totalMinutes := int64(d.Minutes())
 	// 计算天数：总分钟数 / (24 * 60)
