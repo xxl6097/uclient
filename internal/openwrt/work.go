@@ -413,12 +413,13 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 			w.WorkDayAveOverHours = w.WorkDayOverHours / time.Duration(w.DayCount)
 		}
 		tempDu := time.Duration(w.WorkDayAveOverHours.Seconds()) * time.Second
-		w.SWorkDayAveOverHours = tempDu.String() //w.WorkDayAveOverHours.String()
+		w.SWorkDayAveOverHours = tempDu.String()
 
 		if w.SaturdayCount != nil {
 			w.SaturdayAveOverHours = w.SaturdayOverHours / time.Duration(w.WeekCount)
 		}
-		w.SSaturdayAveOverHours = w.SaturdayAveOverHours.String()
+		tempDu1 := time.Duration(w.SaturdayAveOverHours.Seconds()) * time.Second
+		w.SSaturdayAveOverHours = tempDu1.String()
 		//fmt.Println(w.TotalOverHours.Nanoseconds()) //3600000000000
 	}
 	sort.Slice(monthData, func(i, j int) bool {
