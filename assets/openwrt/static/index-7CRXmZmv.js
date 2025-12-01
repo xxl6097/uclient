@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-UovhhD6v.js"(exports, module) {
+  "index-7CRXmZmv.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -39843,7 +39843,7 @@ var require_index_001 = __commonJS({
               break;
             case "thrid":
               formData.value.showFooter = false;
-              width.value = "50%";
+              width.value = "80%";
               break;
           }
         };
@@ -40657,7 +40657,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const ClientSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-62e62e79"]]);
+    const ClientSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-07d3eedb"]]);
     const _hoisted_1$1 = { class: "dialog-wrapper" };
     const _hoisted_2$1 = { class: "upgrade-popup-content" };
     const _sfc_main$1 = /* @__PURE__ */ defineComponent({
@@ -41791,4 +41791,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-UovhhD6v.js.map
+//# sourceMappingURL=index-7CRXmZmv.js.map

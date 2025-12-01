@@ -303,6 +303,7 @@ import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
 import { ComponentSize, ElNotification } from 'element-plus'
 import PushSettingDialog from './components/PushSettingDialog.vue'
+// import { testTableData } from './utils/data.ts'
 
 const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<

@@ -537,7 +537,7 @@ const handleClick = (tab: TabsPaneContext) => {
       break
     case 'thrid':
       formData.value.showFooter = false
-      width.value = '50%'
+      width.value = '80%'
       break
   }
 }
