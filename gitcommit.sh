@@ -237,6 +237,7 @@ function quickPushAndTag() {
 }
 
 function quickPushAndTagDeploy() {
+  upgradeVersion
   git add .
   echo "git commit -m "发布版本 ${version}""
   git commit -m "发布版本 ${version}"
@@ -260,12 +261,17 @@ function tagMenu() {
   esac
 }
 
+function printVersion() {
+  echo "当前版本：$version"
+}
+
 function m() {
     echo "1. 快速提交"
     echo "2. 发布版本"
     echo "3. 项目更新"
     echo "4. 项目标签"
     echo "5. 分支管理"
+    echo "6. 打印版本"
     echo "请输入编号:"
     read index
     clear
@@ -275,6 +281,7 @@ function m() {
     [3]) (pullMenu);;
     [4]) (tagMenu);;
     [5]) (branchMenu);;
+    [6]) (printVersion);;
     *) echo "exit" ;;
   esac
 }
