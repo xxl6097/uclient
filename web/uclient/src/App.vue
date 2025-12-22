@@ -24,6 +24,9 @@
                 <el-dropdown-item @click="handleClearData"
                   >清空数据
                 </el-dropdown-item>
+                <el-dropdown-item @click="handleReboot"
+                  >重启应用
+                </el-dropdown-item>
                 <el-dropdown-item @click="showVersion"
                   >查看版本
                 </el-dropdown-item>
@@ -564,6 +567,26 @@ const showVersion = () => {
       showErrorTips('失败')
     })
 }
+
+const handleReboot = () => {
+  showWarmDialog(
+    `确定重启应用吗？`,
+    () => {
+      fetch('../api/reboot', { credentials: 'include', method: 'GET' })
+        .then((res) => {
+          return res.json()
+        })
+        .then((json) => {
+          showTips(json.code, json.msg)
+        })
+        .catch(() => {
+          showErrorTips('重启失败')
+        })
+    },
+    () => {},
+  )
+}
+
 const handleClearData = () => {
   showWarmDialog(
     `确定清空临时数据吗？`,

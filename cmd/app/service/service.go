@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/kardianos/service"
 	"github.com/xxl6097/glog/glog"
 	_ "github.com/xxl6097/go-service/assets/buffer"
@@ -12,7 +14,6 @@ import (
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/pkg"
-	"os"
 )
 
 type Service struct {

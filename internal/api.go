@@ -186,6 +186,19 @@ func (this *Api) Clear(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (this *Api) Reboot(w http.ResponseWriter, r *http.Request) {
+	//req := utils.GetReqMapData(w, r)
+	//glog.Warn(req)
+	glog.Warn("Reboot---->", r.URL)
+	err := this.igs.Restart()
+	if err != nil {
+		glog.Error("Reboot err:", err)
+		u.Respond(w, u.Error(-1, err.Error()))
+	} else {
+		u.OKK(w)
+	}
+}
+
 func (this *Api) AddStaticIp(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
 	defer f(w)

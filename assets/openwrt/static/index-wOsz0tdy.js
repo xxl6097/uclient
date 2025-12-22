@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-Ob5wTjsF.js"(exports, module) {
+  "index-wOsz0tdy.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -41225,6 +41225,22 @@ var require_index_001 = __commonJS({
             showErrorTips("失败");
           });
         };
+        const handleReboot = () => {
+          showWarmDialog(
+            `确定重启应用吗？`,
+            () => {
+              fetch("../api/reboot", { credentials: "include", method: "GET" }).then((res) => {
+                return res.json();
+              }).then((json) => {
+                showTips(json.code, json.msg);
+              }).catch(() => {
+                showErrorTips("重启失败");
+              });
+            },
+            () => {
+            }
+          );
+        };
         const handleClearData = () => {
           showWarmDialog(
             `确定清空临时数据吗？`,
@@ -41473,6 +41489,12 @@ var require_index_001 = __commonJS({
                             createVNode(_component_el_dropdown_item, { onClick: handleClearData }, {
                               default: withCtx(() => [
                                 createTextVNode("清空数据 ")
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_el_dropdown_item, { onClick: handleReboot }, {
+                              default: withCtx(() => [
+                                createTextVNode("重启应用 ")
                               ]),
                               _: 1
                             }),
@@ -41892,4 +41914,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-Ob5wTjsF.js.map
+//# sourceMappingURL=index-wOsz0tdy.js.map
