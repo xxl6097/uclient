@@ -188,6 +188,7 @@ const handleSetting = () => {
     .then((json) => {
       if (json) {
         showTips(json.code, json.msg)
+        formData.value.show = false
       }
     })
     .catch((error) => {

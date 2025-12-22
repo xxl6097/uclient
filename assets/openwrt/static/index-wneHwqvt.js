@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-wOsz0tdy.js"(exports, module) {
+  "index-wneHwqvt.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -40722,6 +40722,7 @@ var require_index_001 = __commonJS({
           }).then((json) => {
             if (json) {
               showTips(json.code, json.msg);
+              formData.value.show = false;
             }
           }).catch((error) => {
             showErrorTips(`失败:${JSON.stringify(error)}`);
@@ -41020,7 +41021,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-914dbda8"]]);
+    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-d5b804ff"]]);
     const _hoisted_1 = { id: "app" };
     const _hoisted_2 = { class: "grid-content header-color" };
     const _hoisted_3 = { class: "header-content" };
@@ -41914,4 +41915,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-wOsz0tdy.js.map
+//# sourceMappingURL=index-wneHwqvt.js.map

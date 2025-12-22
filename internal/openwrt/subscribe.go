@@ -20,13 +20,9 @@ type subData struct {
 }
 
 func (this *openWRT) SetSettings(settings *u.Settings) error {
-	setting := &u.Settings{
-		IsSysLogListen:  true,
-		IsArpListen:     true,
-		IsDnsmasqListen: true,
-		IsHostApdListen: true,
-	}
-	return utils.SaveToFile[*u.Settings](setting, settingPath)
+	glog.Debug("setting file path:", settingPath)
+	glog.Debug("settings:", settings)
+	return utils.SaveToFile[*u.Settings](settings, settingPath)
 }
 
 func (this *openWRT) GetSettings() (*u.Settings, error) {
@@ -39,9 +35,11 @@ func (this *openWRT) GetSettings() (*u.Settings, error) {
 func (this *openWRT) loadSettings() *u.Settings {
 	info, err := this.GetSettings()
 	if err == nil && info != nil {
-		glog.Errorf("settingPath Error:%v", err)
+		glog.Debugf("读取默认系统配置：%v", info)
 		return info
 	}
+
+	glog.Errorf("读取默认系统配置 Error:%v  info:%v", err, info)
 	setting := &u.Settings{
 		IsSysLogListen:  true,
 		IsArpListen:     true,
@@ -54,6 +52,11 @@ func (this *openWRT) loadSettings() *u.Settings {
 
 func (this *openWRT) subscribe() {
 	settings := this.loadSettings()
+	if settings == nil {
+		glog.Warnf("系统设置孔：%+v", settings)
+		return
+	}
+	glog.Warnf("系统设置：%+v", settings)
 	if settings.IsSysLogListen {
 		glog.Warn("启动 SysLog")
 		go this.subscribeSysLog()

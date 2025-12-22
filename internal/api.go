@@ -293,14 +293,17 @@ func (this *Api) SetSettings(w http.ResponseWriter, r *http.Request) {
 		res.Err(err)
 		return
 	}
+	glog.Debug("设置系统设置:", body)
 	err = openwrt.GetInstance().SetSettings(body)
 	if err != nil {
 		glog.Error(err)
 		res.Err(err)
 		return
-	} else {
-		res.Ok("设置成功")
 	}
+
+	res.Ok("设置成功，准备重启...")
+	glog.Warn("准备重启...")
+	_ = this.igs.Restart()
 }
 
 func (this *Api) GetSettings(w http.ResponseWriter, r *http.Request) {
@@ -312,6 +315,7 @@ func (this *Api) GetSettings(w http.ResponseWriter, r *http.Request) {
 		res.Err(err)
 		return
 	}
+	glog.Debug("获取系统设置:", settings)
 	res.Sucess("获取成功", settings)
 }
 func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
