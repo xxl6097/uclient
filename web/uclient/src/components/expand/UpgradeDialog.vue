@@ -40,25 +40,25 @@ const updateContent = ref<string>()
 const patchUrl = ref<string>()
 const showUpdateDialog = (
   patchurl: string,
-  binurl: string,
+  bin_url: string,
   message: string,
 ) => {
   updateLayout()
   showUpgradeDialog.value = true
   updateContent.value = markdownToHtml(message)
-  binUrl.value = binurl
+  binUrl.value = bin_url
   patchUrl.value = patchurl
   console.log('binUrl', binUrl)
   console.log('patchUrl', patchurl)
 }
 
-const upgradeByUrl = (binurl: string) => {
-  console.log('升级URL', binUrl.value)
+const upgradeByUrl = (fileUrl: string) => {
+  console.log('升级URL', fileUrl)
   const loading = showLoading('程序升级中...')
   fetch('../api/upgrade', {
     credentials: 'include',
     method: 'PUT',
-    body: binurl,
+    body: fileUrl,
   })
     .then((res) => {
       return res.json()

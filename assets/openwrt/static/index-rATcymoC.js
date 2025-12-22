@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-JughrWYk.js"(exports, module) {
+  "index-rATcymoC.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -39117,7 +39117,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const _withScopeId$1 = (n) => (pushScopeId("data-v-ee799f87"), n = n(), popScopeId(), n);
+    const _withScopeId$1 = (n) => (pushScopeId("data-v-9e6284df"), n = n(), popScopeId(), n);
     const _hoisted_1$4 = {
       key: 0,
       class: "upgrade-popup-overlay"
@@ -39133,22 +39133,22 @@ var require_index_001 = __commonJS({
         const binUrl = ref();
         const updateContent = ref();
         const patchUrl = ref();
-        const showUpdateDialog = (patchurl, binurl, message2) => {
+        const showUpdateDialog = (patchurl, bin_url, message2) => {
           updateLayout();
           showUpgradeDialog.value = true;
           updateContent.value = markdownToHtml(message2);
-          binUrl.value = binurl;
+          binUrl.value = bin_url;
           patchUrl.value = patchurl;
           console.log("binUrl", binUrl);
           console.log("patchUrl", patchurl);
         };
-        const upgradeByUrl = (binurl) => {
-          console.log("升级URL", binUrl.value);
+        const upgradeByUrl = (fileUrl) => {
+          console.log("升级URL", fileUrl);
           const loading = showLoading("程序升级中...");
           fetch("../api/upgrade", {
             credentials: "include",
             method: "PUT",
-            body: binurl
+            body: fileUrl
           }).then((res) => {
             return res.json();
           }).then((json) => {
@@ -39280,7 +39280,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const UpgradeDialog = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-ee799f87"]]);
+    const UpgradeDialog = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-9e6284df"]]);
     const _withScopeId = (n) => (pushScopeId("data-v-110a8892"), n = n(), popScopeId(), n);
     const _hoisted_1$3 = { class: "upgrade-popup-content" };
     const _hoisted_2$3 = { style: { "display": "flex", "margin-bottom": "20px" } };
@@ -41915,4 +41915,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-JughrWYk.js.map
+//# sourceMappingURL=index-rATcymoC.js.map
