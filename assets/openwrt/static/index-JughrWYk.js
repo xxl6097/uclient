@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-wneHwqvt.js"(exports, module) {
+  "index-JughrWYk.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -39117,7 +39117,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const _withScopeId$1 = (n) => (pushScopeId("data-v-0e6fd49b"), n = n(), popScopeId(), n);
+    const _withScopeId$1 = (n) => (pushScopeId("data-v-ee799f87"), n = n(), popScopeId(), n);
     const _hoisted_1$4 = {
       key: 0,
       class: "upgrade-popup-overlay"
@@ -39143,9 +39143,7 @@ var require_index_001 = __commonJS({
           console.log("patchUrl", patchurl);
         };
         const upgradeByUrl = (binurl) => {
-          console.log("binurl", binurl);
-          console.log("patchUrl", patchUrl.value);
-          console.log("binUrl", binUrl.value);
+          console.log("升级URL", binUrl.value);
           const loading = showLoading("程序升级中...");
           fetch("../api/upgrade", {
             credentials: "include",
@@ -39196,8 +39194,10 @@ var require_index_001 = __commonJS({
         const handleConfirm = () => {
           showUpgradeDialog.value = false;
           if (patchUrl.value !== "") {
+            console.log("差量升级", patchUrl.value);
             upgradeByUrl(patchUrl.value);
           } else {
+            console.log("全量升级", binUrl.value);
             upgradeByUrl(binUrl.value);
           }
         };
@@ -39280,7 +39280,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const UpgradeDialog = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-0e6fd49b"]]);
+    const UpgradeDialog = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-ee799f87"]]);
     const _withScopeId = (n) => (pushScopeId("data-v-110a8892"), n = n(), popScopeId(), n);
     const _hoisted_1$3 = { class: "upgrade-popup-content" };
     const _hoisted_2$3 = { style: { "display": "flex", "margin-bottom": "20px" } };
@@ -41915,4 +41915,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-wneHwqvt.js.map
+//# sourceMappingURL=index-JughrWYk.js.map

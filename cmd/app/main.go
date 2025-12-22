@@ -39,7 +39,7 @@ func init() {
 
 func main() {
 	//defer glog.GlobalRecover()
-	s := service.Service{}
-	err := gs.Run(&s)
+	serviceCore := service.Service{}
+	err := gs.Run(&serviceCore)
 	glog.Debug("程序结束", err)
 }

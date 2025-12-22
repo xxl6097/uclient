@@ -53,9 +53,7 @@ const showUpdateDialog = (
 }
 
 const upgradeByUrl = (binurl: string) => {
-  console.log('binurl', binurl)
-  console.log('patchUrl', patchUrl.value)
-  console.log('binUrl', binUrl.value)
+  console.log('升级URL', binUrl.value)
   const loading = showLoading('程序升级中...')
   fetch('../api/upgrade', {
     credentials: 'include',
@@ -119,8 +117,10 @@ defineExpose({
 const handleConfirm = () => {
   showUpgradeDialog.value = false
   if (patchUrl.value !== '') {
+    console.log('差量升级', patchUrl.value)
     upgradeByUrl(patchUrl.value as string)
   } else {
+    console.log('全量升级', binUrl.value)
     upgradeByUrl(binUrl.value as string)
   }
 }
