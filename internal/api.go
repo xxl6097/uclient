@@ -272,8 +272,8 @@ func (this *Api) SetWebhook(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *Api) SetSettings(w http.ResponseWriter, r *http.Request) {
-	res, f := Response(r)
-	defer f(w)
+	res, ff := Response(r)
+	defer ff(w)
 	body, err := u.GetDataByJson[u.Settings](r)
 	if err != nil {
 		glog.Error(err)

@@ -176,11 +176,11 @@ const handleOpenIDSetting = () => {
 }
 
 const handleSetting = () => {
-  console.log('handleSetting', handleSetting)
+  console.log('handleSetting', formData.value.settings)
   fetch('../api/setting/set', {
     credentials: 'include',
     method: 'POST',
-    body: JSON.stringify(handleSetting),
+    body: JSON.stringify(formData.value.settings),
   })
     .then((res) => {
       return res.json()

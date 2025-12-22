@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-g_etWknh.js"(exports, module) {
+  "index-Ob5wTjsF.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -40712,11 +40712,11 @@ var require_index_001 = __commonJS({
           });
         };
         const handleSetting = () => {
-          console.log("handleSetting", handleSetting);
+          console.log("handleSetting", formData.value.settings);
           fetch("../api/setting/set", {
             credentials: "include",
             method: "POST",
-            body: JSON.stringify(handleSetting)
+            body: JSON.stringify(formData.value.settings)
           }).then((res) => {
             return res.json();
           }).then((json) => {
@@ -41020,7 +41020,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-d22d1909"]]);
+    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-914dbda8"]]);
     const _hoisted_1 = { id: "app" };
     const _hoisted_2 = { class: "grid-content header-color" };
     const _hoisted_3 = { class: "header-content" };
@@ -41892,4 +41892,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-g_etWknh.js.map
+//# sourceMappingURL=index-Ob5wTjsF.js.map
