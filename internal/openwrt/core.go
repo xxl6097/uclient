@@ -5,9 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/go-service/pkg/ukey"
-	"github.com/xxl6097/uclient/internal/u"
 	"log"
 	"net"
 	"os"
@@ -16,6 +13,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/go-service/pkg/ukey"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 var (
@@ -37,6 +38,7 @@ var (
 	nickFilePath    = "/etc/config/uclient/nick"
 	webhookFilePath = "/etc/config/uclient/webhook"
 	ntfyFilePath    = "/etc/config/uclient/ntfy"
+	settingPath     = "/etc/config/uclient/setting"
 )
 
 type SysLogEvent struct {

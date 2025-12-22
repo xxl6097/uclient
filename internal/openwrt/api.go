@@ -3,15 +3,16 @@ package openwrt
 import (
 	"errors"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/go-service/pkg/utils"
-	"github.com/xxl6097/uclient/internal/ntfy"
-	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/go-service/pkg/utils"
+	"github.com/xxl6097/uclient/internal/ntfy"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 func (this *openWRT) initData() error {

@@ -70,8 +70,38 @@
                 </el-form-item>
               </el-form>
               <el-button type="primary" @click="handleOpenIDSetting"
-              >提交
+                >提交
               </el-button>
+            </el-tab-pane>
+
+            <el-tab-pane label="系统设置" name="4">
+              <el-form
+                label-position="left"
+                label-width="auto"
+                style="max-width: 600px"
+              >
+                <el-form-item label="SysLog监听：">
+                  <el-checkbox
+                    v-model="formData.settings.isSysLogListen"
+                  ></el-checkbox>
+                </el-form-item>
+                <el-form-item label="ARP监听：">
+                  <el-checkbox
+                    v-model="formData.settings.isArpListen"
+                  ></el-checkbox>
+                </el-form-item>
+                <el-form-item label="Hostapd监听：">
+                  <el-checkbox
+                    v-model="formData.settings.isHostApdListen"
+                  ></el-checkbox>
+                </el-form-item>
+                <el-form-item label="Dnsmasq监听：">
+                  <el-checkbox
+                    v-model="formData.settings.isDnsmasqListen"
+                  ></el-checkbox>
+                </el-form-item>
+              </el-form>
+              <el-button type="primary" @click="handleSetting">提交 </el-button>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -98,6 +128,12 @@ const formData = ref({
     password: '',
   },
   title: '',
+  settings: {
+    isSysLogListen: true,
+    isArpListen: true,
+    isHostApdListen: true,
+    isDnsmasqListen: true,
+  },
 })
 
 const handleClick = (tab: TabsPaneContext) => {
@@ -136,6 +172,45 @@ const handleOpenIDSetting = () => {
     })
     .catch((error) => {
       showErrorTips(`失败:${JSON.stringify(error)}`)
+    })
+}
+
+const handleSetting = () => {
+  console.log('handleSetting', handleSetting)
+  fetch('../api/setting/set', {
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(handleSetting),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) => {
+      if (json) {
+        showTips(json.code, json.msg)
+      }
+    })
+    .catch((error) => {
+      showErrorTips(`失败:${JSON.stringify(error)}`)
+    })
+}
+
+const getListenData = () => {
+  fetch(`../api/setting/get`, {
+    credentials: 'include',
+    method: 'GET',
+  })
+    .then((res) => res.json())
+    .then((json) => {
+      console.log('fetchData', json)
+      if (json && json.code === 0 && json.data) {
+        console.log('api/setting/get', json)
+        formData.value.settings = json.data
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+      showErrorTips(`${JSON.stringify(error)}`)
     })
 }
 
@@ -188,6 +263,7 @@ const handleNtfySetting = () => {
 
 const showDialogForm = () => {
   console.log('打开对话框，row:')
+  getListenData()
   formData.value.title = `设备设置`
   formData.value.show = true
 }

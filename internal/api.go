@@ -2,6 +2,10 @@ package internal
 
 import (
 	"fmt"
+	"net/http"
+	"path/filepath"
+	"sync"
+
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-http/pkg/util"
 	"github.com/xxl6097/go-service/pkg/github"
@@ -11,9 +15,6 @@ import (
 	"github.com/xxl6097/uclient/internal/auth"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
-	"net/http"
-	"path/filepath"
-	"sync"
 )
 
 type Api struct {
@@ -268,6 +269,37 @@ func (this *Api) SetWebhook(w http.ResponseWriter, r *http.Request) {
 	} else {
 		res.Ok("设置成功")
 	}
+}
+
+func (this *Api) SetSettings(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	body, err := u.GetDataByJson[u.Settings](r)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	}
+	err = openwrt.GetInstance().SetSettings(body)
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	} else {
+		res.Ok("设置成功")
+	}
+}
+
+func (this *Api) GetSettings(w http.ResponseWriter, r *http.Request) {
+	res, f := Response(r)
+	defer f(w)
+	settings, err := openwrt.GetInstance().GetSettings()
+	if err != nil {
+		glog.Error(err)
+		res.Err(err)
+		return
+	}
+	res.Sucess("获取成功", settings)
 }
 func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)

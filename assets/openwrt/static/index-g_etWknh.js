@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-7CRXmZmv.js"(exports, module) {
+  "index-g_etWknh.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -40675,7 +40675,13 @@ var require_index_001 = __commonJS({
             username: "",
             password: ""
           },
-          title: ""
+          title: "",
+          settings: {
+            isSysLogListen: true,
+            isArpListen: true,
+            isHostApdListen: true,
+            isDnsmasqListen: true
+          }
         });
         const handleClick = (tab) => {
           console.log("handleClick", tab.paneName);
@@ -40703,6 +40709,37 @@ var require_index_001 = __commonJS({
             }
           }).catch((error) => {
             showErrorTips(`失败:${JSON.stringify(error)}`);
+          });
+        };
+        const handleSetting = () => {
+          console.log("handleSetting", handleSetting);
+          fetch("../api/setting/set", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(handleSetting)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            if (json) {
+              showTips(json.code, json.msg);
+            }
+          }).catch((error) => {
+            showErrorTips(`失败:${JSON.stringify(error)}`);
+          });
+        };
+        const getListenData = () => {
+          fetch(`../api/setting/get`, {
+            credentials: "include",
+            method: "GET"
+          }).then((res) => res.json()).then((json) => {
+            console.log("fetchData", json);
+            if (json && json.code === 0 && json.data) {
+              console.log("api/setting/get", json);
+              formData.value.settings = json.data;
+            }
+          }).catch((error) => {
+            console.error(error);
+            showErrorTips(`${JSON.stringify(error)}`);
           });
         };
         const handleWebhookSetting = () => {
@@ -40746,6 +40783,7 @@ var require_index_001 = __commonJS({
         };
         const showDialogForm = () => {
           console.log("打开对话框，row:");
+          getListenData();
           formData.value.title = `设备设置`;
           formData.value.show = true;
         };
@@ -40758,6 +40796,7 @@ var require_index_001 = __commonJS({
           const _component_el_form = ElForm;
           const _component_el_button = ElButton;
           const _component_el_tab_pane = ElTabPane;
+          const _component_el_checkbox = ElCheckbox;
           const _component_el_tabs = ElTabs;
           const _component_el_dialog = ElDialog;
           return openBlock(), createElementBlock("div", _hoisted_1$1, [
@@ -40767,14 +40806,14 @@ var require_index_001 = __commonJS({
               "close-on-press-escape": true,
               width: unref(isMobile)() ? "80%" : "30%",
               modelValue: formData.value.show,
-              "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => formData.value.show = $event),
+              "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => formData.value.show = $event),
               title: formData.value.title
             }, {
               default: withCtx(() => [
                 createBaseVNode("div", _hoisted_2$1, [
                   createVNode(_component_el_tabs, {
                     modelValue: formData.value.activeName,
-                    "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => formData.value.activeName = $event),
+                    "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => formData.value.activeName = $event),
                     onTabClick: handleClick
                   }, {
                     default: withCtx(() => [
@@ -40907,6 +40946,68 @@ var require_index_001 = __commonJS({
                           })
                         ]),
                         _: 1
+                      }),
+                      createVNode(_component_el_tab_pane, {
+                        label: "系统设置",
+                        name: "4"
+                      }, {
+                        default: withCtx(() => [
+                          createVNode(_component_el_form, {
+                            "label-position": "left",
+                            "label-width": "auto",
+                            style: { "max-width": "600px" }
+                          }, {
+                            default: withCtx(() => [
+                              createVNode(_component_el_form_item, { label: "SysLog监听：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_checkbox, {
+                                    modelValue: formData.value.settings.isSysLogListen,
+                                    "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => formData.value.settings.isSysLogListen = $event)
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_el_form_item, { label: "ARP监听：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_checkbox, {
+                                    modelValue: formData.value.settings.isArpListen,
+                                    "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => formData.value.settings.isArpListen = $event)
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_el_form_item, { label: "Hostapd监听：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_checkbox, {
+                                    modelValue: formData.value.settings.isHostApdListen,
+                                    "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => formData.value.settings.isHostApdListen = $event)
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_el_form_item, { label: "Dnsmasq监听：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_checkbox, {
+                                    modelValue: formData.value.settings.isDnsmasqListen,
+                                    "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => formData.value.settings.isDnsmasqListen = $event)
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_button, {
+                            type: "primary",
+                            onClick: handleSetting
+                          }, {
+                            default: withCtx(() => [
+                              createTextVNode("提交 ")
+                            ]),
+                            _: 1
+                          })
+                        ]),
+                        _: 1
                       })
                     ]),
                     _: 1
@@ -40919,7 +41020,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-da1dc4a9"]]);
+    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-d22d1909"]]);
     const _hoisted_1 = { id: "app" };
     const _hoisted_2 = { class: "grid-content header-color" };
     const _hoisted_3 = { class: "header-content" };
@@ -41791,4 +41892,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-7CRXmZmv.js.map
+//# sourceMappingURL=index-g_etWknh.js.map

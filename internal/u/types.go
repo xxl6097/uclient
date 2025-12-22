@@ -7,6 +7,13 @@ type NtfyInfo struct {
 	Password string `json:"password"`
 }
 
+type Settings struct {
+	IsSysLogListen  bool `json:"isSysLogListen"`
+	IsArpListen     bool `json:"isArpListen"`
+	IsHostApdListen bool `json:"isHostApdListen"`
+	IsDnsmasqListen bool `json:"isDnsmasqListen"`
+}
+
 //	type NtfyEventData struct {
 //		Id    string `json:"id,omitempty"`
 //		Time  int    `json:"time,omitempty"`

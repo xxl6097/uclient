@@ -1,12 +1,13 @@
 package internal
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-http/pkg/ihttpserver"
 	"github.com/xxl6097/go-service/pkg/gs"
 	"github.com/xxl6097/uclient/pkg"
-	"net/http"
 )
 
 type ApiRoute struct {
@@ -46,6 +47,9 @@ func (this *ApiRoute) Setup(router *mux.Router) {
 	router.HandleFunc("/api/ntfy/set", this.restApi.SetNtfy).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/webhook/set", this.restApi.SetWebhook).Methods(http.MethodPost)
+
+	router.HandleFunc("/api/setting/set", this.restApi.SetSettings).Methods(http.MethodPost)
+	router.HandleFunc("/api/setting/get", this.restApi.GetSettings).Methods(http.MethodGet)
 
 	router.HandleFunc("/api/staticip/set", this.restApi.AddStaticIp).Methods(http.MethodPost)
 	router.HandleFunc("/api/staticip/delete", this.restApi.DeleteStaticIp).Methods(http.MethodDelete)
