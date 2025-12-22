@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/xxl6097/glog/glog"
 	"github.com/xxl6097/go-service/pkg/gs"
 	"github.com/xxl6097/uclient/cmd/app/service"
 	"github.com/xxl6097/uclient/internal"
 	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/pkg"
-	"os"
 )
 
 //func prome() http.Handler {
@@ -27,7 +28,7 @@ func init() {
 	//go func() { log.Println(http.ListenAndServe("localhost:6060", nil)) }()
 	if u.IsMacOs() {
 		pkg.AppVersion = "v0.0.3"
-		pkg.BinName = "openwrt-client-manager_v0.0.20_darwin_arm64"
+		pkg.BinName = "uclient_v0.2.2_linux_arm64"
 		fmt.Println("Hello World", os.Getpid())
 		internal.Bootstrap(&u.Config{
 			Username:   "admin",
