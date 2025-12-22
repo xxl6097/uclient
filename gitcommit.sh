@@ -237,7 +237,7 @@ function quickPushAndTag() {
 }
 
 function quickPushAndTagDeploy() {
-  upgradeVersion
+#  upgradeVersion
   git add .
   echo "git commit -m "发布版本 ${version}""
   git commit -m "发布版本 ${version}"
