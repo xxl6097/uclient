@@ -6,7 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gorilla/mux v1.8.1
 	github.com/kardianos/service v1.2.4
-	github.com/xxl6097/glog v0.1.59
+	github.com/xxl6097/glog v0.1.60
 	github.com/xxl6097/go-http v0.0.57
 	github.com/xxl6097/go-service v0.7.10
 	github.com/xxl6097/go-sse v0.0.23

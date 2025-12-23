@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/kardianos/service"
 	"github.com/xxl6097/glog/glog"
@@ -66,6 +67,13 @@ func (this *Service) OnVersion() string {
 	return pkg.AppVersion
 }
 
+func testLog() {
+	for {
+		glog.Debug("===========", glog.Now().Format(time.DateTime))
+		time.Sleep(time.Second)
+	}
+}
+
 func (this *Service) OnRun(service igs.Service) error {
 	this.gs = service
 	cfg, err := load()
@@ -81,6 +89,7 @@ func (this *Service) OnRun(service igs.Service) error {
 	//	Done(cfg.ServerPort)
 	//defer server.Stop()
 	//server.Wait()
+	go testLog()
 	internal.Bootstrap(cfg, service)
 	return nil
 }
