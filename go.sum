@@ -10,12 +10,12 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
-github.com/xxl6097/glog v0.1.63 h1:rGNvH2C/Zl5ol08JbrDZ4lUps9ZgJHlbi2aoCoheFXo=
-github.com/xxl6097/glog v0.1.63/go.mod h1:v5J5FG6rnsHhv74uO9GRdqKsdvthvnQqjBooYP0V5Dg=
+github.com/xxl6097/glog v0.1.64 h1:4OKHAVvkn0kTK1uKPlhjtJYfV9J8MEGLkK+rcGCof84=
+github.com/xxl6097/glog v0.1.64/go.mod h1:v5J5FG6rnsHhv74uO9GRdqKsdvthvnQqjBooYP0V5Dg=
 github.com/xxl6097/go-http v0.0.57 h1:5W/wk66YYKEA7ssnGpMyu3KdG3JwarOWmjQuTK5bq6k=
 github.com/xxl6097/go-http v0.0.57/go.mod h1:TulD3wTHC9hXgOM6mYZOJnmFSIpSOxptNIoDj+8f47c=
-github.com/xxl6097/go-service v0.7.13 h1:kZhRJfc1RlOgZmGzYLO211c/64mqRqYtFreC1/9ad7Y=
-github.com/xxl6097/go-service v0.7.13/go.mod h1:gAE+THeH8mnU4JKUJ4qRcbizuWhRAC3HFxNoKJiqBu0=
+github.com/xxl6097/go-service v0.7.14 h1:R0ZbbYWdPCDblGGtsIrjjaqzmYRQWkwj5dfppLn2bt0=
+github.com/xxl6097/go-service v0.7.14/go.mod h1:SoSSeCK/YxMHZJlu1F9wzRiALcmgsq9d9alNUwEMwpg=
 github.com/xxl6097/go-sse v0.0.23 h1:IE79l1QvI/GqFbBcGEfUB51a3sQMosBkFgY6/qxrJW4=
 github.com/xxl6097/go-sse v0.0.23/go.mod h1:5UuNGLbWcmyQmRZpNQVGq3/VDMCRcAz6YBdJKl2RSEM=
 github.com/xxl6097/go-update v0.0.6 h1:z7ipTgVjlXVVNRgMjrrgZfXfDZdb2LUJjsvMh4qwEu8=
