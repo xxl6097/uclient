@@ -70,7 +70,7 @@ func (this *Service) OnVersion() string {
 func testLog() {
 	for {
 		glog.Debug("===========", glog.Now().Format(time.DateTime))
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
 	}
 }
 
