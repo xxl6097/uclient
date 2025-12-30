@@ -89,7 +89,7 @@ func (this *Service) OnRun(service igs.Service) error {
 	//	Done(cfg.ServerPort)
 	//defer server.Stop()
 	//server.Wait()
-	go testLog()
+	//go testLog()
 	internal.Bootstrap(cfg, service)
 	return nil
 }

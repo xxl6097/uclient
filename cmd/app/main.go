@@ -26,7 +26,7 @@ import (
 
 func init() {
 	//go func() { log.Println(http.ListenAndServe("localhost:6060", nil)) }()
-	gs.InitLog(2)
+	gs.InitLog(0)
 	if u.IsMacOs() {
 		pkg.AppVersion = "v0.0.3"
 		pkg.BinName = "uclient_v0.2.2_linux_arm64"
