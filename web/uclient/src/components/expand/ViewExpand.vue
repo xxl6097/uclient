@@ -67,12 +67,12 @@ import { isMobile, formatTimeStamp } from '../../utils/utils.ts'
 import { Client } from '../../utils/type.ts'
 import { onMounted } from 'vue'
 
-const props = defineProps<{
+ defineProps<{
   row: Client
 }>()
 
 onMounted(() => {
-  console.log('VVVVVVVVV====>', props.row)
+  //console.log('VVVVVVVVV====>', props.row)
 })
 function getClientName(row: Client): string {
   // row.nickName === ''

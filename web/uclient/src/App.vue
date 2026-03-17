@@ -71,12 +71,12 @@
     <section>
       <el-main>
         <el-table
-          ref="tableRef"
           :data="paginatedTableData"
           style="width: 100%"
           :border="true"
           :highlight-current-row="false"
           :preserve-expanded-content="true"
+          @expandChange="expandChange"
         >
           <el-table-column type="expand">
             <template #default="props">
@@ -312,7 +312,7 @@ import { EventAwareSSEClient } from './utils/sseclient.ts'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
-import { ComponentSize, ElNotification, TableInstance } from 'element-plus'
+import { ComponentSize, ElNotification } from 'element-plus'
 import PushSettingDialog from './components/PushSettingDialog.vue'
 // import * as trace_events from 'node:trace_events'
 // import { testTableData } from './utils/data.ts'
@@ -356,13 +356,14 @@ const toggleDark = useToggle(isDark)
 const source = ref<EventAwareSSEClient | null>()
 // 搜索关键字
 const searchKeyword = ref<string>('')
+const expandKeys = ref<any[]>()
 const pageSize = ref<number>(50)
 const currentPage = ref<number>(1)
 const tableData = ref<Client[]>([])
 const version = ref<Version>()
 // 表格实例
 // const tableRef = ref<ElTable<TableRowData> | null>(null);
-const tableRef = ref<TableInstance>()
+// const tableRef = ref<TableInstance>()
 // 分页后的表格数
 const paginatedTableData = computed<Client[]>(() => {
   const start = (currentPage.value - 1) * pageSize.value
@@ -374,13 +375,18 @@ const filteredTableData = computed<Client[]>(() => {
   return tableData.value.filter(() => !searchKeyword.value)
 })
 
+const expandChange = (row: any, expandedRows: any[]) => {
+  console.log('=====', row, expandedRows)
+  expandKeys.value = expandedRows
+}
+
 // 检查某一行是否展开
 const isTableExpand = () => {
-  if (!tableRef.value) return false
-  const expandedRows = tableRef.value.expandRowKeys
-  console.log(`是否展开：`, expandedRows)
-  if (!expandedRows) return false
-  return expandedRows.length > 0
+  // if (!tableRef.value) return false
+  // const expandedRows = tableRef.value.expandRowKeys
+  // console.log(`是否展开：`, expandedRows)
+  if (!expandKeys.value) return false
+  return expandKeys.value.length > 0
 }
 
 function renderTable(data: Client[]) {
@@ -398,7 +404,7 @@ function getClientName(row: Client): string {
   //   : row.hostname === '*'
   //     ? row.nickName
   //     : `${row.hostname}(${row.nickName})`
-  console.log('aa------------>', row)
+  //console.log('aa------------>', row)
   if (row.nick) {
     if (row.nick?.name === '') {
       return row.hostname
@@ -473,6 +479,7 @@ const handleShowCheckVersionDialog = () => {
   if (upgradeRef.value) {
     upgradeRef.value.openUpgradeDialog()
   }
+  console.log('KKKK----->', expandKeys.value)
 }
 // 自定义上传函数
 const handleUploadUpgradeBin = (options: any) => {

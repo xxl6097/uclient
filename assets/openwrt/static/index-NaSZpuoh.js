@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-YYnLTsu4.js"(exports, module) {
+  "index-NaSZpuoh.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -40904,7 +40904,6 @@ var require_index_001 = __commonJS({
       setup(__props, { expose: __expose }) {
         const props = __props;
         onMounted(() => {
-          console.log("VVVVVVVVV====>", props.row);
           showDialogForm(props.row);
         });
         const formData = ref({
@@ -41819,7 +41818,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const SettingAndKaoqQin = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-253285a9"]]);
+    const SettingAndKaoqQin = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-f78b5e44"]]);
     const _hoisted_1$1 = { class: "main" };
     const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       __name: "ViewExpand",
@@ -41827,9 +41826,7 @@ var require_index_001 = __commonJS({
         row: {}
       },
       setup(__props) {
-        const props = __props;
         onMounted(() => {
-          console.log("VVVVVVVVV====>", props.row);
         });
         function getClientName(row) {
           var _a2, _b;
@@ -42001,11 +41998,11 @@ var require_index_001 = __commonJS({
         const toggleDark = useToggle(isDark);
         const source = ref();
         const searchKeyword = ref("");
+        const expandKeys = ref();
         const pageSize = ref(50);
         const currentPage = ref(1);
         const tableData = ref([]);
         const version2 = ref();
-        const tableRef = ref();
         const paginatedTableData = computed(() => {
           const start = (currentPage.value - 1) * pageSize.value;
           const end = start + pageSize.value;
@@ -42014,14 +42011,14 @@ var require_index_001 = __commonJS({
         const filteredTableData = computed(() => {
           return tableData.value.filter(() => !searchKeyword.value);
         });
+        const expandChange = (row, expandedRows) => {
+          console.log("=====", row, expandedRows);
+          expandKeys.value = expandedRows;
+        };
         const isTableExpand = () => {
-          if (!tableRef.value)
+          if (!expandKeys.value)
             return false;
-          const expandedRows = tableRef.value.expandRowKeys;
-          console.log(`是否展开：`, expandedRows);
-          if (!expandedRows)
-            return false;
-          return expandedRows.length > 0;
+          return expandKeys.value.length > 0;
         };
         function renderTable(data) {
           tableData.value.length = 0;
@@ -42029,7 +42026,6 @@ var require_index_001 = __commonJS({
         }
         function getClientName(row) {
           var _a2, _b;
-          console.log("aa------------>", row);
           if (row.nick) {
             if (((_a2 = row.nick) == null ? void 0 : _a2.name) === "") {
               return row.hostname;
@@ -42075,6 +42071,7 @@ var require_index_001 = __commonJS({
           if (upgradeRef.value) {
             upgradeRef.value.openUpgradeDialog();
           }
+          console.log("KKKK----->", expandKeys.value);
         };
         const handleUploadUpgradeBin = (options) => {
           const { file } = options;
@@ -42522,13 +42519,12 @@ var require_index_001 = __commonJS({
                 createVNode(_component_el_main, null, {
                   default: withCtx(() => [
                     createVNode(_component_el_table, {
-                      ref_key: "tableRef",
-                      ref: tableRef,
                       data: paginatedTableData.value,
                       style: { "width": "100%" },
                       border: true,
                       "highlight-current-row": false,
-                      "preserve-expanded-content": true
+                      "preserve-expanded-content": true,
+                      onExpandChange: expandChange
                     }, {
                       default: withCtx(() => [
                         createVNode(_component_el_table_column, { type: "expand" }, {
@@ -42872,4 +42868,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-YYnLTsu4.js.map
+//# sourceMappingURL=index-NaSZpuoh.js.map
