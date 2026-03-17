@@ -2,7 +2,7 @@ package openwrt
 
 import (
 	"encoding/json"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"strings"
@@ -10,14 +10,14 @@ import (
 )
 
 func (this *openWRT) StartStatus() {
-	glog.Debug("启动tatus", this.statusRuning)
+	z.Debug("启动tatus", this.statusRuning)
 	if this.statusRuning {
 		return
 	}
 	this.subscribeStatus()
 }
 func (this *openWRT) StopStatus() {
-	glog.Debug("停止status", this.statusRuning)
+	z.Debug("停止status", this.statusRuning)
 	this.statusRuning = false
 	if this.cancel != nil {
 		this.cancel()
@@ -28,12 +28,12 @@ func (this *openWRT) subscribeStatus() {
 	for {
 		select {
 		case <-this.ctx.Done():
-			glog.Debug("RSSI 监听退出...")
+			z.Debug("RSSI 监听退出...")
 			return
 		default:
 			this.readStatus()
 			if !this.statusRuning {
-				glog.Debug("退出状态计算", this.statusRuning)
+				z.Debug("退出状态计算", this.statusRuning)
 				return
 			}
 			time.Sleep(time.Second * 5)
@@ -54,7 +54,7 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 		}
 		mac := u.MacFormat(device.MacAddress)
 		//if mac == "16:00:6f:83:35:e1" {
-		//	glog.Debug(device.HOSTNAME, device.RSSI)
+		//	z.Debug(device.HOSTNAME, device.RSSI)
 		//}
 		v := this.getClient(mac)
 		if v != nil {
@@ -77,7 +77,7 @@ func (this *openWRT) mergeStatus(list []*u.Device) {
 			}
 			//this.dingSignByRSSI(v)
 		} else {
-			glog.Debug("mergeStatus 不存在", device)
+			z.Debug("mergeStatus 不存在", device)
 			if this.nicks == nil {
 				nickMap, e2 := getNickData()
 				if e2 == nil {

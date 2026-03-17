@@ -40,6 +40,7 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     PushSettingDialog: typeof import('./src/components/PushSettingDialog.vue')['default']
+    SettingAndKaoqQin: typeof import('./src/components/expand/SettingAndKaoqQin.vue')['default']
     StaticIpListDialog: typeof import('./src/components/StaticIpListDialog.vue')['default']
     UpgradeDialog: typeof import('./src/components/expand/UpgradeDialog.vue')['default']
     ViewExpand: typeof import('./src/components/expand/ViewExpand.vue')['default']

@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/go-service/pkg/utils/util"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +11,10 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
+	"github.com/xxl6097/go-service/pkg/utils/util"
 )
 
 //var procs = make([]*os.Process, 0)
@@ -32,15 +34,15 @@ import (
 
 func writePid(name string, pid int) {
 	pidData := []byte(strconv.Itoa(pid))
-	if err := os.WriteFile(filepath.Join(glog.TempDir(), name), pidData, 0644); err != nil {
-		glog.Error("写入PID文件失败:", err)
+	if err := os.WriteFile(filepath.Join(zutil.TempDir(), name), pidData, 0644); err != nil {
+		z.Error("写入PID文件失败:", err)
 	}
 }
 
 func readPid(name string) int {
-	data, err := os.ReadFile(filepath.Join(glog.TempDir(), name))
+	data, err := os.ReadFile(filepath.Join(zutil.TempDir(), name))
 	if err != nil {
-		glog.Error("读取PID失败:", err)
+		z.Error("读取PID失败:", err)
 		return 0
 	}
 	savedPid, err := strconv.Atoi(string(data))
@@ -58,17 +60,17 @@ func killPid(pid int) {
 	if runtime.GOOS == "windows" {
 		killCmd := exec.Command("taskkill", "/F", "/PID", strconv.Itoa(pid))
 		if err := killCmd.Run(); err != nil {
-			glog.Error("终止失败:", err)
+			z.Error("终止失败:", err)
 		}
 	} else {
 		if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
-			glog.Error("终止失败:", err)
+			z.Error("终止失败:", err)
 		}
 	}
 }
 
 func Command(ctx context.Context, fu func(string), name string, arg ...string) error {
-	glog.Println(name, arg)
+	z.Println(name, arg)
 	procName := fmt.Sprintf("%s%s", name, strings.Join(arg, "."))
 	pid := readPid(procName)
 	killPid(pid)
@@ -109,7 +111,7 @@ func Command(ctx context.Context, fu func(string), name string, arg ...string) e
 }
 
 func RunCMD(name string, args ...string) ([]byte, error) {
-	//glog.Println(name, args)
+	//z.Println(name, args)
 	cmd := exec.Command(name, args...)
 	//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // 创建进程组
 	util.SetPlatformSpecificAttrs(cmd)

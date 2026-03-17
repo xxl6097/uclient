@@ -2,7 +2,8 @@ package internal
 
 import (
 	"encoding/json"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+
 	"net/http"
 )
 
@@ -29,11 +30,11 @@ func (g *GeneralResponse) StatusCode(code int) *GeneralResponse {
 	return g.response(code, "", nil)
 }
 func (g *GeneralResponse) Err(err error) *GeneralResponse {
-	glog.Error(err)
+	z.Error(err)
 	return g.Response(-1, err.Error())
 }
 func (g *GeneralResponse) Error(msg string) *GeneralResponse {
-	glog.Error(msg)
+	z.Error(msg)
 	return g.Response(-1, msg)
 }
 func (g *GeneralResponse) Any(data any) *GeneralResponse {
@@ -54,7 +55,7 @@ func Response(r *http.Request) (*GeneralResponse, func(w http.ResponseWriter)) {
 	return res, func(w http.ResponseWriter) {
 		defer func() {
 			if res.Code != 0 {
-				glog.Errorf("Http response [%s]: res: %+v", r.URL.Path, res)
+				z.Errorf("Http response [%s]: res: %+v", r.URL.Path, res)
 			}
 		}()
 
@@ -65,12 +66,12 @@ func Response(r *http.Request) (*GeneralResponse, func(w http.ResponseWriter)) {
 		}
 		if res.Raw != nil {
 			data = res.Raw
-			glog.Infof("Http response [%s %s]: raw: %s", r.Method, r.URL.Path, string(res.Raw))
+			z.Infof("Http response [%s %s]: raw: %s", r.Method, r.URL.Path, string(res.Raw))
 		} else {
-			//glog.Infof("Http response [%s %s]: res: %v", r.Method, r.URL.Path, res)
+			//z.Infof("Http response [%s %s]: res: %v", r.Method, r.URL.Path, res)
 			bb, err := json.Marshal(res)
 			if err != nil {
-				glog.Errorf("marshal result error: %v", err)
+				z.Errorf("marshal result error: %v", err)
 				w.WriteHeader(400)
 				return
 			}

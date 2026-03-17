@@ -10,7 +10,8 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
@@ -65,11 +66,11 @@ func (this *openWRT) init() {
 
 func (this *openWRT) Close() {
 	if this.cancel != nil {
-		glog.Debug("close openWRT")
+		z.Debug("close openWRT")
 		this.cancel()
 	}
 	ntfy.GetInstance().Stop()
-	_ = glog.Flush()
+	//_ = z.Flush()
 }
 
 func (this *openWRT) ResetClients() {
@@ -79,13 +80,13 @@ func (this *openWRT) ResetClients() {
 func (this *openWRT) initClients() {
 	err := this.initData()
 	if err != nil {
-		glog.Errorf("initClients Error:%v", err)
+		z.Errorf("initClients Error:%v", err)
 		time.Sleep(5 * time.Second)
-		glog.Error("5 seconds later and try...")
+		z.Error("5 seconds later and try...")
 		this.initClients()
 	}
 	if this.clients == nil || len(this.clients) == 0 {
-		glog.Error("dataMap is empty, 1 seconds later and try...")
+		z.Error("dataMap is empty, 1 seconds later and try...")
 		time.Sleep(16 * time.Second)
 		this.initClients()
 	}
@@ -98,16 +99,16 @@ func (this *openWRT) ntfyMessage(message string) {
 	var res u.NtfyEventData
 	err := json.Unmarshal([]byte(message), &res)
 	if err != nil {
-		glog.Errorf("ntfyMessage Error:%v", err)
+		z.Errorf("ntfyMessage Error:%v", err)
 		return
 	}
 	if res.Topic == "uclient" && res.Title == "sign" {
-		glog.Info("ntfyMessage sign", res)
+		z.Info("ntfyMessage sign", res)
 		mac := res.Message
 		cls := this.getClient(mac)
-		glog.Info("ntfyMessage cls", cls)
+		z.Info("ntfyMessage cls", cls)
 		if cls != nil {
-			cls.StartTime = glog.Now().UnixMilli()
+			cls.StartTime = zutil.Now().UnixMilli()
 			this.dingSign("ntfyMessage", cls)
 			_ = this.TiggerSignCardEvent(mac)
 		}
@@ -118,7 +119,7 @@ func (this *openWRT) initNtfy() {
 	if u.IsFileExist(ntfyFilePath) {
 		info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
 		if err != nil {
-			glog.Errorf("initNtfy Error:%v", err)
+			z.Errorf("initNtfy Error:%v", err)
 		} else {
 			go ntfy.GetInstance().Start(info)
 			ntfy.GetInstance().AddFunc(this.ntfyMessage)
@@ -156,7 +157,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			//glog.Debug("listenFsnotify:", event)
+			//z.Debug("listenFsnotify:", event)
 			if event.Has(fsnotify.Write) {
 				//filePath := event.Name
 				//switch event.Name {
@@ -173,9 +174,9 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			glog.Error("error:", err)
+			z.Error("error:", err)
 		case <-this.ctx.Done():
-			glog.Debug("Fsnotify 监听退出...")
+			z.Debug("Fsnotify 监听退出...")
 			return
 		}
 	}
@@ -188,9 +189,9 @@ func (p *openWRT) updateClientsByDHCP() {
 		p.nicks = nickMap
 	}
 	if err != nil {
-		glog.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
+		z.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
 	} else {
-		glog.Printf("DHCP变化，客户端数量 %+v\n", len(dhcpArray))
+		z.Printf("DHCP变化，客户端数量 %+v\n", len(dhcpArray))
 		arpMap, e1 := getClientsByArp(brLanString)
 		staInfo := GetStaInfo(strings.Contains(p.ulistString, "ahsapd.sta"))
 		for _, client := range dhcpArray {
@@ -234,7 +235,7 @@ func (p *openWRT) updateClientsByDHCP() {
 				//if client.StartTime > 0 {
 				//	v.StartTime = client.StartTime
 				//} else {
-				//	v.StartTime = glog.Now().UnixMilli()
+				//	v.StartTime = zutil.Now().UnixMilli()
 				//}
 				//v.Online = client.Online //这里不能改变状态，应该到updateDeviceStatus变更状态
 
@@ -259,7 +260,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		return nil, nil
 	}
 	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
-	glog.Infof("1-----refreshClients typeEvent:%v new:%+v", new, staInfo)
+	z.Infof("1-----refreshClients typeEvent:%v new:%+v", new, staInfo)
 	if staInfo != nil {
 		sta := staInfo[new.MAC]
 		if sta != nil {
@@ -279,7 +280,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		}
 	}
 	old := this.getClient(new.MAC)
-	glog.Infof("2-----refreshClients old:%v sta:%+v", old, staInfo)
+	z.Infof("2-----refreshClients old:%v sta:%+v", old, staInfo)
 	if old != nil {
 		if new.IP != "" {
 			old.IP = new.IP
@@ -326,7 +327,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		old.Flags = new.Flags
 		old.Signal = new.Signal
 	} else {
-		glog.Debugf("新设备：%+v", new)
+		z.Debugf("新设备：%+v", new)
 		if this.nicks == nil {
 			nickMap, e2 := getNickData()
 			if e2 == nil {

@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/uclient/pkg"
 	"net"
 	"net/http"
 	"os"
@@ -15,6 +13,10 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
+	"github.com/xxl6097/uclient/pkg"
 )
 
 func Error(code int, msg string) map[string]interface{} {
@@ -64,8 +66,8 @@ func GetDataByJson[T any](r *http.Request) (*T, error) {
 }
 
 func ClearTemp() error {
-	tempDir := glog.TempDir()
-	glog.Debug(tempDir)
+	tempDir := zutil.TempDir()
+	z.Debug(tempDir)
 	entries, err := os.ReadDir(tempDir)
 	if err != nil {
 		return fmt.Errorf("读取目录失败: %v", err)
@@ -74,9 +76,9 @@ func ClearTemp() error {
 		fullPath := filepath.Join(tempDir, entry.Name())
 		err = os.RemoveAll(fullPath)
 		if err != nil {
-			glog.Errorf("删除失败 %s  %v", fullPath, err)
+			z.Errorf("删除失败 %s  %v", fullPath, err)
 		} else {
-			glog.Debugf("删除成功 %s", fullPath)
+			z.Debugf("删除成功 %s", fullPath)
 		}
 	}
 	return err
@@ -194,7 +196,7 @@ func IsTimestampToday(timestamp int64) bool {
 	if loc != nil {
 		t = time.UnixMilli(timestamp).In(loc)
 	}
-	now := glog.Now()
+	now := zutil.Now()
 	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	tomorrowStart := todayStart.AddDate(0, 0, 1)
 	return t.After(todayStart) || t.Equal(todayStart) && t.Before(tomorrowStart)
@@ -347,7 +349,7 @@ func IsWorkingTime(time1, time2 string) (int, error) {
 	if e2 != nil {
 		return -1, e2
 	}
-	now := glog.Now()
+	now := zutil.Now()
 	if CompareTime(now, t1) <= 0 {
 		//小于等于上班时间
 		return 0, nil
@@ -365,7 +367,7 @@ func IsOnWorked(time1 string) bool {
 	if e1 != nil {
 		return false
 	}
-	now := glog.Now()
+	now := zutil.Now()
 	if CompareTime(now, t1) > 0 {
 		return true
 	} else {
@@ -547,15 +549,15 @@ func AppandText(filename, content string) {
 		0644,                                // 权限：所有者读写，其他用户只读
 	)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 	}
 	defer file.Close() // 确保关闭文件[1,3,4](@ref)
 
 	// 写入内容
 	if _, err := file.WriteString(EnsureNewline(content)); err != nil {
-		glog.Error(err)
+		z.Error(err)
 	}
-	//glog.Println("内容追加成功！")
+	//z.Println("内容追加成功！")
 }
 
 func ReadFile(fpath string) ([]byte, error) {

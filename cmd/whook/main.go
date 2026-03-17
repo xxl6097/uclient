@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/go-http/pkg/util"
 	"github.com/xxl6097/go-sse/pkg/sse"
 	"github.com/xxl6097/uclient/internal/u"
@@ -34,7 +34,7 @@ func main() {
 	sse.NewClient(url).
 		BasicAuth("admin", "het002402").
 		ListenFunc(func(s string) {
-			glog.Debugf("SSE: %s", s)
+			z.Debugf("SSE: %s", s)
 		}).Header(func(header *http.Header) {
 		header.Add("Sse-Event-IP-Address", util.GetHostIp())
 		header.Add("Sse-Event-MAC-Address", u.GetLocalMac())

@@ -2,7 +2,7 @@ package openwrt
 
 import (
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/go-service/pkg/utils/util"
 	"os/exec"
 )
@@ -37,11 +37,11 @@ func OfflineDevice(macAddr string) error {
 	// 执行命令并捕获输出
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		glog.Printf("❌ 强制下线失败: %v\n输出: %s\n", err, string(output))
+		z.Printf("❌ 强制下线失败: %v\n输出: %s\n", err, string(output))
 		return err
 	}
 
-	glog.Printf("✅ 设备 %s 已强制下线\n", macAddr)
+	z.Printf("✅ 设备 %s 已强制下线\n", macAddr)
 	return nil
 
 }
@@ -62,7 +62,7 @@ func UbusList() string {
 	// 执行命令并捕获输出
 	output, err := c.CombinedOutput()
 	if err != nil {
-		glog.Printf("❌ %v\n输出: %s\n", err, string(output))
+		z.Printf("❌ %v\n输出: %s\n", err, string(output))
 		return ""
 	}
 	return string(output)

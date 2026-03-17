@@ -3,7 +3,8 @@ package openwrt
 import (
 	"context"
 	"encoding/json"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/zutil"
+
 	"time"
 )
 
@@ -38,7 +39,7 @@ func deviceOnline(s string) *HostapdDevice {
 	err := json.Unmarshal([]byte(s), &tempData)
 	if err == nil {
 		if tempData.Assoc != nil {
-			tempData.Assoc.Timestamp = glog.Now()
+			tempData.Assoc.Timestamp = zutil.Now()
 			tempData.Assoc.DataType = 0
 		}
 		return tempData.Assoc
@@ -51,7 +52,7 @@ func deviceOffline(s string) *HostapdDevice {
 	err := json.Unmarshal([]byte(s), &tempData)
 	if err == nil {
 		if tempData.Disassoc != nil {
-			tempData.Disassoc.Timestamp = glog.Now()
+			tempData.Disassoc.Timestamp = zutil.Now()
 			tempData.Disassoc.DataType = 1
 		}
 		return tempData.Disassoc
@@ -63,7 +64,7 @@ func deviceStatus(s string) *HostapdDevice {
 	err := json.Unmarshal([]byte(s), &tempData)
 	if err == nil {
 		if tempData.Probe != nil {
-			tempData.Probe.Timestamp = glog.Now()
+			tempData.Probe.Timestamp = zutil.Now()
 			tempData.Probe.DataType = 2
 		}
 		return tempData.Probe
@@ -79,15 +80,15 @@ func decode(s string, fn func(*HostapdDevice)) {
 			switch key {
 			case "assoc":
 				tempDevice = deviceOnline(s)
-				//glog.Debugf("上线 %+v", tempData)
+				//z.Debugf("上线 %+v", tempData)
 				break
 			case "disassoc":
 				tempDevice = deviceOffline(s)
-				//glog.Debugf("离线 %+v", tempData)
+				//z.Debugf("离线 %+v", tempData)
 				break
 			case "probe":
 				tempDevice = deviceStatus(s)
-				//glog.Debugf("状态 %+v", tempData)
+				//z.Debugf("状态 %+v", tempData)
 				break
 			}
 			if fn != nil && tempDevice != nil {
@@ -115,7 +116,7 @@ func SubscribeHostapd(ctx context.Context, fn func(*HostapdDevice)) error {
 //			return
 //		}
 //		if strings.Contains(s, "5a:a7:22:62:3d:26") {
-//			glog.Info(s)
+//			z.Info(s)
 //		}
 //	}, "ubus", "monitor")
 //}

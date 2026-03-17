@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
@@ -20,18 +21,18 @@ func (this *openWRT) initData() error {
 	this.webhookUrl = this.GetWebHook()
 	arpList, e1 := getClientsByArp(brLanString)
 	if e1 == nil {
-		glog.Debug("\n✅ arpList：")
+		z.Debug("\n✅ arpList：")
 		for _, temp := range arpList {
-			glog.Debugf("%+v", temp)
+			z.Debugf("%+v", temp)
 		}
 	}
 	if e1 == nil {
 		dhcpMap, e2 := getClientsByDhcp()
 		if e2 == nil {
 			this.leases = dhcpMap
-			glog.Debug("\n✅ dhcpMap：")
+			z.Debug("\n✅ dhcpMap：")
 			for _, temp := range dhcpMap {
-				glog.Debugf("%+v", temp)
+				z.Debugf("%+v", temp)
 			}
 		}
 		var sysLogMap map[string][]*Status
@@ -41,10 +42,10 @@ func (this *openWRT) initData() error {
 		nickMap, e4 := getNickData()
 		if e4 == nil {
 			this.nicks = nickMap
-			glog.Debug("\n✅ nickMap：")
+			z.Debug("\n✅ nickMap：")
 			for _, temp := range nickMap {
 				if temp != nil {
-					glog.Debugf("%+v %+v", temp, temp.WorkType)
+					z.Debugf("%+v %+v", temp, temp.WorkType)
 				}
 			}
 		}
@@ -64,14 +65,14 @@ func (this *openWRT) initData() error {
 			if e2 == nil {
 				if lease, ok := dhcpMap[mac]; ok {
 					//if lease.StartTime <= 0 {
-					//	lease.StartTime = glog.Now().UnixMilli()
+					//	lease.StartTime = zutil.Now().UnixMilli()
 					//}
 					//item.StartTime = lease.StartTime
 					item.Hostname = lease.Hostname
 				}
 			}
 			if staInfo != nil {
-				//glog.Debugf("---->%+v", staInfo)
+				//z.Debugf("---->%+v", staInfo)
 				sta := staInfo[mac]
 				if sta != nil {
 					item.Vendor = sta.StaVendor
@@ -134,13 +135,13 @@ func (this *openWRT) initData() error {
 		if e4 != nil {
 			err := updateNicksData(nickMap)
 			if err != nil {
-				glog.Errorf("NickData Save Error:%v", err)
+				z.Errorf("NickData Save Error:%v", err)
 			}
 		}
 
-		glog.Debug("\n✅ dataMap：")
+		z.Debug("\n✅ dataMap：")
 		for _, temp := range this.clients {
-			glog.Debugf("%+v", temp)
+			z.Debugf("%+v", temp)
 		}
 		return nil
 	}
@@ -207,7 +208,7 @@ func (this *openWRT) GetDeviceTimeLineDatas(tempFilePath string) []*DeviceTimeLi
 	if list == nil || len(list) == 0 {
 		return nil
 	}
-	t := glog.Now()
+	t := zutil.Now()
 	sort.Slice(list, func(i, j int) bool {
 		a := u.UTC8ToTime(list[i].Timestamp)
 		b := u.UTC8ToTime(list[j].Timestamp)
@@ -272,13 +273,13 @@ func (this *openWRT) UpdateNickName(obj *NickEntry) error {
 func (this *openWRT) GetStaticIpMap() ([]*DHCPHost, error) {
 	arr, err := GetUCIOutput()
 	if err != nil {
-		glog.Printf("GetStaticIpMap Error: %v\n", err)
+		z.Printf("GetStaticIpMap Error: %v\n", err)
 		return nil, err
 	}
 	//for _, entry := range arr {
 	//	this.clients[entry.MAC].Static = entry
 	//}
-	glog.Println("GetStaticIpMap：", len(arr))
+	z.Println("GetStaticIpMap：", len(arr))
 	return arr, nil
 }
 func (this *openWRT) DeleteStaticIp(mac string) error {
@@ -344,7 +345,7 @@ func (this *openWRT) CheckFile(file string) {
 			}
 			tryCount++
 			if tryCount > RE_REY_MAX_COUNT {
-				glog.Error("监听  失败，超过最大重试次数")
+				z.Error("监听  失败，超过最大重试次数")
 				return
 			}
 		}

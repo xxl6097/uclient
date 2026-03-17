@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/go-http/pkg/util"
 	"github.com/xxl6097/go-service/pkg/github"
 	"github.com/xxl6097/go-service/pkg/gs/igs"
@@ -72,13 +72,13 @@ func initSSE() isse.ISseServer {
 	return sse.
 		New().
 		Register(func(server isse.ISseServer, client *isse.Client) {
-			//glog.Debug("sse新链接", client)
+			//z.Debug("sse新链接", client)
 			//openwrt.GetInstance().StartStatus()
 		}).
 		UnRegister(func(server isse.ISseServer, client *isse.Client) {
 			cls := server.GetClients()
 			if cls != nil {
-				//glog.Debug("sse链接断开", len(cls), client)
+				//z.Debug("sse链接断开", len(cls), client)
 				if len(cls) == 0 {
 					//表示没有客户端了
 					//openwrt.GetInstance().StopStatus()
@@ -102,7 +102,7 @@ func initSSEClient(username string, password string) *sse.Client {
 	return sse.NewClient(url).
 		BasicAuth(username, password).
 		ListenFunc(func(s string) {
-			glog.Debugf("SSE: %s", s)
+			z.Debugf("SSE: %s", s)
 		}).Header(func(header *http.Header) {
 		header.Add("Sse-Event-IP-Address", util.GetHostIp())
 		header.Add("Sse-Event-MAC-Address", u.GetLocalMac())
@@ -135,12 +135,12 @@ func initSSEClient(username string, password string) *sse.Client {
 
 func (this *Api) GetClients(w http.ResponseWriter, r *http.Request) {
 	//req := utils.GetReqMapData(w, r)
-	//glog.Warn(req)
-	//glog.Warn("getClients---->", r)
+	//z.Warn(req)
+	//z.Warn("getClients---->", r)
 	//cls, err := getClients()
 	//
 	//if err != nil {
-	//	glog.Error("getClients err:", err)
+	//	z.Error("getClients err:", err)
 	//	u.Respond(w, u.Error(-1, err.Error()))
 	//} else {
 	//
@@ -175,11 +175,11 @@ func (this *Api) GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func (this *Api) Clear(w http.ResponseWriter, r *http.Request) {
 	//req := utils.GetReqMapData(w, r)
-	//glog.Warn(req)
-	glog.Warn("Clear---->", r.URL)
+	//z.Warn(req)
+	z.Warn("Clear---->", r.URL)
 	err := u.ClearTemp()
 	if err != nil {
-		glog.Error("Clear err:", err)
+		z.Error("Clear err:", err)
 		u.Respond(w, u.Error(-1, err.Error()))
 	} else {
 		u.OKK(w)
@@ -188,11 +188,11 @@ func (this *Api) Clear(w http.ResponseWriter, r *http.Request) {
 
 func (this *Api) Reboot(w http.ResponseWriter, r *http.Request) {
 	//req := utils.GetReqMapData(w, r)
-	//glog.Warn(req)
-	glog.Warn("Reboot---->", r.URL)
+	//z.Warn(req)
+	z.Warn("Reboot---->", r.URL)
 	err := this.igs.Restart()
 	if err != nil {
-		glog.Error("Reboot err:", err)
+		z.Error("Reboot err:", err)
 		u.Respond(w, u.Error(-1, err.Error()))
 	} else {
 		u.OKK(w)
@@ -221,13 +221,13 @@ func (this *Api) SetNtfy(w http.ResponseWriter, r *http.Request) {
 	defer f(w)
 	body, err := u.GetDataByJson[u.NtfyInfo](r)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	}
 	err = openwrt.GetInstance().SetNtfy(body)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	} else {
@@ -242,19 +242,19 @@ func (this *Api) AddAuthCode(w http.ResponseWriter, r *http.Request) {
 		Authcode string `json:"authcode"`
 	}](r)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	}
 	if body.Authcode == "" {
-		glog.Error("Authcode is empty")
+		z.Error("Authcode is empty")
 		res.Error("Authcode is empty")
 		return
 	}
 
 	err = auth.AddAuthData(body.Authcode)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	} else {
@@ -270,13 +270,13 @@ func (this *Api) SetWebhook(w http.ResponseWriter, r *http.Request) {
 		WebHookUrl string `json:"webhookUrl"`
 	}](r)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	}
 	err = openwrt.GetInstance().SetWebHook(body.WebHookUrl)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	} else {
@@ -289,20 +289,20 @@ func (this *Api) SetSettings(w http.ResponseWriter, r *http.Request) {
 	defer ff(w)
 	body, err := u.GetDataByJson[u.Settings](r)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	}
-	glog.Debug("设置系统设置:", body)
+	z.Debug("设置系统设置:", body)
 	err = openwrt.GetInstance().SetSettings(body)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	}
 
 	res.Ok("设置成功，准备重启...")
-	glog.Warn("准备重启...")
+	z.Warn("准备重启...")
 	_ = this.igs.Restart()
 }
 
@@ -311,11 +311,11 @@ func (this *Api) GetSettings(w http.ResponseWriter, r *http.Request) {
 	defer f(w)
 	settings, err := openwrt.GetInstance().GetSettings()
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	}
-	glog.Debug("获取系统设置:", settings)
+	z.Debug("获取系统设置:", settings)
 	res.Sucess("获取成功", settings)
 }
 func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
@@ -328,7 +328,7 @@ func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {
 	}
 	err := openwrt.GetInstance().DeleteStaticIp(mac)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		res.Err(err)
 		return
 	} else {
@@ -355,7 +355,7 @@ func (this *Api) GetStaticIps(w http.ResponseWriter, r *http.Request) {
 func (this *Api) GetLedLog(w http.ResponseWriter, r *http.Request) {
 	data, err := u.ReadFile(openwrt.LedEventLog)
 	if err != nil {
-		glog.Error(err)
+		z.Error(err)
 		w.WriteHeader(400)
 		return
 	}
@@ -480,7 +480,7 @@ func (this *Api) GetWorkTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//for _, work := range data {
-	//	glog.Printf("%+v\n", work)
+	//	z.Printf("%+v\n", work)
 	//}
 	res.Object("获取成功", data)
 }
@@ -549,7 +549,7 @@ func (this *Api) UpdatetWorkTime(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("Day is empty"))
 		return
 	}
-	glog.Printf("修改 %+v\n", body)
+	z.Printf("修改 %+v\n", body)
 	err = openwrt.ApiUpdateWorkTime(body.Mac, body.Day, body.Data)
 	if err != nil {
 		res.Err(fmt.Errorf("UpdatetWorkTime err %v", err))

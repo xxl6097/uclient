@@ -1,7 +1,8 @@
 package openwrt
 
 import (
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/u"
 	"regexp"
 	"strings"
@@ -32,12 +33,12 @@ func parseHetSysLog(logStr string) *KernelLog {
 	}
 	macAddress := ParseMacAddr(logStr)
 	if macAddress == "" {
-		glog.Errorf("parseHetSysLog: invalid macAddress")
+		z.Errorf("parseHetSysLog: invalid macAddress")
 		return nil
 	}
 	// 填充结构体
 	logEntry := KernelLog{
-		Timestamp:  glog.Now().UnixMilli(),
+		Timestamp:  zutil.Now().UnixMilli(),
 		MACAddress: macAddress,
 		Online:     online,
 	}
@@ -50,7 +51,7 @@ func subscribeHetSysLog(s string, fn func(*KernelLog)) {
 	if re.MatchString(s) {
 		if strings.Contains(s, ONLINE_KEYWORDS) || strings.Contains(s, OFFLINE_KEYWORDS) {
 			tempData := parseHetSysLog(s)
-			//glog.Debug("--->", tempData)
+			//z.Debug("--->", tempData)
 			if fn != nil && tempData != nil {
 				fn(tempData)
 			}
@@ -74,7 +75,7 @@ func subscribeLedLog(s string) {
 //		if re.MatchString(s) {
 //			if strings.Contains(s, ONLINE_KEYWORDS) || strings.Contains(s, OFFLINE_KEYWORDS) {
 //				tempData := parseHetSysLog(s)
-//				//glog.Debug("--->", tempData)
+//				//z.Debug("--->", tempData)
 //				if fn != nil && tempData != nil {
 //					fn(tempData)
 //				}
@@ -89,11 +90,11 @@ func subscribeLedLog(s string) {
 //	for {
 //		err := subscribeHetSysLog(func(event *KernelLog) {
 //			if event != nil && event.MACAddress != "" {
-//				glog.Infof("HetSysLog事件:%+v", event)
+//				z.Infof("HetSysLog事件:%+v", event)
 //				eve := &DHCPLease{
 //					MAC:       event.MACAddress,
 //					Online:    event.Online,
-//					StartTime: glog.Now().UnixMilli(),
+//					StartTime: zutil.Now().UnixMilli(),
 //				}
 //				if v, ok := this.leases[eve.MAC]; ok {
 //					if v.Hostname != "" {
@@ -104,12 +105,12 @@ func subscribeLedLog(s string) {
 //			}
 //		})
 //		if err != nil {
-//			glog.Error(fmt.Errorf("SysLog监听失败 %v", err))
+//			z.Error(fmt.Errorf("SysLog监听失败 %v", err))
 //			time.Sleep(time.Second * 10)
-//			glog.Error("重新监听 SysLog")
+//			z.Error("重新监听 SysLog")
 //			tryCount++
 //			if tryCount > RE_REY_MAX_COUNT {
-//				glog.Error("监听 SysLog 失败，超过最大重试次数")
+//				z.Error("监听 SysLog 失败，超过最大重试次数")
 //				break
 //			}
 //		}

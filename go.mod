@@ -6,9 +6,9 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gorilla/mux v1.8.1
 	github.com/kardianos/service v1.2.4
-	github.com/xxl6097/glog v0.1.64
-	github.com/xxl6097/go-http v0.0.57
-	github.com/xxl6097/go-service v0.7.14
+	github.com/xxl6097/glog v0.1.84
+	github.com/xxl6097/go-http v0.0.62
+	github.com/xxl6097/go-service v0.7.15
 	github.com/xxl6097/go-sse v0.0.23
 	go.uber.org/goleak v1.3.0
 	golang.org/x/net v0.42.0
@@ -16,5 +16,8 @@ require (
 
 require (
 	github.com/xxl6097/go-update v0.0.6 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
+	go.uber.org/zap v1.27.1 // indirect
 	golang.org/x/sys v0.34.0 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

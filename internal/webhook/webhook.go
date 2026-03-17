@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
 	"io"
@@ -39,7 +40,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	}
 	text := strings.Builder{}
 	text.WriteString(fmt.Sprintf("#### %s \n ", msg.Title))
-	now := glog.Now()
+	now := zutil.Now()
 	text.WriteString(fmt.Sprintf("- 今天是 %s %s\n ", now.Format(time.DateOnly), u.GetWeekName(now.Weekday())))
 	hostName, err := os.Hostname()
 	if err == nil && hostName != "" {
@@ -72,12 +73,12 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	//if msg.WorkTime != nil {
 	//	text.WriteString(fmt.Sprintf("- 打卡时间：%s\n ", msg.WorkTime.Format(time.DateTime)))
 	//}
-	text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", u.TimestampToMilliTime(glog.Now().UnixMilli())))
+	text.WriteString(fmt.Sprintf("- 消息时间：%s\n ", u.TimestampToMilliTime(zutil.Now().UnixMilli())))
 	markdown := make(map[string]interface{})
 	markdown["title"] = msg.Title
 	markdown["text"] = text.String()
 	payload := map[string]interface{}{"msgtype": "markdown", "markdown": markdown}
-	glog.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp), msg.Signal, msg.EventName)
+	z.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp), msg.Signal, msg.EventName)
 
 	go func() {
 		e := ntfy.GetInstance().Publish(&u.NtfyEventData{
@@ -88,7 +89,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 			Markdown: true,
 		})
 		if e != nil {
-			glog.Error("ntfy", e)
+			z.Error("ntfy", e)
 		}
 	}()
 
@@ -100,14 +101,14 @@ func WebHook(webhookUrl string, payload any) error {
 	if err != nil {
 		return err
 	}
-	//glog.Debug("webhook", string(jsonData))
+	//z.Debug("webhook", string(jsonData))
 	resp, err := http.Post(
 		webhookUrl,
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
-		glog.Errorf("Error: %v\n", err)
+		z.Errorf("Error: %v\n", err)
 		return err
 	}
 	defer resp.Body.Close()
@@ -120,6 +121,6 @@ func WebHook(webhookUrl string, payload any) error {
 	if resp.StatusCode != 200 {
 		return errors.New(fmt.Sprintf("%s %s", resp.Status, string(respBody)))
 	}
-	//glog.Println("响应内容:", resp.StatusCode, string(respBody))
+	//z.Println("响应内容:", resp.StatusCode, string(respBody))
 	return err
 }

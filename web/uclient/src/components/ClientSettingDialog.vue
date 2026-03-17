@@ -155,6 +155,7 @@
                                 style="width: 100px"
                                 arrow-control
                                 value-format="HH:mm:ss"
+                                @change="handleChangeWorkTime(scope.row)"
                               />
                             </template>
                           </el-table-column>
@@ -165,6 +166,7 @@
                                 style="width: 100px"
                                 arrow-control
                                 value-format="HH:mm:ss"
+                                @change="handleChangeWorkTime(scope.row)"
                               />
                             </template>
                           </el-table-column>
@@ -345,7 +347,6 @@
                       </el-tag>
                     </template>
                   </el-table-column>
-
                 </el-table>
                 <!-- 分页 -->
                 <el-pagination
@@ -405,7 +406,8 @@ import {
   showTips,
 } from '../utils/utils.ts'
 import { ComponentSize, ElMessageBox, TabsPaneContext } from 'element-plus'
-
+// import { testSettingData } from '../utils/data.ts'
+// const isTesting = ref<boolean>(true)
 const formData = ref({
   show: false,
   deleteloading: false,
@@ -714,7 +716,9 @@ function fetchWorkData() {
     .catch((error) => {
       console.log('error', error)
     })
-    .finally(() => {})
+    .finally(() => {
+      // if (isTesting.value) monthData.value = testSettingData //as MonthData[]
+    })
 }
 
 const handleNickSetting = () => {

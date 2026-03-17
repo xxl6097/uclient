@@ -2,7 +2,8 @@ package openwrt
 
 import (
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/internal/webhook"
 	"strings"
@@ -12,8 +13,8 @@ import (
 func (this *openWRT) TiggerSignCardEvent(macAddress string) error {
 	if v, ok := this.clients[macAddress]; ok {
 		if v.Nick != nil && v.Nick.WorkType != nil {
-			//return this.NotifyDingSign(0, macAddress, "测试", glog.Now(), GetTodaySignData(macAddress), v.Nick.WorkType)
-			return this.NotifyDingSign(v, "测试", glog.Now(), GetTodaySignData(macAddress))
+			//return this.NotifyDingSign(0, macAddress, "测试", zutil.Now(), GetTodaySignData(macAddress), v.Nick.WorkType)
+			return this.NotifyDingSign(v, "测试", zutil.Now(), GetTodaySignData(macAddress))
 		}
 	}
 	return nil
@@ -164,6 +165,6 @@ func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) err
 	} else {
 		msg.Title = fmt.Sprintf("【%s】离线了", msg.DeviceName)
 	}
-	glog.Debug("ding通知", eveName, client.Hostname, client.IP, client.MAC, client.Signal, client.Online, client.StartTime, u.TimestampToSecondTime(client.StartTime))
+	z.Debug("ding通知", eveName, client.Hostname, client.IP, client.MAC, client.Signal, client.Online, client.StartTime, u.TimestampToSecondTime(client.StartTime))
 	return webhook.Notify(msg, nil)
 }

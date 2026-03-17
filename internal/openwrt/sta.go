@@ -3,9 +3,11 @@ package openwrt
 import (
 	"context"
 	"encoding/json"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/uclient/internal/u"
 	"time"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 //	{
@@ -49,11 +51,11 @@ func SubscribeSta(ctx context.Context, fn func(*StaUpDown)) error {
 		if s == "" {
 			return
 		}
-		glog.LogToFile("ahsapd.sta", s)
+		z.Debug("ahsapd.sta", s)
 		var tempData Sta
 		err := json.Unmarshal([]byte(s), &tempData)
 		if err == nil && tempData.StaUpDown != nil {
-			tempData.StaUpDown.Timestamp = glog.Now()
+			tempData.StaUpDown.Timestamp = zutil.Now()
 			if fn != nil {
 				fn(tempData.StaUpDown)
 			}
@@ -65,17 +67,17 @@ func SubscribeSta(ctx context.Context, fn func(*StaUpDown)) error {
 func getStaInfo() *u.StaInfo {
 	data, err := RunCMD("ubus", "call", "ahsapd.sta", "getStaInfo")
 	if err != nil {
-		glog.Errorf("Get sta info error: %v", err)
+		z.Errorf("Get sta info error: %v", err)
 		return nil
 	}
 	if data == nil {
-		glog.Errorf("Get sta info error")
+		z.Errorf("Get sta info error")
 		return nil
 	}
 	sta := u.StaInfo{}
 	e := json.Unmarshal(data, &sta)
 	if e != nil {
-		glog.Errorf("Get sta info error: %v", e)
+		z.Errorf("Get sta info error: %v", e)
 		return nil
 	}
 	return &sta

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-service/pkg/ukey"
 	"github.com/xxl6097/uclient/internal/u"
 )
@@ -262,8 +262,8 @@ func parseSysLog(data string) *SysLogEvent {
 	phy := parsePhy(data)
 	//timestamp := parseTime(data)
 	macAddr := ParseMacAddr(data)
-	//timestamp := glog.Now().UnixMilli() //time.Now().UnixMilli()
-	timestamp := glog.Now()
+	//timestamp := zutil.Now().UnixMilli() //time.Now().UnixMilli()
+	timestamp := zutil.Now()
 	// 1. 检查字符串是否包含目标字段
 	eve := SysLogEvent{
 		Timestamp: timestamp,
@@ -288,7 +288,7 @@ func parseLeaseLine(line string, leasetime time.Duration) (DHCPLease, error) {
 	}
 	//fmt.Println("fields", fields)
 	// 解析时间戳（Unix时间）
-	now := glog.Now()
+	now := zutil.Now()
 	var startTime = now
 	startSec, e := strconv.ParseInt(fields[0], 10, 64)
 	if e != nil {

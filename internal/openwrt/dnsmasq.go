@@ -3,7 +3,10 @@ package openwrt
 import (
 	"context"
 	"encoding/json"
-	"github.com/xxl6097/glog/glog"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
+
 	"time"
 )
 
@@ -26,12 +29,12 @@ func SubscribeDnsmasq(ctx context.Context, fn func(*DnsmasqDevice)) error {
 		if s == "" {
 			return
 		}
-		glog.LogToFile("dnsmasq", s)
+		z.Debug("dnsmasq", s)
 		var tempData Dnsmasq
 		err := json.Unmarshal([]byte(s), &tempData)
 		if err == nil && tempData.DhcpAck != nil {
 			if tempData.DhcpAck != nil {
-				tempData.DhcpAck.Timestamp = glog.Now()
+				tempData.DhcpAck.Timestamp = zutil.Now()
 			}
 			if fn != nil {
 				fn(tempData.DhcpAck)

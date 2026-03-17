@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/go-service/pkg/gs"
 	"github.com/xxl6097/uclient/cmd/app/service"
 	"github.com/xxl6097/uclient/internal"
@@ -40,8 +40,8 @@ func init() {
 }
 
 func main() {
-	//defer glog.GlobalRecover()
+	//defer z.GlobalRecover()
 	serviceCore := service.Service{}
 	err := gs.Run(&serviceCore)
-	glog.Debug("程序结束", err)
+	z.Debug("程序结束", err)
 }

@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/kardianos/service"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	_ "github.com/xxl6097/go-service/assets/buffer"
 	"github.com/xxl6097/go-service/pkg/gs/igs"
 	"github.com/xxl6097/go-service/pkg/ukey"
@@ -33,7 +34,7 @@ func (this *Service) OnShutdown() {
 }
 
 func load() (*u.Config, error) {
-	defer glog.Flush()
+	//defer z.Flush()
 	byteArray, err := ukey.Load()
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func load() (*u.Config, error) {
 	err = ukey.GobToStruct(byteArray, &cfg)
 	//err = json.Unmarshal(byteArray, &cfg)
 	if err != nil {
-		glog.Println("ClientConfig解析错误", err)
+		z.Println("ClientConfig解析错误", err)
 		return nil, err
 	}
 	pkg.Version()
@@ -62,14 +63,14 @@ func (this *Service) OnVersion() string {
 	pkg.Version()
 	//cfg, err := load()
 	//if err == nil {
-	//	glog.Debugf("cfg:%+v", cfg)
+	//	z.Debugf("cfg:%+v", cfg)
 	//}
 	return pkg.AppVersion
 }
 
 func testLog() {
 	for {
-		glog.Debug("===========", glog.Now().Format(time.DateTime))
+		z.Debug("===========", zutil.Now().Format(time.DateTime))
 		time.Sleep(time.Minute)
 	}
 }
@@ -80,7 +81,7 @@ func (this *Service) OnRun(service igs.Service) error {
 	if err != nil {
 		return err
 	}
-	glog.Debug("程序运行", os.Args)
+	z.Debug("程序运行", os.Args)
 	//server := httpserver.New().
 	//	CORSMethodMiddleware().
 	//	AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
@@ -95,7 +96,7 @@ func (this *Service) OnRun(service igs.Service) error {
 }
 
 func (this *Service) GetAny(binDir string) ([]byte, []string) {
-	glog.Debug("运行目录：", binDir)
+	z.Debug("运行目录：", binDir)
 	return this.menu(), nil
 }
 

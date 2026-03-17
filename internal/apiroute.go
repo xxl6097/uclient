@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-http/pkg/ihttpserver"
 	"github.com/xxl6097/go-service/pkg/gs"
 	"github.com/xxl6097/uclient/pkg"
@@ -24,7 +24,7 @@ func NewRoute(ctl *Api) ihttpserver.IRoute {
 func (this *ApiRoute) Setup(router *mux.Router) {
 
 	staticPrefix := "/tmp/"
-	baseDir := glog.TempDir()
+	baseDir := zutil.TempDir()
 	router.PathPrefix(staticPrefix).Handler(http.StripPrefix(staticPrefix, http.FileServer(http.Dir(baseDir))))
 
 	router.HandleFunc("/api/get/status", this.restApi.GetStatus).Methods(http.MethodGet)

@@ -25,11 +25,11 @@ export interface DayData {
   date: string
   workTime1: string
   workTime2: string
-  isWeekDay: boolean
-  showSelect: boolean
+  isWeekDay?: boolean
+  showSelect?: boolean
   weekday: number
   dayType: number //0工作日，1休息日，2补班日
-  // overHours: number
+  overHours: number
   soverHours: string
 }
 
@@ -42,11 +42,16 @@ export interface MonthData {
   // workDayAveOverHours: number
   // saturdayOverHours: number
   // saturdayAveOverHours: number
-  stotalOverHours: number
-  sworkDayOverHours: number
-  sworkDayAveOverHours: number
-  ssaturdayOverHours: number
-  ssaturdayAveOverHours: number
+  // stotalOverHours: number
+  // sworkDayOverHours: number
+  // sworkDayAveOverHours: number
+  // ssaturdayOverHours: number
+  // ssaturdayAveOverHours: number
+  stotalOverHours: string
+  sworkDayOverHours: string
+  sworkDayAveOverHours: string
+  ssaturdayOverHours: string
+  ssaturdayAveOverHours: string
   saturdayCount: string[]
   dayDatas: DayData[]
 }
@@ -74,7 +79,7 @@ export interface NickEntry {
   name: string
   mac: string
   ip: string
-  starTime: string
+  starTime: number
   hostname: string
   isPush: boolean
   workType: WorkType
@@ -90,10 +95,11 @@ export interface Client {
   upRate: string
   downRate: string
   vendor: string
+  flags: number
   signal: number
   freq: number
   nick: NickEntry
-  static: DHCPHost
+  static?: DHCPHost | null
   starTime: number
   online: boolean
   statusList: Status[]

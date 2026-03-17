@@ -2,12 +2,13 @@ package assets
 
 import (
 	"embed"
-	"github.com/gorilla/mux"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/go-http/pkg/ihttpserver"
-	"github.com/xxl6097/go-http/pkg/util"
 	"io/fs"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/go-http/pkg/ihttpserver"
+	"github.com/xxl6097/go-http/pkg/util"
 )
 
 //go:embed static/*
@@ -17,7 +18,7 @@ var FileSystem http.FileSystem
 func init() {
 	subFs, err := fs.Sub(StaticFS, "static")
 	if err != nil {
-		glog.Fatal("静态资源加载失败", err)
+		z.Fatal("静态资源加载失败", err)
 	}
 	FileSystem = http.FS(subFs)
 }

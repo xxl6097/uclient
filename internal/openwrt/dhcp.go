@@ -2,7 +2,8 @@ package openwrt
 
 import (
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+
 	"log"
 	"os/exec"
 	"regexp"
@@ -20,7 +21,7 @@ type DHCPHost struct {
 func DownDevice(mac, ip, name string) error {
 	// 添加或更新DHCP配置
 	if err := exec.Command("uci", "add", "dhcp", "host").Run(); err != nil {
-		glog.Printf("新增host条目失败（可能已存在）: %v", err)
+		z.Printf("新增host条目失败（可能已存在）: %v", err)
 		return err
 	}
 	return nil
@@ -29,29 +30,29 @@ func DownDevice(mac, ip, name string) error {
 func addStaticIp(mac, ip, name string) error {
 	// 添加或更新DHCP配置
 	if err := exec.Command("uci", "add", "dhcp", "host").Run(); err != nil {
-		glog.Printf("新增host条目失败（可能已存在）: %v", err)
+		z.Printf("新增host条目失败（可能已存在）: %v", err)
 		return err
 	}
 	if err := exec.Command("uci", "set", "dhcp.@host[-1].name="+name).Run(); err != nil {
-		glog.Errorf("新增host条目失败（name出错%v）: %v", name, err)
+		z.Errorf("新增host条目失败（name出错%v）: %v", name, err)
 		return err
 	}
 	if err := exec.Command("uci", "set", "dhcp.@host[-1].mac="+mac).Run(); err != nil {
-		glog.Errorf("新增host条目失败（mac出错%v）: %v", mac, err)
+		z.Errorf("新增host条目失败（mac出错%v）: %v", mac, err)
 		return err
 	}
 	if err := exec.Command("uci", "set", "dhcp.@host[-1].ip="+ip).Run(); err != nil {
-		glog.Errorf("新增host条目失败（ip出错 %v）: %v", ip, err)
+		z.Errorf("新增host条目失败（ip出错 %v）: %v", ip, err)
 		return err
 	}
 	leasetime := "infinite"
 	if err := exec.Command("uci", "set", "dhcp.@host[-1].leasetime="+leasetime).Run(); err != nil {
-		glog.Errorf("新增host条目失败（leasetime出错 %v）: %v", leasetime, err)
+		z.Errorf("新增host条目失败（leasetime出错 %v）: %v", leasetime, err)
 		return err
 	}
 	// 提交配置变更
 	if err := exec.Command("uci", "commit", "dhcp").Run(); err != nil {
-		glog.Errorf("新增host条目失败（commit出错）: %v", err)
+		z.Errorf("新增host条目失败（commit出错）: %v", err)
 		return err
 	}
 	return nil
@@ -61,7 +62,7 @@ func deleteStaticLease(index string) error {
 	// 添加或更新DHCP配置
 	cmdAdd := exec.Command("uci", "delete", fmt.Sprintf("dhcp.%s", index))
 	if err := cmdAdd.Run(); err != nil {
-		glog.Printf("新增host条目失败（可能已存在）: %v", err)
+		z.Printf("新增host条目失败（可能已存在）: %v", err)
 		return err
 	}
 
@@ -206,13 +207,13 @@ func GetUCIOutput() ([]*DHCPHost, error) {
 	cmd := exec.Command("uci", "show", "dhcp")
 	output, err := cmd.Output()
 	if err != nil {
-		glog.Printf("Error: %v\n", err)
+		z.Printf("Error: %v\n", err)
 		return nil, err
 	}
 	hosts := parseUciShowDHCP(string(output))
-	glog.Println("✅ 静态IP：", len(hosts))
+	z.Println("✅ 静态IP：", len(hosts))
 	//for _, host := range hosts {
-	//	glog.Printf("索引: %v | MAC: %s | IP: %s | 设备名: %s\n",
+	//	z.Printf("索引: %v | MAC: %s | IP: %s | 设备名: %s\n",
 	//		host.Index, host.MAC, host.IP, host.Hostname)
 	//}
 	return hosts, nil
@@ -221,7 +222,7 @@ func GetUCIOutput() ([]*DHCPHost, error) {
 func getStaticIpMap() (map[string]*DHCPHost, error) {
 	arr, err := GetUCIOutput()
 	if err != nil {
-		glog.Printf("Error: %v\n", err)
+		z.Printf("Error: %v\n", err)
 		return nil, err
 	}
 	dataMap := make(map[string]*DHCPHost)
@@ -229,6 +230,6 @@ func getStaticIpMap() (map[string]*DHCPHost, error) {
 		dataMap[entry.MAC] = entry
 	}
 
-	glog.Println("静态IPMAP：", len(dataMap))
+	z.Println("静态IPMAP：", len(dataMap))
 	return dataMap, nil
 }

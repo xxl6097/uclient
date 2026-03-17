@@ -7,11 +7,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
-	"github.com/xxl6097/uclient/internal/u"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 var (
@@ -58,7 +59,7 @@ func (this *Ntfy) AddFunc(fn func(string)) {
 func (this *Ntfy) Stop() {
 	if this.resp != nil {
 		this.isClosed = true
-		glog.Debugf("Ntfy stop url: %s", this.resp.Request.URL.String())
+		z.Debugf("Ntfy stop url: %s", this.resp.Request.URL.String())
 		_ = this.resp.Body.Close()
 		if this.cancel != nil {
 			this.cancel()
@@ -82,14 +83,14 @@ func (this *Ntfy) Subscribe(address, topic string, username, password string) er
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
 	}
-	glog.Info("NTFY订阅成功", address, resp.StatusCode)
+	z.Info("NTFY订阅成功", address, resp.StatusCode)
 	scanner := bufio.NewScanner(resp.Body)
 	if e1 := scanner.Err(); e1 != nil {
 		return e1
 	}
 	for scanner.Scan() {
 		text := scanner.Text()
-		//glog.Info(text)
+		//z.Info(text)
 		if this.fnArray != nil && len(this.fnArray) > 0 {
 			for _, fn := range this.fnArray {
 				fn(text)
@@ -104,12 +105,12 @@ func (this *Ntfy) subscribe(info *u.NtfyInfo) {
 	for {
 		select {
 		case <-this.ctx.Done():
-			glog.Debug("ntfy 监听退出...")
+			z.Debug("ntfy 监听退出...")
 			return
 		default:
 			err := this.Subscribe(info.Address, info.Topic, info.Username, info.Password)
 			if err != nil {
-				//glog.Error(err)
+				//z.Error(err)
 				if this.isClosed {
 					return
 				}
@@ -141,7 +142,7 @@ func (this *Ntfy) Publish(data *u.NtfyEventData) error {
 	}
 	defer resp.Body.Close()
 	this.resp = resp
-	//glog.Debug("Ntfy publish: ", resp.Status)
+	//z.Debug("Ntfy publish: ", resp.Status)
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
 	}

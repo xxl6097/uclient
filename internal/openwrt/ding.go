@@ -1,7 +1,8 @@
 package openwrt
 
 import (
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/u"
 	"time"
 )
@@ -18,7 +19,7 @@ func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 		go func() {
 			err := this.notifyWebhookMessage(eveName, tempData)
 			if err != nil {
-				glog.Errorf("钉钉通知失败 %v %+v", err, tempData)
+				z.Errorf("钉钉通知失败 %v %+v", err, tempData)
 			}
 		}()
 	}
@@ -60,7 +61,7 @@ func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 		//if forceSign {
 		//	if !u.IsWithinDuration(todaySignData.OnWorkTime, tempData.StartTime, time.Minute*5) {
 		//		//如果不在5分钟内，不满足sign
-		//		glog.Warnf("超过5分钟了，不允许签到，%+v,%+v", tempData, todaySignData)
+		//		z.Warnf("超过5分钟了，不允许签到，%+v,%+v", tempData, todaySignData)
 		//		return
 		//	}
 		//}
@@ -102,12 +103,12 @@ func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 		signDatas[now.Format(time.DateOnly)] = todaySignData
 		e := SetSignData(mac, signDatas)
 		if e != nil {
-			glog.Errorf("打卡更新失败 %v %+v", e, tempData)
+			z.Errorf("打卡更新失败 %v %+v", e, tempData)
 		} else {
-			glog.Errorf("打卡更新成功  %+v", tempData)
+			z.Errorf("打卡更新成功  %+v", tempData)
 			e1 := this.NotifyDingSign(tempData, eveName, now, todaySignData)
 			if e1 != nil {
-				glog.Errorf("钉钉打卡失败 %v %+v", e1, tempData)
+				z.Errorf("钉钉打卡失败 %v %+v", e1, tempData)
 			}
 		}
 	}
@@ -134,7 +135,7 @@ func (this *openWRT) hasSignCondition(tempData *DHCPLease) bool {
 
 func (this *openWRT) isSignTime(tempData *DHCPLease) (bool, int, time.Time) {
 	if this.hasSignCondition(tempData) {
-		now := glog.Now()
+		now := zutil.Now()
 		if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
 			return true, 3, now
 		} else {
@@ -149,7 +150,7 @@ func (this *openWRT) isSignTime(tempData *DHCPLease) (bool, int, time.Time) {
 					return false, working, now
 				}
 			} else {
-				glog.Error("判断工作时间错误❌", e1)
+				z.Error("判断工作时间错误❌", e1)
 			}
 		}
 	}
@@ -159,7 +160,7 @@ func (this *openWRT) isSignTime(tempData *DHCPLease) (bool, int, time.Time) {
 
 // 判断是否为周末
 func (this *openWRT) isWeekend() bool {
-	t1 := glog.Now()
+	t1 := zutil.Now()
 	if t1.Weekday() == time.Saturday || t1.Weekday() == time.Sunday {
 		return true
 	}

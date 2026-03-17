@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/go-service/pkg/ukey"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
@@ -460,13 +460,13 @@ func tee8() {
 			intVal := int(floatVal) // 显式转换为 int
 			tempEntry.Weekday = intVal
 		} else {
-			glog.Println("值非数字类型 weekday", data["weekday"])
+			z.Println("值非数字类型 weekday", data["weekday"])
 		}
 		if floatVal, ok := data["dayType"].(float64); ok {
 			intVal := int(floatVal) // 显式转换为 int
 			tempEntry.DayType = intVal
 		} else {
-			glog.Println("值非数字类型 dayType", data["dayType"])
+			z.Println("值非数字类型 dayType", data["dayType"])
 		}
 	})
 }

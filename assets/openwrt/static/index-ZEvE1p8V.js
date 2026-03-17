@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-rATcymoC.js"(exports, module) {
+  "index-ZEvE1p8V.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -10536,7 +10536,7 @@ var require_index_001 = __commonJS({
       name: "ElIcon",
       inheritAttrs: false
     });
-    const _sfc_main$1m = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1n = /* @__PURE__ */ defineComponent({
       ...__default__$P,
       props: iconProps,
       setup(__props) {
@@ -10561,7 +10561,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Icon = /* @__PURE__ */ _export_sfc$1(_sfc_main$1m, [["__file", "icon.vue"]]);
+    var Icon = /* @__PURE__ */ _export_sfc$1(_sfc_main$1n, [["__file", "icon.vue"]]);
     const ElIcon = withInstall(Icon);
     function useTimeout() {
       let timeoutHandle;
@@ -11561,7 +11561,7 @@ var require_index_001 = __commonJS({
       name: COMPONENT_NAME$c,
       inheritAttrs: false
     });
-    const _sfc_main$1l = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1m = /* @__PURE__ */ defineComponent({
       ...__default__$O,
       props: inputProps,
       emits: inputEmits,
@@ -11972,7 +11972,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Input = /* @__PURE__ */ _export_sfc$1(_sfc_main$1l, [["__file", "input.vue"]]);
+    var Input = /* @__PURE__ */ _export_sfc$1(_sfc_main$1m, [["__file", "input.vue"]]);
     const ElInput = withInstall(Input);
     const GAP = 4;
     const BAR_MAP = {
@@ -12017,7 +12017,7 @@ var require_index_001 = __commonJS({
       always: Boolean
     });
     const COMPONENT_NAME$b = "Thumb";
-    const _sfc_main$1k = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1l = /* @__PURE__ */ defineComponent({
       __name: "thumb",
       props: thumbProps,
       setup(__props) {
@@ -12146,7 +12146,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Thumb = /* @__PURE__ */ _export_sfc$1(_sfc_main$1k, [["__file", "thumb.vue"]]);
+    var Thumb = /* @__PURE__ */ _export_sfc$1(_sfc_main$1l, [["__file", "thumb.vue"]]);
     const barProps = buildProps({
       always: {
         type: Boolean,
@@ -12157,7 +12157,7 @@ var require_index_001 = __commonJS({
         required: true
       }
     });
-    const _sfc_main$1j = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1k = /* @__PURE__ */ defineComponent({
       __name: "bar",
       props: barProps,
       setup(__props, { expose }) {
@@ -12215,7 +12215,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Bar = /* @__PURE__ */ _export_sfc$1(_sfc_main$1j, [["__file", "bar.vue"]]);
+    var Bar = /* @__PURE__ */ _export_sfc$1(_sfc_main$1k, [["__file", "bar.vue"]]);
     const scrollbarProps = buildProps({
       distance: {
         type: Number,
@@ -12275,7 +12275,7 @@ var require_index_001 = __commonJS({
     const __default__$N = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$a
     });
-    const _sfc_main$1i = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1j = /* @__PURE__ */ defineComponent({
       ...__default__$N,
       props: scrollbarProps,
       emits: scrollbarEmits,
@@ -12484,7 +12484,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Scrollbar = /* @__PURE__ */ _export_sfc$1(_sfc_main$1i, [["__file", "scrollbar.vue"]]);
+    var Scrollbar = /* @__PURE__ */ _export_sfc$1(_sfc_main$1j, [["__file", "scrollbar.vue"]]);
     const ElScrollbar = withInstall(Scrollbar);
     const POPPER_INJECTION_KEY = Symbol("popper");
     const POPPER_CONTENT_INJECTION_KEY = Symbol("popperContent");
@@ -12509,7 +12509,7 @@ var require_index_001 = __commonJS({
       name: "ElPopper",
       inheritAttrs: false
     });
-    const _sfc_main$1h = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1i = /* @__PURE__ */ defineComponent({
       ...__default__$M,
       props: popperProps,
       setup(__props, { expose }) {
@@ -12533,12 +12533,12 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Popper = /* @__PURE__ */ _export_sfc$1(_sfc_main$1h, [["__file", "popper.vue"]]);
+    var Popper = /* @__PURE__ */ _export_sfc$1(_sfc_main$1i, [["__file", "popper.vue"]]);
     const __default__$L = /* @__PURE__ */ defineComponent({
       name: "ElPopperArrow",
       inheritAttrs: false
     });
-    const _sfc_main$1g = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1h = /* @__PURE__ */ defineComponent({
       ...__default__$L,
       setup(__props, { expose }) {
         const ns = useNamespace("popper");
@@ -12560,7 +12560,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElPopperArrow = /* @__PURE__ */ _export_sfc$1(_sfc_main$1g, [["__file", "arrow.vue"]]);
+    var ElPopperArrow = /* @__PURE__ */ _export_sfc$1(_sfc_main$1h, [["__file", "arrow.vue"]]);
     const popperTriggerProps = buildProps({
       virtualRef: {
         type: definePropType(Object)
@@ -12670,7 +12670,7 @@ var require_index_001 = __commonJS({
       name: "ElPopperTrigger",
       inheritAttrs: false
     });
-    const _sfc_main$1f = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1g = /* @__PURE__ */ defineComponent({
       ...__default__$K,
       props: popperTriggerProps,
       setup(__props, { expose }) {
@@ -12782,7 +12782,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElPopperTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$1f, [["__file", "trigger.vue"]]);
+    var ElPopperTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$1g, [["__file", "trigger.vue"]]);
     const FOCUS_AFTER_TRAPPED = "focus-trap.focus-after-trapped";
     const FOCUS_AFTER_RELEASED = "focus-trap.focus-after-released";
     const FOCUSOUT_PREVENTED = "focus-trap.focusout-prevented";
@@ -12976,7 +12976,7 @@ var require_index_001 = __commonJS({
         }
       });
     };
-    const _sfc_main$1e = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1f = /* @__PURE__ */ defineComponent({
       name: "ElFocusTrap",
       inheritAttrs: false,
       props: {
@@ -13221,7 +13221,7 @@ var require_index_001 = __commonJS({
     function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
       return renderSlot(_ctx.$slots, "default", { handleKeydown: _ctx.onKeydown });
     }
-    var ElFocusTrap = /* @__PURE__ */ _export_sfc$1(_sfc_main$1e, [["render", _sfc_render$g], ["__file", "focus-trap.vue"]]);
+    var ElFocusTrap = /* @__PURE__ */ _export_sfc$1(_sfc_main$1f, [["render", _sfc_render$g], ["__file", "focus-trap.vue"]]);
     var E$1 = "top", R = "bottom", W = "right", P$1 = "left", me = "auto", G = [E$1, R, W, P$1], U$1 = "start", J = "end", Xe = "clippingParents", je = "viewport", K = "popper", Ye = "reference", De = G.reduce(function(t, e) {
       return t.concat([e + "-" + U$1, e + "-" + J]);
     }, []), Ee = [].concat(G, [me]).reduce(function(t, e) {
@@ -14147,7 +14147,7 @@ var require_index_001 = __commonJS({
     const __default__$J = /* @__PURE__ */ defineComponent({
       name: "ElPopperContent"
     });
-    const _sfc_main$1d = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1e = /* @__PURE__ */ defineComponent({
       ...__default__$J,
       props: popperContentProps,
       emits: popperContentEmits,
@@ -14262,7 +14262,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElPopperContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$1d, [["__file", "content.vue"]]);
+    var ElPopperContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$1e, [["__file", "content.vue"]]);
     const ElPopper = withInstall(Popper);
     const TOOLTIP_INJECTION_KEY = Symbol("elTooltip");
     const teleportProps = buildProps({
@@ -14482,7 +14482,7 @@ var require_index_001 = __commonJS({
     const __default__$I = /* @__PURE__ */ defineComponent({
       name: "ElTooltipTrigger"
     });
-    const _sfc_main$1c = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1d = /* @__PURE__ */ defineComponent({
       ...__default__$I,
       props: useTooltipTriggerProps,
       setup(__props, { expose }) {
@@ -14542,8 +14542,8 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElTooltipTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$1c, [["__file", "trigger.vue"]]);
-    const _sfc_main$1b = /* @__PURE__ */ defineComponent({
+    var ElTooltipTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$1d, [["__file", "trigger.vue"]]);
+    const _sfc_main$1c = /* @__PURE__ */ defineComponent({
       __name: "teleport",
       props: teleportProps,
       setup(__props) {
@@ -14557,7 +14557,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Teleport = /* @__PURE__ */ _export_sfc$1(_sfc_main$1b, [["__file", "teleport.vue"]]);
+    var Teleport = /* @__PURE__ */ _export_sfc$1(_sfc_main$1c, [["__file", "teleport.vue"]]);
     const ElTeleport = withInstall(Teleport);
     const usePopperContainerId = () => {
       const namespace = useGetDerivedNamespace();
@@ -14595,7 +14595,7 @@ var require_index_001 = __commonJS({
       name: "ElTooltipContent",
       inheritAttrs: false
     });
-    const _sfc_main$1a = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1b = /* @__PURE__ */ defineComponent({
       ...__default__$H,
       props: useTooltipContentProps,
       setup(__props, { expose }) {
@@ -14771,11 +14771,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElTooltipContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$1a, [["__file", "content.vue"]]);
+    var ElTooltipContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$1b, [["__file", "content.vue"]]);
     const __default__$G = /* @__PURE__ */ defineComponent({
       name: "ElTooltip"
     });
-    const _sfc_main$19 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$1a = /* @__PURE__ */ defineComponent({
       ...__default__$G,
       props: useTooltipProps,
       emits: tooltipEmits,
@@ -14924,7 +14924,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Tooltip = /* @__PURE__ */ _export_sfc$1(_sfc_main$19, [["__file", "tooltip.vue"]]);
+    var Tooltip = /* @__PURE__ */ _export_sfc$1(_sfc_main$1a, [["__file", "tooltip.vue"]]);
     const ElTooltip = withInstall(Tooltip);
     const badgeProps = buildProps({
       value: {
@@ -14961,7 +14961,7 @@ var require_index_001 = __commonJS({
     const __default__$F = /* @__PURE__ */ defineComponent({
       name: "ElBadge"
     });
-    const _sfc_main$18 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$19 = /* @__PURE__ */ defineComponent({
       ...__default__$F,
       props: badgeProps,
       setup(__props, { expose }) {
@@ -15023,7 +15023,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Badge = /* @__PURE__ */ _export_sfc$1(_sfc_main$18, [["__file", "badge.vue"]]);
+    var Badge = /* @__PURE__ */ _export_sfc$1(_sfc_main$19, [["__file", "badge.vue"]]);
     const ElBadge = withInstall(Badge);
     const buttonGroupContextKey = Symbol("buttonGroupContextKey");
     const useDeprecated = ({ from, replacement, scope, version: version2, ref: ref2, type = "API" }, condition) => {
@@ -16110,7 +16110,7 @@ var require_index_001 = __commonJS({
     const __default__$E = /* @__PURE__ */ defineComponent({
       name: "ElButton"
     });
-    const _sfc_main$17 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$18 = /* @__PURE__ */ defineComponent({
       ...__default__$E,
       props: buttonProps,
       emits: buttonEmits,
@@ -16187,7 +16187,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Button = /* @__PURE__ */ _export_sfc$1(_sfc_main$17, [["__file", "button.vue"]]);
+    var Button = /* @__PURE__ */ _export_sfc$1(_sfc_main$18, [["__file", "button.vue"]]);
     const buttonGroupProps = {
       size: buttonProps.size,
       type: buttonProps.type
@@ -16195,7 +16195,7 @@ var require_index_001 = __commonJS({
     const __default__$D = /* @__PURE__ */ defineComponent({
       name: "ElButtonGroup"
     });
-    const _sfc_main$16 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$17 = /* @__PURE__ */ defineComponent({
       ...__default__$D,
       props: buttonGroupProps,
       setup(__props) {
@@ -16214,7 +16214,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ButtonGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$16, [["__file", "button-group.vue"]]);
+    var ButtonGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$17, [["__file", "button-group.vue"]]);
     const ElButton = withInstall(Button, {
       ButtonGroup
     });
@@ -17064,7 +17064,7 @@ var require_index_001 = __commonJS({
     const __default__$C = /* @__PURE__ */ defineComponent({
       name: "ElCheckbox"
     });
-    const _sfc_main$15 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$16 = /* @__PURE__ */ defineComponent({
       ...__default__$C,
       props: checkboxProps,
       emits: checkboxEmits,
@@ -17173,11 +17173,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Checkbox = /* @__PURE__ */ _export_sfc$1(_sfc_main$15, [["__file", "checkbox.vue"]]);
+    var Checkbox = /* @__PURE__ */ _export_sfc$1(_sfc_main$16, [["__file", "checkbox.vue"]]);
     const __default__$B = /* @__PURE__ */ defineComponent({
       name: "ElCheckboxButton"
     });
-    const _sfc_main$14 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$15 = /* @__PURE__ */ defineComponent({
       ...__default__$B,
       props: checkboxProps,
       emits: checkboxEmits,
@@ -17266,7 +17266,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var CheckboxButton = /* @__PURE__ */ _export_sfc$1(_sfc_main$14, [["__file", "checkbox-button.vue"]]);
+    var CheckboxButton = /* @__PURE__ */ _export_sfc$1(_sfc_main$15, [["__file", "checkbox-button.vue"]]);
     const checkboxGroupProps = buildProps({
       modelValue: {
         type: definePropType(Array),
@@ -17295,7 +17295,7 @@ var require_index_001 = __commonJS({
     const __default__$A = /* @__PURE__ */ defineComponent({
       name: "ElCheckboxGroup"
     });
-    const _sfc_main$13 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$14 = /* @__PURE__ */ defineComponent({
       ...__default__$A,
       props: checkboxGroupProps,
       emits: checkboxGroupEmits,
@@ -17354,7 +17354,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var CheckboxGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$13, [["__file", "checkbox-group.vue"]]);
+    var CheckboxGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$14, [["__file", "checkbox-group.vue"]]);
     const ElCheckbox = withInstall(Checkbox, {
       CheckboxButton,
       CheckboxGroup
@@ -17394,7 +17394,7 @@ var require_index_001 = __commonJS({
     const __default__$z = /* @__PURE__ */ defineComponent({
       name: "ElTag"
     });
-    const _sfc_main$12 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$13 = /* @__PURE__ */ defineComponent({
       ...__default__$z,
       props: tagProps,
       emits: tagEmits,
@@ -17482,7 +17482,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Tag = /* @__PURE__ */ _export_sfc$1(_sfc_main$12, [["__file", "tag.vue"]]);
+    var Tag = /* @__PURE__ */ _export_sfc$1(_sfc_main$13, [["__file", "tag.vue"]]);
     const ElTag = withInstall(Tag);
     const nodeList = /* @__PURE__ */ new Map();
     if (isClient) {
@@ -17556,7 +17556,7 @@ var require_index_001 = __commonJS({
     const __default__$y = /* @__PURE__ */ defineComponent({
       name: "ElContainer"
     });
-    const _sfc_main$11 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$12 = /* @__PURE__ */ defineComponent({
       ...__default__$y,
       props: {
         direction: {
@@ -17592,11 +17592,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Container = /* @__PURE__ */ _export_sfc$1(_sfc_main$11, [["__file", "container.vue"]]);
+    var Container = /* @__PURE__ */ _export_sfc$1(_sfc_main$12, [["__file", "container.vue"]]);
     const __default__$x = /* @__PURE__ */ defineComponent({
       name: "ElAside"
     });
-    const _sfc_main$10 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$11 = /* @__PURE__ */ defineComponent({
       ...__default__$x,
       props: {
         width: {
@@ -17618,11 +17618,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Aside = /* @__PURE__ */ _export_sfc$1(_sfc_main$10, [["__file", "aside.vue"]]);
+    var Aside = /* @__PURE__ */ _export_sfc$1(_sfc_main$11, [["__file", "aside.vue"]]);
     const __default__$w = /* @__PURE__ */ defineComponent({
       name: "ElFooter"
     });
-    const _sfc_main$$ = /* @__PURE__ */ defineComponent({
+    const _sfc_main$10 = /* @__PURE__ */ defineComponent({
       ...__default__$w,
       props: {
         height: {
@@ -17644,11 +17644,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Footer = /* @__PURE__ */ _export_sfc$1(_sfc_main$$, [["__file", "footer.vue"]]);
+    var Footer = /* @__PURE__ */ _export_sfc$1(_sfc_main$10, [["__file", "footer.vue"]]);
     const __default__$v = /* @__PURE__ */ defineComponent({
       name: "ElHeader"
     });
-    const _sfc_main$_ = /* @__PURE__ */ defineComponent({
+    const _sfc_main$$ = /* @__PURE__ */ defineComponent({
       ...__default__$v,
       props: {
         height: {
@@ -17674,11 +17674,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Header = /* @__PURE__ */ _export_sfc$1(_sfc_main$_, [["__file", "header.vue"]]);
+    var Header = /* @__PURE__ */ _export_sfc$1(_sfc_main$$, [["__file", "header.vue"]]);
     const __default__$u = /* @__PURE__ */ defineComponent({
       name: "ElMain"
     });
-    const _sfc_main$Z = /* @__PURE__ */ defineComponent({
+    const _sfc_main$_ = /* @__PURE__ */ defineComponent({
       ...__default__$u,
       setup(__props) {
         const ns = useNamespace("main");
@@ -17691,7 +17691,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Main = /* @__PURE__ */ _export_sfc$1(_sfc_main$Z, [["__file", "main.vue"]]);
+    var Main = /* @__PURE__ */ _export_sfc$1(_sfc_main$_, [["__file", "main.vue"]]);
     withInstall(Container, {
       Aside,
       Footer,
@@ -18139,7 +18139,7 @@ var require_index_001 = __commonJS({
       name: "PickerRangeTrigger",
       inheritAttrs: false
     });
-    const _sfc_main$Y = /* @__PURE__ */ defineComponent({
+    const _sfc_main$Z = /* @__PURE__ */ defineComponent({
       ...__default__$t,
       props: timePickerRangeTriggerProps,
       emits: [
@@ -18243,11 +18243,11 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var PickerRangeTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$Y, [["__file", "picker-range-trigger.vue"]]);
+    var PickerRangeTrigger = /* @__PURE__ */ _export_sfc$1(_sfc_main$Z, [["__file", "picker-range-trigger.vue"]]);
     const __default__$s = /* @__PURE__ */ defineComponent({
       name: "Picker"
     });
-    const _sfc_main$X = /* @__PURE__ */ defineComponent({
+    const _sfc_main$Y = /* @__PURE__ */ defineComponent({
       ...__default__$s,
       props: timePickerDefaultProps,
       emits: [
@@ -18850,7 +18850,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var CommonPicker = /* @__PURE__ */ _export_sfc$1(_sfc_main$X, [["__file", "picker.vue"]]);
+    var CommonPicker = /* @__PURE__ */ _export_sfc$1(_sfc_main$Y, [["__file", "picker.vue"]]);
     const panelTimePickerProps = buildProps({
       ...timePanelSharedProps,
       datetimeRole: String,
@@ -19008,7 +19008,7 @@ var require_index_001 = __commonJS({
         });
       }
     };
-    const _sfc_main$W = /* @__PURE__ */ defineComponent({
+    const _sfc_main$X = /* @__PURE__ */ defineComponent({
       __name: "basic-time-spinner",
       props: basicTimeSpinnerProps,
       emits: [CHANGE_EVENT, "select-range", "set-option"],
@@ -19311,8 +19311,8 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TimeSpinner = /* @__PURE__ */ _export_sfc$1(_sfc_main$W, [["__file", "basic-time-spinner.vue"]]);
-    const _sfc_main$V = /* @__PURE__ */ defineComponent({
+    var TimeSpinner = /* @__PURE__ */ _export_sfc$1(_sfc_main$X, [["__file", "basic-time-spinner.vue"]]);
+    const _sfc_main$W = /* @__PURE__ */ defineComponent({
       __name: "panel-time-pick",
       props: panelTimePickerProps,
       emits: ["pick", "select-range", "set-picker-option"],
@@ -19480,14 +19480,14 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TimePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$V, [["__file", "panel-time-pick.vue"]]);
+    var TimePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$W, [["__file", "panel-time-pick.vue"]]);
     const panelTimeRangeProps = buildProps({
       ...timePanelSharedProps,
       parsedValue: {
         type: definePropType(Array)
       }
     });
-    const _sfc_main$U = /* @__PURE__ */ defineComponent({
+    const _sfc_main$V = /* @__PURE__ */ defineComponent({
       __name: "panel-time-range",
       props: panelTimeRangeProps,
       emits: ["pick", "select-range", "set-picker-option"],
@@ -19758,7 +19758,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TimeRangePanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$U, [["__file", "panel-time-range.vue"]]);
+    var TimeRangePanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$V, [["__file", "panel-time-range.vue"]]);
     dayjs.extend(customParseFormat);
     var TimePicker = /* @__PURE__ */ defineComponent({
       name: "ElTimePicker",
@@ -20386,7 +20386,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const _sfc_main$T = /* @__PURE__ */ defineComponent({
+    const _sfc_main$U = /* @__PURE__ */ defineComponent({
       __name: "basic-date-table",
       props: basicDateTableProps,
       emits: basicDateTableEmits,
@@ -20474,12 +20474,12 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var DateTable = /* @__PURE__ */ _export_sfc$1(_sfc_main$T, [["__file", "basic-date-table.vue"]]);
+    var DateTable = /* @__PURE__ */ _export_sfc$1(_sfc_main$U, [["__file", "basic-date-table.vue"]]);
     const basicMonthTableProps = buildProps({
       ...datePickerSharedProps,
       selectionMode: selectionModeWithDefault("month")
     });
-    const _sfc_main$S = /* @__PURE__ */ defineComponent({
+    const _sfc_main$T = /* @__PURE__ */ defineComponent({
       __name: "basic-month-table",
       props: basicMonthTableProps,
       emits: ["changerange", "pick", "select"],
@@ -20678,12 +20678,12 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var MonthTable = /* @__PURE__ */ _export_sfc$1(_sfc_main$S, [["__file", "basic-month-table.vue"]]);
+    var MonthTable = /* @__PURE__ */ _export_sfc$1(_sfc_main$T, [["__file", "basic-month-table.vue"]]);
     const basicYearTableProps = buildProps({
       ...datePickerSharedProps,
       selectionMode: selectionModeWithDefault("year")
     });
-    const _sfc_main$R = /* @__PURE__ */ defineComponent({
+    const _sfc_main$S = /* @__PURE__ */ defineComponent({
       __name: "basic-year-table",
       props: basicYearTableProps,
       emits: ["changerange", "pick", "select"],
@@ -20879,8 +20879,8 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var YearTable = /* @__PURE__ */ _export_sfc$1(_sfc_main$R, [["__file", "basic-year-table.vue"]]);
-    const _sfc_main$Q = /* @__PURE__ */ defineComponent({
+    var YearTable = /* @__PURE__ */ _export_sfc$1(_sfc_main$S, [["__file", "basic-year-table.vue"]]);
+    const _sfc_main$R = /* @__PURE__ */ defineComponent({
       __name: "panel-date-pick",
       props: panelDatePickProps,
       emits: ["pick", "set-picker-option", "panel-change"],
@@ -21550,7 +21550,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var DatePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$Q, [["__file", "panel-date-pick.vue"]]);
+    var DatePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$R, [["__file", "panel-date-pick.vue"]]);
     const panelDateRangeProps = buildProps({
       ...panelSharedProps,
       ...panelRangeSharedProps
@@ -21774,7 +21774,7 @@ var require_index_001 = __commonJS({
       };
     };
     const unit$2 = "month";
-    const _sfc_main$P = /* @__PURE__ */ defineComponent({
+    const _sfc_main$Q = /* @__PURE__ */ defineComponent({
       __name: "panel-date-range",
       props: panelDateRangeProps,
       emits: [
@@ -22549,7 +22549,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var DateRangePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$P, [["__file", "panel-date-range.vue"]]);
+    var DateRangePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$Q, [["__file", "panel-date-range.vue"]]);
     const panelMonthRangeProps = buildProps({
       ...panelRangeSharedProps
     });
@@ -22609,7 +22609,7 @@ var require_index_001 = __commonJS({
     const __default__$r = /* @__PURE__ */ defineComponent({
       name: "DatePickerMonthRange"
     });
-    const _sfc_main$O = /* @__PURE__ */ defineComponent({
+    const _sfc_main$P = /* @__PURE__ */ defineComponent({
       ...__default__$r,
       props: panelMonthRangeProps,
       emits: panelMonthRangeEmits,
@@ -22847,7 +22847,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var MonthRangePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$O, [["__file", "panel-month-range.vue"]]);
+    var MonthRangePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$P, [["__file", "panel-month-range.vue"]]);
     const panelYearRangeProps = buildProps({
       ...panelRangeSharedProps
     });
@@ -22911,7 +22911,7 @@ var require_index_001 = __commonJS({
     const __default__$q = /* @__PURE__ */ defineComponent({
       name: "DatePickerYearRange"
     });
-    const _sfc_main$N = /* @__PURE__ */ defineComponent({
+    const _sfc_main$O = /* @__PURE__ */ defineComponent({
       ...__default__$q,
       props: panelYearRangeProps,
       emits: panelYearRangeEmits,
@@ -23175,7 +23175,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var YearRangePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$N, [["__file", "panel-year-range.vue"]]);
+    var YearRangePickPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$O, [["__file", "panel-year-range.vue"]]);
     const getPanel = function(type) {
       switch (type) {
         case "daterange":
@@ -23380,7 +23380,7 @@ var require_index_001 = __commonJS({
     const __default__$p = /* @__PURE__ */ defineComponent({
       name: "ElDescriptionsRow"
     });
-    const _sfc_main$M = /* @__PURE__ */ defineComponent({
+    const _sfc_main$N = /* @__PURE__ */ defineComponent({
       ...__default__$p,
       props: descriptionsRowProps,
       setup(__props) {
@@ -23435,7 +23435,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElDescriptionsRow = /* @__PURE__ */ _export_sfc$1(_sfc_main$M, [["__file", "descriptions-row.vue"]]);
+    var ElDescriptionsRow = /* @__PURE__ */ _export_sfc$1(_sfc_main$N, [["__file", "descriptions-row.vue"]]);
     const descriptionProps = buildProps({
       border: Boolean,
       column: {
@@ -23465,7 +23465,7 @@ var require_index_001 = __commonJS({
     const __default__$o = /* @__PURE__ */ defineComponent({
       name: "ElDescriptions"
     });
-    const _sfc_main$L = /* @__PURE__ */ defineComponent({
+    const _sfc_main$M = /* @__PURE__ */ defineComponent({
       ...__default__$o,
       props: descriptionProps,
       setup(__props) {
@@ -23580,7 +23580,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Descriptions = /* @__PURE__ */ _export_sfc$1(_sfc_main$L, [["__file", "description.vue"]]);
+    var Descriptions = /* @__PURE__ */ _export_sfc$1(_sfc_main$M, [["__file", "description.vue"]]);
     const columnAlignment = ["left", "center", "right"];
     const descriptionItemProps = buildProps({
       label: {
@@ -23843,7 +23843,7 @@ var require_index_001 = __commonJS({
       };
     };
     const __default__$n = /* @__PURE__ */ defineComponent({ name: "ElDialogContent" });
-    const _sfc_main$K = /* @__PURE__ */ defineComponent({
+    const _sfc_main$L = /* @__PURE__ */ defineComponent({
       ...__default__$n,
       props: dialogContentProps,
       emits: dialogContentEmits,
@@ -23920,7 +23920,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var ElDialogContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$K, [["__file", "dialog-content.vue"]]);
+    var ElDialogContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$L, [["__file", "dialog-content.vue"]]);
     const dialogProps = buildProps({
       ...dialogContentProps,
       appendToBody: Boolean,
@@ -24268,7 +24268,7 @@ var require_index_001 = __commonJS({
       name: "ElDialog",
       inheritAttrs: false
     });
-    const _sfc_main$J = /* @__PURE__ */ defineComponent({
+    const _sfc_main$K = /* @__PURE__ */ defineComponent({
       ...__default__$m,
       props: dialogProps,
       emits: dialogEmits,
@@ -24426,23 +24426,23 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Dialog = /* @__PURE__ */ _export_sfc$1(_sfc_main$J, [["__file", "dialog.vue"]]);
+    var Dialog = /* @__PURE__ */ _export_sfc$1(_sfc_main$K, [["__file", "dialog.vue"]]);
     const ElDialog = withInstall(Dialog);
-    const _sfc_main$I = /* @__PURE__ */ defineComponent({
+    const _sfc_main$J = /* @__PURE__ */ defineComponent({
       inheritAttrs: false
     });
     function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
       return renderSlot(_ctx.$slots, "default");
     }
-    var Collection = /* @__PURE__ */ _export_sfc$1(_sfc_main$I, [["render", _sfc_render$f], ["__file", "collection.vue"]]);
-    const _sfc_main$H = /* @__PURE__ */ defineComponent({
+    var Collection = /* @__PURE__ */ _export_sfc$1(_sfc_main$J, [["render", _sfc_render$f], ["__file", "collection.vue"]]);
+    const _sfc_main$I = /* @__PURE__ */ defineComponent({
       name: "ElCollectionItem",
       inheritAttrs: false
     });
     function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
       return renderSlot(_ctx.$slots, "default");
     }
-    var CollectionItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$H, [["render", _sfc_render$e], ["__file", "collection-item.vue"]]);
+    var CollectionItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$I, [["render", _sfc_render$e], ["__file", "collection-item.vue"]]);
     const COLLECTION_ITEM_SIGN = `data-el-collection-item`;
     const createCollectionWithScope = (name) => {
       const COLLECTION_NAME = `El${name}Collection`;
@@ -24574,7 +24574,7 @@ var require_index_001 = __commonJS({
     const CURRENT_TAB_ID_CHANGE_EVT = "currentTabIdChange";
     const ENTRY_FOCUS_EVT = "rovingFocusGroup.entryFocus";
     const EVT_OPTS = { bubbles: false, cancelable: true };
-    const _sfc_main$G = /* @__PURE__ */ defineComponent({
+    const _sfc_main$H = /* @__PURE__ */ defineComponent({
       name: "ElRovingFocusGroupImpl",
       inheritAttrs: false,
       props: rovingFocusGroupProps,
@@ -24660,8 +24660,8 @@ var require_index_001 = __commonJS({
     function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
       return renderSlot(_ctx.$slots, "default");
     }
-    var ElRovingFocusGroupImpl = /* @__PURE__ */ _export_sfc$1(_sfc_main$G, [["render", _sfc_render$d], ["__file", "roving-focus-group-impl.vue"]]);
-    const _sfc_main$F = /* @__PURE__ */ defineComponent({
+    var ElRovingFocusGroupImpl = /* @__PURE__ */ _export_sfc$1(_sfc_main$H, [["render", _sfc_render$d], ["__file", "roving-focus-group-impl.vue"]]);
+    const _sfc_main$G = /* @__PURE__ */ defineComponent({
       name: "ElRovingFocusGroup",
       components: {
         ElFocusGroupCollection: ElCollection$1,
@@ -24683,7 +24683,7 @@ var require_index_001 = __commonJS({
         _: 3
       });
     }
-    var ElRovingFocusGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$F, [["render", _sfc_render$c], ["__file", "roving-focus-group.vue"]]);
+    var ElRovingFocusGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$G, [["render", _sfc_render$c], ["__file", "roving-focus-group.vue"]]);
     const dropdownProps = buildProps({
       trigger: useTooltipTriggerProps.trigger,
       triggerKeys: {
@@ -24790,7 +24790,7 @@ var require_index_001 = __commonJS({
     const DROPDOWN_INJECTION_KEY = Symbol("elDropdown");
     const DROPDOWN_INSTANCE_INJECTION_KEY = "elDropdown";
     const { ButtonGroup: ElButtonGroup } = ElButton;
-    const _sfc_main$E = /* @__PURE__ */ defineComponent({
+    const _sfc_main$F = /* @__PURE__ */ defineComponent({
       name: "ElDropdown",
       components: {
         ElButton,
@@ -25076,8 +25076,8 @@ var require_index_001 = __commonJS({
         })) : createCommentVNode("v-if", true)
       ], 2);
     }
-    var Dropdown = /* @__PURE__ */ _export_sfc$1(_sfc_main$E, [["render", _sfc_render$b], ["__file", "dropdown.vue"]]);
-    const _sfc_main$D = /* @__PURE__ */ defineComponent({
+    var Dropdown = /* @__PURE__ */ _export_sfc$1(_sfc_main$F, [["render", _sfc_render$b], ["__file", "dropdown.vue"]]);
+    const _sfc_main$E = /* @__PURE__ */ defineComponent({
       components: {
         ElRovingFocusCollectionItem: ElCollectionItem$1
       },
@@ -25172,8 +25172,8 @@ var require_index_001 = __commonJS({
         _: 3
       }, 8, ["id", "focusable", "active"]);
     }
-    var ElRovingFocusItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$D, [["render", _sfc_render$a], ["__file", "roving-focus-item.vue"]]);
-    const _sfc_main$C = /* @__PURE__ */ defineComponent({
+    var ElRovingFocusItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$E, [["render", _sfc_render$a], ["__file", "roving-focus-item.vue"]]);
+    const _sfc_main$D = /* @__PURE__ */ defineComponent({
       name: "DropdownItemImpl",
       components: {
         ElIcon
@@ -25253,7 +25253,7 @@ var require_index_001 = __commonJS({
         ], 16, ["aria-disabled", "tabindex", "role", "onClick", "onFocus", "onKeydown", "onMousedown", "onPointermove", "onPointerleave"])
       ], 64);
     }
-    var ElDropdownItemImpl = /* @__PURE__ */ _export_sfc$1(_sfc_main$C, [["render", _sfc_render$9], ["__file", "dropdown-item-impl.vue"]]);
+    var ElDropdownItemImpl = /* @__PURE__ */ _export_sfc$1(_sfc_main$D, [["render", _sfc_render$9], ["__file", "dropdown-item-impl.vue"]]);
     const useDropdown = () => {
       const elDropdown = inject(DROPDOWN_INSTANCE_INJECTION_KEY, {});
       const _elDropdownSize = computed(() => elDropdown == null ? void 0 : elDropdown.dropdownSize);
@@ -25262,7 +25262,7 @@ var require_index_001 = __commonJS({
         _elDropdownSize
       };
     };
-    const _sfc_main$B = /* @__PURE__ */ defineComponent({
+    const _sfc_main$C = /* @__PURE__ */ defineComponent({
       name: "ElDropdownItem",
       components: {
         ElDropdownCollectionItem: ElCollectionItem,
@@ -25362,8 +25362,8 @@ var require_index_001 = __commonJS({
         _: 3
       }, 8, ["disabled", "text-value"]);
     }
-    var DropdownItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$B, [["render", _sfc_render$8], ["__file", "dropdown-item.vue"]]);
-    const _sfc_main$A = /* @__PURE__ */ defineComponent({
+    var DropdownItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$C, [["render", _sfc_render$8], ["__file", "dropdown-item.vue"]]);
+    const _sfc_main$B = /* @__PURE__ */ defineComponent({
       name: "ElDropdownMenu",
       props: dropdownMenuProps,
       setup(props) {
@@ -25440,7 +25440,7 @@ var require_index_001 = __commonJS({
         renderSlot(_ctx.$slots, "default")
       ], 46, ["role", "aria-labelledby", "onBlur", "onFocus", "onKeydown", "onMousedown"]);
     }
-    var DropdownMenu = /* @__PURE__ */ _export_sfc$1(_sfc_main$A, [["render", _sfc_render$7], ["__file", "dropdown-menu.vue"]]);
+    var DropdownMenu = /* @__PURE__ */ _export_sfc$1(_sfc_main$B, [["render", _sfc_render$7], ["__file", "dropdown-menu.vue"]]);
     const ElDropdown = withInstall(Dropdown, {
       DropdownItem,
       DropdownMenu
@@ -25541,7 +25541,7 @@ var require_index_001 = __commonJS({
     const __default__$l = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$8
     });
-    const _sfc_main$z = /* @__PURE__ */ defineComponent({
+    const _sfc_main$A = /* @__PURE__ */ defineComponent({
       ...__default__$l,
       props: formProps,
       emits: formEmits,
@@ -25685,7 +25685,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Form = /* @__PURE__ */ _export_sfc$1(_sfc_main$z, [["__file", "form.vue"]]);
+    var Form = /* @__PURE__ */ _export_sfc$1(_sfc_main$A, [["__file", "form.vue"]]);
     var define_process_env_default = {};
     function _extends() {
       _extends = Object.assign ? Object.assign.bind() : function(target) {
@@ -26875,7 +26875,7 @@ var require_index_001 = __commonJS({
     const __default__$k = /* @__PURE__ */ defineComponent({
       name: "ElFormItem"
     });
-    const _sfc_main$y = /* @__PURE__ */ defineComponent({
+    const _sfc_main$z = /* @__PURE__ */ defineComponent({
       ...__default__$k,
       props: formItemProps,
       setup(__props, { expose }) {
@@ -27179,7 +27179,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var FormItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$y, [["__file", "form-item.vue"]]);
+    var FormItem = /* @__PURE__ */ _export_sfc$1(_sfc_main$z, [["__file", "form-item.vue"]]);
     const ElForm = withInstall(Form, {
       FormItem
     });
@@ -27222,7 +27222,7 @@ var require_index_001 = __commonJS({
     const __default__$j = /* @__PURE__ */ defineComponent({
       name: "ElPaginationPrev"
     });
-    const _sfc_main$x = /* @__PURE__ */ defineComponent({
+    const _sfc_main$y = /* @__PURE__ */ defineComponent({
       ...__default__$j,
       props: paginationPrevProps,
       emits: paginationPrevEmits,
@@ -27249,7 +27249,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Prev = /* @__PURE__ */ _export_sfc$1(_sfc_main$x, [["__file", "prev.vue"]]);
+    var Prev = /* @__PURE__ */ _export_sfc$1(_sfc_main$y, [["__file", "prev.vue"]]);
     const paginationNextProps = buildProps({
       disabled: Boolean,
       currentPage: {
@@ -27270,7 +27270,7 @@ var require_index_001 = __commonJS({
     const __default__$i = /* @__PURE__ */ defineComponent({
       name: "ElPaginationNext"
     });
-    const _sfc_main$w = /* @__PURE__ */ defineComponent({
+    const _sfc_main$x = /* @__PURE__ */ defineComponent({
       ...__default__$i,
       props: paginationNextProps,
       emits: ["click"],
@@ -27297,7 +27297,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Next = /* @__PURE__ */ _export_sfc$1(_sfc_main$w, [["__file", "next.vue"]]);
+    var Next = /* @__PURE__ */ _export_sfc$1(_sfc_main$x, [["__file", "next.vue"]]);
     const selectGroupKey = Symbol("ElSelectGroup");
     const selectKey = Symbol("ElSelect");
     const COMPONENT_NAME$6 = "ElOption";
@@ -27393,7 +27393,7 @@ var require_index_001 = __commonJS({
         updateOption
       };
     }
-    const _sfc_main$v = /* @__PURE__ */ defineComponent({
+    const _sfc_main$w = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$6,
       componentName: COMPONENT_NAME$6,
       props: optionProps,
@@ -27475,8 +27475,8 @@ var require_index_001 = __commonJS({
         [vShow, _ctx.visible]
       ]);
     }
-    var Option = /* @__PURE__ */ _export_sfc$1(_sfc_main$v, [["render", _sfc_render$6], ["__file", "option.vue"]]);
-    const _sfc_main$u = /* @__PURE__ */ defineComponent({
+    var Option = /* @__PURE__ */ _export_sfc$1(_sfc_main$w, [["render", _sfc_render$6], ["__file", "option.vue"]]);
+    const _sfc_main$v = /* @__PURE__ */ defineComponent({
       name: "ElSelectDropdown",
       componentName: "ElSelectDropdown",
       setup() {
@@ -27523,7 +27523,7 @@ var require_index_001 = __commonJS({
         ], 2)) : createCommentVNode("v-if", true)
       ], 6);
     }
-    var ElSelectMenu = /* @__PURE__ */ _export_sfc$1(_sfc_main$u, [["render", _sfc_render$5], ["__file", "select-dropdown.vue"]]);
+    var ElSelectMenu = /* @__PURE__ */ _export_sfc$1(_sfc_main$v, [["render", _sfc_render$5], ["__file", "select-dropdown.vue"]]);
     const useSelect = (props, emit2) => {
       const { t } = useLocale();
       const contentId = useId();
@@ -28329,7 +28329,7 @@ var require_index_001 = __commonJS({
       clear: () => true
     });
     const COMPONENT_NAME$5 = "ElSelect";
-    const _sfc_main$t = /* @__PURE__ */ defineComponent({
+    const _sfc_main$u = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$5,
       componentName: COMPONENT_NAME$5,
       components: {
@@ -28809,8 +28809,8 @@ var require_index_001 = __commonJS({
         [_directive_click_outside, _ctx.handleClickOutside, _ctx.popperRef]
       ]);
     }
-    var Select = /* @__PURE__ */ _export_sfc$1(_sfc_main$t, [["render", _sfc_render$4], ["__file", "select.vue"]]);
-    const _sfc_main$s = /* @__PURE__ */ defineComponent({
+    var Select = /* @__PURE__ */ _export_sfc$1(_sfc_main$u, [["render", _sfc_render$4], ["__file", "select.vue"]]);
+    const _sfc_main$t = /* @__PURE__ */ defineComponent({
       name: "ElOptionGroup",
       componentName: "ElOptionGroup",
       props: {
@@ -28884,7 +28884,7 @@ var require_index_001 = __commonJS({
         [vShow, _ctx.visible]
       ]);
     }
-    var OptionGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$s, [["render", _sfc_render$3], ["__file", "option-group.vue"]]);
+    var OptionGroup = /* @__PURE__ */ _export_sfc$1(_sfc_main$t, [["render", _sfc_render$3], ["__file", "option-group.vue"]]);
     const ElSelect = withInstall(Select, {
       Option,
       OptionGroup
@@ -28915,7 +28915,7 @@ var require_index_001 = __commonJS({
     const __default__$h = /* @__PURE__ */ defineComponent({
       name: "ElPaginationSizes"
     });
-    const _sfc_main$r = /* @__PURE__ */ defineComponent({
+    const _sfc_main$s = /* @__PURE__ */ defineComponent({
       ...__default__$h,
       props: paginationSizesProps,
       emits: ["page-size-change"],
@@ -28973,7 +28973,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Sizes = /* @__PURE__ */ _export_sfc$1(_sfc_main$r, [["__file", "sizes.vue"]]);
+    var Sizes = /* @__PURE__ */ _export_sfc$1(_sfc_main$s, [["__file", "sizes.vue"]]);
     const paginationJumperProps = buildProps({
       size: {
         type: String,
@@ -28983,7 +28983,7 @@ var require_index_001 = __commonJS({
     const __default__$g = /* @__PURE__ */ defineComponent({
       name: "ElPaginationJumper"
     });
-    const _sfc_main$q = /* @__PURE__ */ defineComponent({
+    const _sfc_main$r = /* @__PURE__ */ defineComponent({
       ...__default__$g,
       props: paginationJumperProps,
       setup(__props) {
@@ -29031,7 +29031,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Jumper = /* @__PURE__ */ _export_sfc$1(_sfc_main$q, [["__file", "jumper.vue"]]);
+    var Jumper = /* @__PURE__ */ _export_sfc$1(_sfc_main$r, [["__file", "jumper.vue"]]);
     const paginationTotalProps = buildProps({
       total: {
         type: Number,
@@ -29041,7 +29041,7 @@ var require_index_001 = __commonJS({
     const __default__$f = /* @__PURE__ */ defineComponent({
       name: "ElPaginationTotal"
     });
-    const _sfc_main$p = /* @__PURE__ */ defineComponent({
+    const _sfc_main$q = /* @__PURE__ */ defineComponent({
       ...__default__$f,
       props: paginationTotalProps,
       setup(__props) {
@@ -29058,7 +29058,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Total = /* @__PURE__ */ _export_sfc$1(_sfc_main$p, [["__file", "total.vue"]]);
+    var Total = /* @__PURE__ */ _export_sfc$1(_sfc_main$q, [["__file", "total.vue"]]);
     const paginationPagerProps = buildProps({
       currentPage: {
         type: Number,
@@ -29077,7 +29077,7 @@ var require_index_001 = __commonJS({
     const __default__$e = /* @__PURE__ */ defineComponent({
       name: "ElPaginationPager"
     });
-    const _sfc_main$o = /* @__PURE__ */ defineComponent({
+    const _sfc_main$p = /* @__PURE__ */ defineComponent({
       ...__default__$e,
       props: paginationPagerProps,
       emits: [CHANGE_EVENT],
@@ -29276,7 +29276,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Pager = /* @__PURE__ */ _export_sfc$1(_sfc_main$o, [["__file", "pager.vue"]]);
+    var Pager = /* @__PURE__ */ _export_sfc$1(_sfc_main$p, [["__file", "pager.vue"]]);
     const isAbsent = (v2) => typeof v2 !== "number";
     const paginationProps = buildProps({
       pageSize: Number,
@@ -29594,7 +29594,7 @@ var require_index_001 = __commonJS({
     const __default__$d = /* @__PURE__ */ defineComponent({
       name: "ElPopconfirm"
     });
-    const _sfc_main$n = /* @__PURE__ */ defineComponent({
+    const _sfc_main$o = /* @__PURE__ */ defineComponent({
       ...__default__$d,
       props: popconfirmProps,
       emits: popconfirmEmits,
@@ -29704,7 +29704,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Popconfirm = /* @__PURE__ */ _export_sfc$1(_sfc_main$n, [["__file", "popconfirm.vue"]]);
+    var Popconfirm = /* @__PURE__ */ _export_sfc$1(_sfc_main$o, [["__file", "popconfirm.vue"]]);
     const ElPopconfirm = withInstall(Popconfirm);
     const progressProps = buildProps({
       type: {
@@ -29762,7 +29762,7 @@ var require_index_001 = __commonJS({
     const __default__$c = /* @__PURE__ */ defineComponent({
       name: "ElProgress"
     });
-    const _sfc_main$m = /* @__PURE__ */ defineComponent({
+    const _sfc_main$n = /* @__PURE__ */ defineComponent({
       ...__default__$c,
       props: progressProps,
       setup(__props) {
@@ -29959,7 +29959,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Progress = /* @__PURE__ */ _export_sfc$1(_sfc_main$m, [["__file", "progress.vue"]]);
+    var Progress = /* @__PURE__ */ _export_sfc$1(_sfc_main$n, [["__file", "progress.vue"]]);
     const ElProgress = withInstall(Progress);
     const isValidComponentSize = (val) => ["", ...componentSizes].includes(val);
     const switchProps = buildProps({
@@ -30032,7 +30032,7 @@ var require_index_001 = __commonJS({
     const __default__$b = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$4
     });
-    const _sfc_main$l = /* @__PURE__ */ defineComponent({
+    const _sfc_main$m = /* @__PURE__ */ defineComponent({
       ...__default__$b,
       props: switchProps,
       emits: switchEmits,
@@ -30242,7 +30242,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Switch = /* @__PURE__ */ _export_sfc$1(_sfc_main$l, [["__file", "switch.vue"]]);
+    var Switch = /* @__PURE__ */ _export_sfc$1(_sfc_main$m, [["__file", "switch.vue"]]);
     const ElSwitch = withInstall(Switch);
     const getCell = function(event) {
       var _a2;
@@ -31878,7 +31878,7 @@ var require_index_001 = __commonJS({
       }
     }
     const { CheckboxGroup: ElCheckboxGroup } = ElCheckbox;
-    const _sfc_main$k = /* @__PURE__ */ defineComponent({
+    const _sfc_main$l = /* @__PURE__ */ defineComponent({
       name: "ElTableFilterPanel",
       components: {
         ElCheckbox,
@@ -32151,7 +32151,7 @@ var require_index_001 = __commonJS({
         _: 3
       }, 8, ["visible", "placement", "popper-class", "append-to"]);
     }
-    var FilterPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$k, [["render", _sfc_render$2], ["__file", "filter-panel.vue"]]);
+    var FilterPanel = /* @__PURE__ */ _export_sfc$1(_sfc_main$l, [["render", _sfc_render$2], ["__file", "filter-panel.vue"]]);
     function useLayoutObserver(root2) {
       const instance = getCurrentInstance();
       onBeforeMount(() => {
@@ -32987,7 +32987,7 @@ var require_index_001 = __commonJS({
     const __default__$a = /* @__PURE__ */ defineComponent({
       name: "TableTdWrapper"
     });
-    const _sfc_main$j = /* @__PURE__ */ defineComponent({
+    const _sfc_main$k = /* @__PURE__ */ defineComponent({
       ...__default__$a,
       props: {
         colspan: {
@@ -33010,7 +33010,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TdWrapper = /* @__PURE__ */ _export_sfc$1(_sfc_main$j, [["__file", "td-wrapper.vue"]]);
+    var TdWrapper = /* @__PURE__ */ _export_sfc$1(_sfc_main$k, [["__file", "td-wrapper.vue"]]);
     function useRender$1(props) {
       const parent2 = inject(TABLE_INJECTION_KEY);
       const ns = useNamespace("table");
@@ -34055,7 +34055,7 @@ var require_index_001 = __commonJS({
       }
     };
     let tableIdSeed = 1;
-    const _sfc_main$i = /* @__PURE__ */ defineComponent({
+    const _sfc_main$j = /* @__PURE__ */ defineComponent({
       name: "ElTable",
       directives: {
         Mousewheel
@@ -34401,7 +34401,7 @@ var require_index_001 = __commonJS({
         ])
       ], 46, ["data-prefix", "onMouseleave"]);
     }
-    var Table = /* @__PURE__ */ _export_sfc$1(_sfc_main$i, [["render", _sfc_render$1], ["__file", "table.vue"]]);
+    var Table = /* @__PURE__ */ _export_sfc$1(_sfc_main$j, [["render", _sfc_render$1], ["__file", "table.vue"]]);
     const defaultClassNames = {
       selection: "table-column--selection",
       expand: "table__expand-column"
@@ -35058,7 +35058,7 @@ var require_index_001 = __commonJS({
     const __default__$9 = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$3
     });
-    const _sfc_main$h = /* @__PURE__ */ defineComponent({
+    const _sfc_main$i = /* @__PURE__ */ defineComponent({
       ...__default__$9,
       props: tabBarProps,
       setup(__props, { expose }) {
@@ -35132,7 +35132,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TabBar = /* @__PURE__ */ _export_sfc$1(_sfc_main$h, [["__file", "tab-bar.vue"]]);
+    var TabBar = /* @__PURE__ */ _export_sfc$1(_sfc_main$i, [["__file", "tab-bar.vue"]]);
     const tabNavProps = buildProps({
       panes: {
         type: definePropType(Array),
@@ -35584,7 +35584,7 @@ var require_index_001 = __commonJS({
     const __default__$8 = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME$1
     });
-    const _sfc_main$g = /* @__PURE__ */ defineComponent({
+    const _sfc_main$h = /* @__PURE__ */ defineComponent({
       ...__default__$8,
       props: tabPaneProps,
       setup(__props) {
@@ -35654,7 +35654,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TabPane = /* @__PURE__ */ _export_sfc$1(_sfc_main$g, [["__file", "tab-pane.vue"]]);
+    var TabPane = /* @__PURE__ */ _export_sfc$1(_sfc_main$h, [["__file", "tab-pane.vue"]]);
     const ElTabs = withInstall(Tabs$1, {
       TabPane
     });
@@ -35682,7 +35682,7 @@ var require_index_001 = __commonJS({
     const __default__$7 = /* @__PURE__ */ defineComponent({
       name: "ElText"
     });
-    const _sfc_main$f = /* @__PURE__ */ defineComponent({
+    const _sfc_main$g = /* @__PURE__ */ defineComponent({
       ...__default__$7,
       props: textProps,
       setup(__props) {
@@ -35740,7 +35740,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Text = /* @__PURE__ */ _export_sfc$1(_sfc_main$f, [["__file", "text.vue"]]);
+    var Text = /* @__PURE__ */ _export_sfc$1(_sfc_main$g, [["__file", "text.vue"]]);
     const ElText = withInstall(Text);
     const timeSelectProps = buildProps({
       format: {
@@ -35853,7 +35853,7 @@ var require_index_001 = __commonJS({
     const __default__$6 = /* @__PURE__ */ defineComponent({
       name: "ElTimeSelect"
     });
-    const _sfc_main$e = /* @__PURE__ */ defineComponent({
+    const _sfc_main$f = /* @__PURE__ */ defineComponent({
       ...__default__$6,
       props: timeSelectProps,
       emits: [CHANGE_EVENT, "blur", "focus", "clear", UPDATE_MODEL_EVENT],
@@ -35969,7 +35969,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var TimeSelect = /* @__PURE__ */ _export_sfc$1(_sfc_main$e, [["__file", "time-select.vue"]]);
+    var TimeSelect = /* @__PURE__ */ _export_sfc$1(_sfc_main$f, [["__file", "time-select.vue"]]);
     const ElTimeSelect = withInstall(TimeSelect);
     const uploadContextKey = Symbol("uploadContextKey");
     const SCOPE$1 = "ElUpload";
@@ -36172,7 +36172,7 @@ var require_index_001 = __commonJS({
     const __default__$5 = /* @__PURE__ */ defineComponent({
       name: "ElUploadList"
     });
-    const _sfc_main$d = /* @__PURE__ */ defineComponent({
+    const _sfc_main$e = /* @__PURE__ */ defineComponent({
       ...__default__$5,
       props: uploadListProps,
       emits: uploadListEmits,
@@ -36333,7 +36333,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var UploadList = /* @__PURE__ */ _export_sfc$1(_sfc_main$d, [["__file", "upload-list.vue"]]);
+    var UploadList = /* @__PURE__ */ _export_sfc$1(_sfc_main$e, [["__file", "upload-list.vue"]]);
     const uploadDraggerProps = buildProps({
       disabled: Boolean
     });
@@ -36344,7 +36344,7 @@ var require_index_001 = __commonJS({
     const __default__$4 = /* @__PURE__ */ defineComponent({
       name: COMPONENT_NAME
     });
-    const _sfc_main$c = /* @__PURE__ */ defineComponent({
+    const _sfc_main$d = /* @__PURE__ */ defineComponent({
       ...__default__$4,
       props: uploadDraggerProps,
       emits: uploadDraggerEmits,
@@ -36393,7 +36393,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var UploadDragger = /* @__PURE__ */ _export_sfc$1(_sfc_main$c, [["__file", "upload-dragger.vue"]]);
+    var UploadDragger = /* @__PURE__ */ _export_sfc$1(_sfc_main$d, [["__file", "upload-dragger.vue"]]);
     const uploadContentProps = buildProps({
       ...uploadBaseProps,
       beforeUpload: {
@@ -36429,7 +36429,7 @@ var require_index_001 = __commonJS({
       name: "ElUploadContent",
       inheritAttrs: false
     });
-    const _sfc_main$b = /* @__PURE__ */ defineComponent({
+    const _sfc_main$c = /* @__PURE__ */ defineComponent({
       ...__default__$3,
       props: uploadContentProps,
       setup(__props, { expose }) {
@@ -36611,7 +36611,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var UploadContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$b, [["__file", "upload-content.vue"]]);
+    var UploadContent = /* @__PURE__ */ _export_sfc$1(_sfc_main$c, [["__file", "upload-content.vue"]]);
     const SCOPE = "ElUpload";
     const revokeFileObjectURL = (file) => {
       var _a2;
@@ -36743,7 +36743,7 @@ var require_index_001 = __commonJS({
     const __default__$2 = /* @__PURE__ */ defineComponent({
       name: "ElUpload"
     });
-    const _sfc_main$a = /* @__PURE__ */ defineComponent({
+    const _sfc_main$b = /* @__PURE__ */ defineComponent({
       ...__default__$2,
       props: uploadProps,
       setup(__props, { expose }) {
@@ -36858,7 +36858,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var Upload = /* @__PURE__ */ _export_sfc$1(_sfc_main$a, [["__file", "upload.vue"]]);
+    var Upload = /* @__PURE__ */ _export_sfc$1(_sfc_main$b, [["__file", "upload.vue"]]);
     const ElUpload = withInstall(Upload);
     function createLoadingComponent(options, appContext) {
       let afterLeaveTimer;
@@ -37265,7 +37265,7 @@ var require_index_001 = __commonJS({
     const __default__$1 = /* @__PURE__ */ defineComponent({
       name: "ElMessage"
     });
-    const _sfc_main$9 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$a = /* @__PURE__ */ defineComponent({
       ...__default__$1,
       props: messageProps,
       emits: messageEmits,
@@ -37406,7 +37406,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var MessageConstructor = /* @__PURE__ */ _export_sfc$1(_sfc_main$9, [["__file", "message.vue"]]);
+    var MessageConstructor = /* @__PURE__ */ _export_sfc$1(_sfc_main$a, [["__file", "message.vue"]]);
     let seed$1 = 1;
     const normalizeOptions = (params) => {
       const options = !params || isString$1(params) || isVNode(params) || isFunction$2(params) ? { message: params } : params;
@@ -37570,7 +37570,7 @@ var require_index_001 = __commonJS({
         }
       }
     };
-    const _sfc_main$8 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$9 = /* @__PURE__ */ defineComponent({
       name: "ElMessageBox",
       directives: {
         TrapFocus
@@ -38040,7 +38040,7 @@ var require_index_001 = __commonJS({
         _: 3
       }, 8, ["onAfterLeave"]);
     }
-    var MessageBoxConstructor = /* @__PURE__ */ _export_sfc$1(_sfc_main$8, [["render", _sfc_render], ["__file", "index.vue"]]);
+    var MessageBoxConstructor = /* @__PURE__ */ _export_sfc$1(_sfc_main$9, [["render", _sfc_render], ["__file", "index.vue"]]);
     const messageInstance = /* @__PURE__ */ new Map();
     const getAppendToElement = (props) => {
       let appendTo = document.body;
@@ -38253,7 +38253,7 @@ var require_index_001 = __commonJS({
     const __default__ = /* @__PURE__ */ defineComponent({
       name: "ElNotification"
     });
-    const _sfc_main$7 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$8 = /* @__PURE__ */ defineComponent({
       ...__default__,
       props: notificationProps,
       emits: notificationEmits,
@@ -38382,7 +38382,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    var NotificationConstructor = /* @__PURE__ */ _export_sfc$1(_sfc_main$7, [["__file", "notification.vue"]]);
+    var NotificationConstructor = /* @__PURE__ */ _export_sfc$1(_sfc_main$8, [["__file", "notification.vue"]]);
     const notifications = {
       "top-left": [],
       "top-right": [],
@@ -38708,8 +38708,8 @@ var require_index_001 = __commonJS({
       }
       return "";
     }
-    const _hoisted_1$6 = { class: "upgrade-popup-content" };
-    const _sfc_main$6 = /* @__PURE__ */ defineComponent({
+    const _hoisted_1$7 = { class: "upgrade-popup-content" };
+    const _sfc_main$7 = /* @__PURE__ */ defineComponent({
       __name: "ClientTimeLineDialog",
       setup(__props, { expose: __expose }) {
         const responsiveLayout = ref("sizes, prev, pager, next");
@@ -38818,7 +38818,7 @@ var require_index_001 = __commonJS({
             title: title.value
           }, {
             default: withCtx(() => [
-              createBaseVNode("div", _hoisted_1$6, [
+              createBaseVNode("div", _hoisted_1$7, [
                 createVNode(_component_el_table, {
                   data: paginatedTableData.value,
                   border: ""
@@ -38903,7 +38903,7 @@ var require_index_001 = __commonJS({
       }
       return target;
     };
-    const ClientTimeLineDialog = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-908236e8"]]);
+    const ClientTimeLineDialog = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-908236e8"]]);
     class SimpleSSEClient {
       constructor(url) {
         __publicField(this, "eventSource", null);
@@ -38984,148 +38984,15 @@ var require_index_001 = __commonJS({
         }
       }
     }
-    const _hoisted_1$5 = { class: "main" };
-    const _sfc_main$5 = /* @__PURE__ */ defineComponent({
-      __name: "ViewExpand",
-      props: {
-        row: {}
-      },
-      setup(__props) {
-        function getClientName(row) {
-          var _a2, _b;
-          if (row.nick) {
-            if (((_a2 = row.nick) == null ? void 0 : _a2.name) === "") {
-              return row.hostname;
-            } else {
-              return (_b = row.nick) == null ? void 0 : _b.name;
-            }
-          } else {
-            return row.hostname;
-          }
-        }
-        return (_ctx, _cache) => {
-          const _component_el_form_item = ElFormItem;
-          const _component_el_tooltip = ElTooltip;
-          const _component_el_form = ElForm;
-          return openBlock(), createElementBlock("div", _hoisted_1$5, [
-            createVNode(_component_el_form, {
-              "label-position": "left",
-              "label-width": "auto"
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_el_form_item, { label: "昵称" }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(getClientName(_ctx.row)), 1)
-                  ]),
-                  _: 1
-                }),
-                createVNode(_component_el_form_item, { label: "名称" }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.hostname), 1)
-                  ]),
-                  _: 1
-                }),
-                createVNode(_component_el_form_item, { label: "品牌" }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.vendor), 1)
-                  ]),
-                  _: 1
-                }),
-                createVNode(_component_el_form_item, { label: "类型" }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.staType), 1)
-                  ]),
-                  _: 1
-                }),
-                createVNode(_component_el_form_item, { label: "wifi名称" }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.ssid), 1)
-                  ]),
-                  _: 1
-                }),
-                createVNode(_component_el_form_item, { label: "信号强度" }, {
-                  default: withCtx(() => [
-                    createVNode(_component_el_tooltip, { content: "信号强度（单位：dBm）：负值（越接近0表示信号越强）。`-44`为优秀信号（通常`-50`以上为良好）" }, {
-                      default: withCtx(() => [
-                        createBaseVNode("span", null, toDisplayString(_ctx.row.signal), 1)
-                      ]),
-                      _: 1
-                    })
-                  ]),
-                  _: 1
-                }),
-                createVNode(_component_el_form_item, { label: "无线频段" }, {
-                  default: withCtx(() => [
-                    createVNode(_component_el_tooltip, { content: "无线频段频率（单位：MHz）：`5180`属于5GHz频段（常见频段：2.4GHz范围为`2400~2483`，5GHz为`5150~5850`）" }, {
-                      default: withCtx(() => [
-                        createBaseVNode("span", null, toDisplayString(_ctx.row.freq), 1)
-                      ]),
-                      _: 1
-                    })
-                  ]),
-                  _: 1
-                }),
-                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
-                  key: 0,
-                  label: "Mac地址"
-                }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.mac), 1)
-                  ]),
-                  _: 1
-                })) : createCommentVNode("", true),
-                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
-                  key: 1,
-                  label: "wifi名称"
-                }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.ssid), 1)
-                  ]),
-                  _: 1
-                })) : createCommentVNode("", true),
-                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
-                  key: 2,
-                  label: "设备类型"
-                }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.staType), 1)
-                  ]),
-                  _: 1
-                })) : createCommentVNode("", true),
-                _ctx.row.phy !== "" ? (openBlock(), createBlock(_component_el_form_item, {
-                  key: 3,
-                  label: "网络接口"
-                }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(_ctx.row.phy), 1)
-                  ]),
-                  _: 1
-                })) : createCommentVNode("", true),
-                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
-                  key: 4,
-                  label: "连接时间"
-                }, {
-                  default: withCtx(() => [
-                    createBaseVNode("span", null, toDisplayString(unref(formatTimeStamp)(_ctx.row.starTime)), 1)
-                  ]),
-                  _: 1
-                })) : createCommentVNode("", true)
-              ]),
-              _: 1
-            })
-          ]);
-        };
-      }
-    });
     const _withScopeId$1 = (n) => (pushScopeId("data-v-9e6284df"), n = n(), popScopeId(), n);
-    const _hoisted_1$4 = {
+    const _hoisted_1$6 = {
       key: 0,
       class: "upgrade-popup-overlay"
     };
-    const _hoisted_2$4 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("h3", null, "❤️ 发现新版本", -1));
-    const _hoisted_3$3 = ["innerHTML"];
-    const _hoisted_4$3 = { class: "upgrade-popup-footer" };
-    const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+    const _hoisted_2$5 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("h3", null, "❤️ 发现新版本", -1));
+    const _hoisted_3$4 = ["innerHTML"];
+    const _hoisted_4$4 = { class: "upgrade-popup-footer" };
+    const _sfc_main$6 = /* @__PURE__ */ defineComponent({
       __name: "UpgradeDialog",
       setup(__props, { expose: __expose }) {
         const showUpgradeDialog = ref(false);
@@ -39231,13 +39098,13 @@ var require_index_001 = __commonJS({
         return (_ctx, _cache) => {
           const _component_el_button = ElButton;
           return openBlock(), createElementBlock("div", null, [
-            showUpgradeDialog.value ? (openBlock(), createElementBlock("div", _hoisted_1$4, [
+            showUpgradeDialog.value ? (openBlock(), createElementBlock("div", _hoisted_1$6, [
               createBaseVNode("div", {
                 class: "upgrade-popup",
                 style: normalizeStyle({ width: dialogWidth.value + "px" })
               }, [
                 createBaseVNode("div", { class: "upgrade-popup-header" }, [
-                  _hoisted_2$4,
+                  _hoisted_2$5,
                   createBaseVNode("button", {
                     onClick: handleClose,
                     class: "close-button"
@@ -39246,8 +39113,8 @@ var require_index_001 = __commonJS({
                 createBaseVNode("div", {
                   class: "upgrade-popup-content",
                   innerHTML: updateContent.value
-                }, null, 8, _hoisted_3$3),
-                createBaseVNode("div", _hoisted_4$3, [
+                }, null, 8, _hoisted_3$4),
+                createBaseVNode("div", _hoisted_4$4, [
                   createVNode(_component_el_button, { onClick: handleClose }, {
                     default: withCtx(() => [
                       createTextVNode("稍后提醒")
@@ -39280,17 +39147,17 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const UpgradeDialog = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-9e6284df"]]);
+    const UpgradeDialog = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-9e6284df"]]);
     const _withScopeId = (n) => (pushScopeId("data-v-110a8892"), n = n(), popScopeId(), n);
-    const _hoisted_1$3 = { class: "upgrade-popup-content" };
-    const _hoisted_2$3 = { style: { "display": "flex", "margin-bottom": "20px" } };
-    const _hoisted_3$2 = { style: { "display": "flex" } };
-    const _hoisted_4$2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "主机名：", -1));
-    const _hoisted_5$2 = { style: { "display": "flex", "margin-left": "20px" } };
+    const _hoisted_1$5 = { class: "upgrade-popup-content" };
+    const _hoisted_2$4 = { style: { "display": "flex", "margin-bottom": "20px" } };
+    const _hoisted_3$3 = { style: { "display": "flex" } };
+    const _hoisted_4$3 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "主机名：", -1));
+    const _hoisted_5$3 = { style: { "display": "flex", "margin-left": "20px" } };
     const _hoisted_6$1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "Mac地址：", -1));
     const _hoisted_7$1 = { style: { "display": "flex", "margin-left": "20px" } };
     const _hoisted_8$1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "IP地址：", -1));
-    const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+    const _sfc_main$5 = /* @__PURE__ */ defineComponent({
       __name: "StaticIpListDialog",
       setup(__props, { expose: __expose }) {
         const valueName = ref("");
@@ -39504,20 +39371,20 @@ var require_index_001 = __commonJS({
             title: formData.value.title
           }, {
             default: withCtx(() => [
-              createBaseVNode("div", _hoisted_1$3, [
+              createBaseVNode("div", _hoisted_1$5, [
                 createBaseVNode("section", null, [
                   createVNode(_component_el_main, null, {
                     default: withCtx(() => [
-                      createBaseVNode("div", _hoisted_2$3, [
-                        createBaseVNode("div", _hoisted_3$2, [
-                          _hoisted_4$2,
+                      createBaseVNode("div", _hoisted_2$4, [
+                        createBaseVNode("div", _hoisted_3$3, [
+                          _hoisted_4$3,
                           createVNode(_component_el_input, {
                             placeholder: "请输入主机名",
                             modelValue: valueName.value,
                             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => valueName.value = $event)
                           }, null, 8, ["modelValue"])
                         ]),
-                        createBaseVNode("div", _hoisted_5$2, [
+                        createBaseVNode("div", _hoisted_5$3, [
                           _hoisted_6$1,
                           createVNode(_component_el_select, {
                             modelValue: valueMac.value,
@@ -39717,13 +39584,13 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const StaticIpListDialog = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-110a8892"]]);
-    const _hoisted_1$2 = { class: "dialog-wrapper" };
-    const _hoisted_2$2 = { class: "upgrade-popup-content" };
-    const _hoisted_3$1 = { style: { "display": "flex", "align-items": "center" } };
-    const _hoisted_4$1 = { style: { "margin-bottom": "10px" } };
-    const _hoisted_5$1 = { m: "4" };
-    const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+    const StaticIpListDialog = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-110a8892"]]);
+    const _hoisted_1$4 = { class: "dialog-wrapper" };
+    const _hoisted_2$3 = { class: "upgrade-popup-content" };
+    const _hoisted_3$2 = { style: { "display": "flex", "align-items": "center" } };
+    const _hoisted_4$2 = { style: { "margin-bottom": "10px" } };
+    const _hoisted_5$2 = { m: "4" };
+    const _sfc_main$4 = /* @__PURE__ */ defineComponent({
       __name: "ClientSettingDialog",
       setup(__props, { expose: __expose }) {
         const formData = ref({
@@ -40128,7 +39995,7 @@ var require_index_001 = __commonJS({
           const _component_el_pagination = ElPagination;
           const _component_el_tabs = ElTabs;
           const _component_el_dialog = ElDialog;
-          return openBlock(), createElementBlock("div", _hoisted_1$2, [
+          return openBlock(), createElementBlock("div", _hoisted_1$4, [
             createVNode(_component_el_dialog, {
               modal: true,
               "close-on-click-modal": true,
@@ -40139,7 +40006,7 @@ var require_index_001 = __commonJS({
               title: formData.value.title
             }, createSlots({
               default: withCtx(() => [
-                createBaseVNode("div", _hoisted_2$2, [
+                createBaseVNode("div", _hoisted_2$3, [
                   createVNode(_component_el_tabs, {
                     modelValue: formData.value.activeName,
                     "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => formData.value.activeName = $event),
@@ -40192,7 +40059,7 @@ var require_index_001 = __commonJS({
                               }),
                               createVNode(_component_el_form_item, { label: "统计考勤：" }, {
                                 default: withCtx(() => [
-                                  createBaseVNode("div", _hoisted_3$1, [
+                                  createBaseVNode("div", _hoisted_3$2, [
                                     createVNode(_component_el_time_select, {
                                       modelValue: formData.value.client.nick.workType.onWorkTime,
                                       "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => formData.value.client.nick.workType.onWorkTime = $event),
@@ -40233,7 +40100,7 @@ var require_index_001 = __commonJS({
                       }, {
                         default: withCtx(() => [
                           createBaseVNode("div", null, [
-                            createBaseVNode("div", _hoisted_4$1, [
+                            createBaseVNode("div", _hoisted_4$2, [
                               createVNode(_component_el_date_picker, {
                                 modelValue: value3.value,
                                 "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => value3.value = $event),
@@ -40308,7 +40175,7 @@ var require_index_001 = __commonJS({
                               default: withCtx(() => [
                                 createVNode(_component_el_table_column, { type: "expand" }, {
                                   default: withCtx((props) => [
-                                    createBaseVNode("div", _hoisted_5$1, [
+                                    createBaseVNode("div", _hoisted_5$2, [
                                       createVNode(_component_el_table, {
                                         data: props.row.dayDatas,
                                         border: "",
@@ -40330,8 +40197,9 @@ var require_index_001 = __commonJS({
                                                 "onUpdate:modelValue": ($event) => scope.row.workTime1 = $event,
                                                 style: { "width": "100px" },
                                                 "arrow-control": "",
-                                                "value-format": "HH:mm:ss"
-                                              }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                                "value-format": "HH:mm:ss",
+                                                onChange: ($event) => handleChangeWorkTime(scope.row)
+                                              }, null, 8, ["modelValue", "onUpdate:modelValue", "onChange"])
                                             ]),
                                             _: 1
                                           }),
@@ -40345,8 +40213,9 @@ var require_index_001 = __commonJS({
                                                 "onUpdate:modelValue": ($event) => scope.row.workTime2 = $event,
                                                 style: { "width": "100px" },
                                                 "arrow-control": "",
-                                                "value-format": "HH:mm:ss"
-                                              }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                                "value-format": "HH:mm:ss",
+                                                onChange: ($event) => handleChangeWorkTime(scope.row)
+                                              }, null, 8, ["modelValue", "onUpdate:modelValue", "onChange"])
                                             ]),
                                             _: 1
                                           }),
@@ -40657,10 +40526,10 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const ClientSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-07d3eedb"]]);
-    const _hoisted_1$1 = { class: "dialog-wrapper" };
-    const _hoisted_2$1 = { class: "upgrade-popup-content" };
-    const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+    const ClientSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-12eb9f54"]]);
+    const _hoisted_1$3 = { class: "dialog-wrapper" };
+    const _hoisted_2$2 = { class: "upgrade-popup-content" };
+    const _sfc_main$3 = /* @__PURE__ */ defineComponent({
       __name: "PushSettingDialog",
       setup(__props, { expose: __expose }) {
         const formData = ref({
@@ -40800,7 +40669,7 @@ var require_index_001 = __commonJS({
           const _component_el_checkbox = ElCheckbox;
           const _component_el_tabs = ElTabs;
           const _component_el_dialog = ElDialog;
-          return openBlock(), createElementBlock("div", _hoisted_1$1, [
+          return openBlock(), createElementBlock("div", _hoisted_1$3, [
             createVNode(_component_el_dialog, {
               modal: true,
               "close-on-click-modal": true,
@@ -40811,7 +40680,7 @@ var require_index_001 = __commonJS({
               title: formData.value.title
             }, {
               default: withCtx(() => [
-                createBaseVNode("div", _hoisted_2$1, [
+                createBaseVNode("div", _hoisted_2$2, [
                   createVNode(_component_el_tabs, {
                     modelValue: formData.value.activeName,
                     "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => formData.value.activeName = $event),
@@ -41021,7 +40890,1073 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-d5b804ff"]]);
+    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-d5b804ff"]]);
+    const _hoisted_1$2 = { class: "upgrade-popup-content" };
+    const _hoisted_2$1 = { style: { "display": "flex", "align-items": "center" } };
+    const _hoisted_3$1 = { style: { "margin-bottom": "10px" } };
+    const _hoisted_4$1 = { m: "4" };
+    const _hoisted_5$1 = { key: 0 };
+    const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+      __name: "SettingAndKaoqQin",
+      props: {
+        row: {}
+      },
+      setup(__props, { expose: __expose }) {
+        const props = __props;
+        onMounted(() => {
+          console.log("VVVVVVVVV====>", props.row);
+          showDialogForm(props.row);
+        });
+        const formData = ref({
+          show: false,
+          deleteloading: false,
+          loading: false,
+          activeName: "first",
+          hideErrBtn: false,
+          showFooter: true,
+          title: "",
+          second: {
+            hostname: "",
+            mac: "",
+            ip: ""
+          },
+          client: {
+            hostname: "",
+            ip: "",
+            mac: "",
+            nick: {
+              isPush: false,
+              workType: {
+                onWorkTime: "",
+                offWorkTime: "",
+                webhookUrl: "",
+                isSaturdayWork: false
+              }
+            }
+          }
+        });
+        const handleShowSelect = (row) => {
+          row.showSelect = !row.showSelect;
+        };
+        const handleSelectChange = (row) => {
+          row.showSelect = false;
+        };
+        function isThridShow() {
+          if (formData.value && formData.value.client && formData.value.client.nick && formData.value.client.nick.workType && formData.value.client.nick.workType.onWorkTime != "" && formData.value.client.nick.workType.offWorkTime != "") {
+            return true;
+          }
+          return false;
+        }
+        const getTagType = (value) => {
+          switch (value) {
+            case 0:
+              return "success";
+            case 1:
+              return "danger";
+            case 2:
+              return "warning";
+            case 3:
+              return "warning";
+            default:
+              return "primary";
+          }
+        };
+        const getTagName = (value) => {
+          switch (value) {
+            case 0:
+              return "工作日";
+            case 1:
+              return "休息日";
+            case 2:
+              return "补班日";
+            case 3:
+              return "加班日";
+            default:
+              return "未知";
+          }
+        };
+        const options = [
+          {
+            value: 0,
+            label: "工作日"
+          },
+          {
+            value: 1,
+            label: "节假日"
+          },
+          {
+            value: 2,
+            label: "补班日"
+          },
+          {
+            value: 3,
+            label: "加班日"
+          }
+        ];
+        const value3 = ref(0);
+        const width = ref("30%");
+        const monthData = ref([]);
+        const currentPage = ref(1);
+        const pageSize = ref(10);
+        const size2 = ref("default");
+        const paginatedTableData = computed(() => {
+          const start = (currentPage.value - 1) * pageSize.value;
+          const end = start + pageSize.value;
+          return monthData.value.slice(start, end);
+        });
+        const handlePageChange = (page) => {
+          currentPage.value = page;
+        };
+        const handleSizeChange = (val) => {
+          console.log(`${val} items per page`);
+          pageSize.value = val;
+        };
+        const handleClick = (tab) => {
+          formData.value.hideErrBtn = false;
+          formData.value.showFooter = true;
+          console.log("handleClick", tab.paneName);
+          width.value = "30%";
+          switch (tab.paneName) {
+            case "first":
+              break;
+            case "second":
+              formData.value.hideErrBtn = true;
+              break;
+            case "thrid":
+              formData.value.showFooter = false;
+              width.value = "80%";
+              break;
+          }
+        };
+        const handleChangeWorkTime = (row) => {
+          const loadings = showLoading("修改中...");
+          const body = {
+            mac: formData.value.client.mac,
+            day: row.date,
+            data: row
+          };
+          console.log("handleChangeWorkTime", body);
+          fetch("../api/work/update", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(body)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("handleChangeWorkTime", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+            showErrorTips("修改失败");
+          }).finally(() => {
+            loadings.close();
+          });
+        };
+        const handleDeleteWorkTime = (row) => {
+          const loadings = showLoading("修改中...");
+          const body = {
+            mac: formData.value.client.mac,
+            day: row.date
+          };
+          console.log("handleChangeWorkTime", body);
+          fetch("../api/work/del", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(body)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("handleChangeWorkTime", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+            showErrorTips("修改失败");
+          }).finally(() => {
+            loadings.close();
+          });
+        };
+        function initOnWorkTime() {
+          formData.value.client = {};
+          formData.value.client.nick = {};
+          formData.value.client.nick.workType = {
+            onWorkTime: "",
+            offWorkTime: "",
+            webhookUrl: "",
+            isSaturdayWork: false
+          };
+        }
+        function checkOnWorkTime() {
+          if (!formData.value.client) {
+            formData.value.client = {};
+          }
+          if (!formData.value.client.nick) {
+            formData.value.client.nick = {};
+          }
+          if (!formData.value.client.nick.workType) {
+            formData.value.client.nick.workType = {
+              onWorkTime: "",
+              offWorkTime: "",
+              webhookUrl: "",
+              isSaturdayWork: false
+            };
+          }
+        }
+        function handleAddWorkTime(isOnWork) {
+          console.log("handleAddWorkTime", value3.value, formData.value.client.mac);
+          const loadings = showLoading("补签申请中...");
+          const row = {
+            timestamp: value3.value,
+            mac: formData.value.client.mac,
+            isOnWork
+          };
+          fetch("../api/work/add", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(row)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("handleAddWorkTime", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+            showErrorTips("补签失败");
+          }).finally(() => {
+            loadings.close();
+          });
+        }
+        function fetchWorkEvent() {
+          const row = {
+            mac: formData.value.client.mac
+          };
+          fetch("../api/work/tigger", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(row)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("fetchWorkEvent", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+          }).finally(() => {
+          });
+        }
+        function fetchWorkData() {
+          const row = {
+            mac: formData.value.client.mac
+          };
+          fetch("../api/work/get", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(row)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("fetchWorkData", json);
+            if (json.code === 0 && json.data) {
+              monthData.value = json.data;
+            }
+          }).catch((error) => {
+            console.log("error", error);
+          }).finally(() => {
+          });
+        }
+        const handleNickSetting = () => {
+          const row = {
+            name: formData.value.client.nick.name,
+            isPush: formData.value.client.nick.isPush,
+            starTime: formData.value.client.starTime,
+            mac: formData.value.client.mac,
+            ip: formData.value.client.ip,
+            hostname: formData.value.client.hostname,
+            workType: formData.value.client.nick.workType
+          };
+          console.log("handleChangeNickName", row);
+          formData.value.loading = true;
+          fetch("../api/nick/set", {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(row)
+          }).then((res) => {
+            return res.json();
+          }).then((json) => {
+            console.log("handleChangeNickName", json);
+            showTips(json.code, json.msg);
+          }).catch((error) => {
+            console.log("error", error);
+            showErrorTips("修改昵称失败");
+          }).finally(() => {
+            formData.value.loading = false;
+            setTimeout(function() {
+              hideDialog();
+            }, 300);
+          });
+        };
+        const handleDeleteStaticIp = () => {
+          console.log("handleDeleteStaticIp", formData.value.client.mac);
+          const mac = formData.value.client.mac;
+          const name = formData.value.client.hostname;
+          formData.value.deleteloading = true;
+          ElMessageBox.confirm(`确定删除【${name}】静态IP吗?`, "Warning", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          }).then(() => {
+            const loader = showLoading("删除中...");
+            fetch(`../api/staticip/delete?mac=${mac}`, {
+              credentials: "include",
+              method: "DELETE"
+            }).then((res) => {
+              return res.json();
+            }).then((json) => {
+              console.log("handleDeleteStaticIp", json);
+              showTips(json.code, json.msg);
+            }).catch((error) => {
+              console.log("error", error);
+              showErrorTips("删除失败");
+            }).finally(() => {
+              loader.close();
+              formData.value.deleteloading = false;
+              hideDialog();
+            });
+          }).catch(() => {
+          });
+        };
+        function handleConfirm() {
+          console.log("handleConfirm");
+          switch (formData.value.activeName) {
+            case "first":
+              handleNickSetting();
+              break;
+            case "second":
+              handleStaticSet();
+              break;
+          }
+        }
+        function handleStaticSet() {
+          formData.value.loading = true;
+          const body = {
+            hostname: formData.value.second.hostname,
+            ip: formData.value.second.ip,
+            mac: formData.value.second.mac
+          };
+          console.log("handleStaticSet", body);
+          fetch(`../api/staticip/set`, {
+            credentials: "include",
+            method: "POST",
+            body: JSON.stringify(body)
+          }).then((res) => res.json()).then((json) => {
+            console.log("static ip setting", json);
+            if (json && json.code === 0) {
+              showSucessTips(json.msg);
+            } else {
+              showTips(json.code, json.msg);
+            }
+          }).catch((error) => {
+            console.log(error);
+            showErrorTips(`获取失败${JSON.stringify(error)}`);
+          }).finally(() => {
+            formData.value.loading = false;
+            setTimeout(function() {
+              hideDialog();
+            }, 300);
+          });
+        }
+        const showDialogForm = (row) => {
+          console.log("打开对话框，row:", row);
+          initOnWorkTime();
+          formData.value.title = `设备设置`;
+          formData.value.client = row;
+          formData.value.show = true;
+          formData.value.second.hostname = row.hostname;
+          formData.value.second.ip = row.ip;
+          formData.value.second.mac = row.mac;
+          if (row && row.static) {
+            formData.value.second.hostname = row.static.hostname;
+            formData.value.second.ip = row.static.ip;
+            formData.value.second.mac = row.static.mac;
+          }
+          checkOnWorkTime();
+          fetchWorkData();
+        };
+        function hideDialog() {
+          formData.value.show = false;
+        }
+        __expose({
+          showDialogForm
+        });
+        return (_ctx, _cache) => {
+          const _component_el_input = ElInput;
+          const _component_el_form_item = ElFormItem;
+          const _component_el_checkbox = ElCheckbox;
+          const _component_el_time_select = ElTimeSelect;
+          const _component_el_form = ElForm;
+          const _component_el_tab_pane = ElTabPane;
+          const _component_el_date_picker = ElDatePicker;
+          const _component_el_button = ElButton;
+          const _component_el_popconfirm = ElPopconfirm;
+          const _component_el_table_column = ElTableColumn;
+          const _component_el_time_picker = ElTimePicker;
+          const _component_el_tag = ElTag;
+          const _component_el_option = ElOption;
+          const _component_el_select = ElSelect;
+          const _component_el_dropdown_item = ElDropdownItem;
+          const _component_el_dropdown_menu = ElDropdownMenu;
+          const _component_el_dropdown = ElDropdown;
+          const _component_el_table = ElTable;
+          const _component_el_pagination = ElPagination;
+          const _component_el_tabs = ElTabs;
+          return openBlock(), createElementBlock("div", _hoisted_1$2, [
+            createVNode(_component_el_tabs, {
+              modelValue: formData.value.activeName,
+              "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => formData.value.activeName = $event),
+              onTabClick: handleClick
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_el_tab_pane, {
+                  label: "设置设备名称",
+                  name: "first"
+                }, {
+                  default: withCtx(() => [
+                    createVNode(_component_el_form, null, {
+                      default: withCtx(() => [
+                        createVNode(_component_el_form_item, { label: "设备名称：" }, {
+                          default: withCtx(() => [
+                            createVNode(_component_el_input, {
+                              modelValue: formData.value.client.nick.name,
+                              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => formData.value.client.nick.name = $event),
+                              placeholder: "请输入设备名称"
+                            }, null, 8, ["modelValue"])
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_form_item, { label: "状态通知：" }, {
+                          default: withCtx(() => [
+                            createVNode(_component_el_checkbox, {
+                              modelValue: formData.value.client.nick.isPush,
+                              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => formData.value.client.nick.isPush = $event)
+                            }, null, 8, ["modelValue"])
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_form_item, { label: "周六加班：" }, {
+                          default: withCtx(() => [
+                            createVNode(_component_el_checkbox, {
+                              modelValue: formData.value.client.nick.workType.isSaturdayWork,
+                              "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => formData.value.client.nick.workType.isSaturdayWork = $event)
+                            }, null, 8, ["modelValue"])
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_form_item, { label: "推送地址：" }, {
+                          default: withCtx(() => [
+                            createVNode(_component_el_input, {
+                              modelValue: formData.value.client.nick.workType.webhookUrl,
+                              "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => formData.value.client.nick.workType.webhookUrl = $event)
+                            }, null, 8, ["modelValue"])
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_form_item, { label: "统计考勤：" }, {
+                          default: withCtx(() => [
+                            createBaseVNode("div", _hoisted_2$1, [
+                              createVNode(_component_el_time_select, {
+                                modelValue: formData.value.client.nick.workType.onWorkTime,
+                                "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => formData.value.client.nick.workType.onWorkTime = $event),
+                                style: { "width": "140px" },
+                                "max-time": formData.value.client.nick.workType.offWorkTime,
+                                class: "mr-4",
+                                format: "HH:mm:ss",
+                                placeholder: "上班考勤",
+                                start: "07:00:00",
+                                step: "00:30:00",
+                                end: "20:00:00"
+                              }, null, 8, ["modelValue", "max-time"]),
+                              createVNode(_component_el_time_select, {
+                                modelValue: formData.value.client.nick.workType.offWorkTime,
+                                "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => formData.value.client.nick.workType.offWorkTime = $event),
+                                style: { "width": "140px" },
+                                "min-time": formData.value.client.nick.workType.onWorkTime,
+                                placeholder: "下班考勤",
+                                format: "HH:mm:ss",
+                                start: "07:00:00",
+                                step: "00:30:00",
+                                end: "20:00:00"
+                              }, null, 8, ["modelValue", "min-time"])
+                            ])
+                          ]),
+                          _: 1
+                        })
+                      ]),
+                      _: 1
+                    })
+                  ]),
+                  _: 1
+                }),
+                isThridShow() ? (openBlock(), createBlock(_component_el_tab_pane, {
+                  key: 0,
+                  label: "统计",
+                  name: "thrid"
+                }, {
+                  default: withCtx(() => [
+                    createBaseVNode("div", null, [
+                      createBaseVNode("div", _hoisted_3$1, [
+                        createVNode(_component_el_date_picker, {
+                          modelValue: value3.value,
+                          "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => value3.value = $event),
+                          type: "datetime",
+                          placeholder: "Select date and time",
+                          "value-format": "x"
+                        }, null, 8, ["modelValue"]),
+                        createVNode(_component_el_popconfirm, {
+                          title: "确定补签上班吗?",
+                          onConfirm: _cache[7] || (_cache[7] = ($event) => handleAddWorkTime(true))
+                        }, {
+                          reference: withCtx(() => [
+                            createVNode(_component_el_button, {
+                              type: "primary",
+                              style: { "margin-left": "10px" },
+                              plain: ""
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode("补签上班 ")
+                              ]),
+                              _: 1
+                            })
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_popconfirm, {
+                          title: "确定补签下班吗?",
+                          onConfirm: _cache[8] || (_cache[8] = ($event) => handleAddWorkTime(false))
+                        }, {
+                          reference: withCtx(() => [
+                            createVNode(_component_el_button, {
+                              type: "primary",
+                              style: { "margin-left": "10px" },
+                              plain: ""
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode("补签下班 ")
+                              ]),
+                              _: 1
+                            })
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_button, {
+                          type: "warning",
+                          style: { "margin-left": "10px" },
+                          plain: "",
+                          onClick: fetchWorkData
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode("刷新 ")
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_el_button, {
+                          type: "warning",
+                          style: { "margin-left": "10px" },
+                          plain: "",
+                          onClick: fetchWorkEvent
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode("触发统计 ")
+                          ]),
+                          _: 1
+                        })
+                      ]),
+                      createVNode(_component_el_table, {
+                        data: paginatedTableData.value,
+                        border: "",
+                        "preserve-expanded-content": false
+                      }, {
+                        default: withCtx(() => [
+                          createVNode(_component_el_table_column, { type: "expand" }, {
+                            default: withCtx((props2) => [
+                              createBaseVNode("div", _hoisted_4$1, [
+                                createVNode(_component_el_table, {
+                                  data: props2.row.dayDatas,
+                                  border: "",
+                                  "preserve-expanded-content": false
+                                }, {
+                                  default: withCtx(() => [
+                                    createVNode(_component_el_table_column, {
+                                      label: "日期",
+                                      prop: "date",
+                                      sortable: ""
+                                    }),
+                                    createVNode(_component_el_table_column, {
+                                      label: "上班",
+                                      prop: "workTime1"
+                                    }, {
+                                      default: withCtx((scope) => [
+                                        createVNode(_component_el_time_picker, {
+                                          modelValue: scope.row.workTime1,
+                                          "onUpdate:modelValue": ($event) => scope.row.workTime1 = $event,
+                                          style: { "width": "100px" },
+                                          "arrow-control": "",
+                                          "value-format": "HH:mm:ss",
+                                          onChange: ($event) => handleChangeWorkTime(scope.row)
+                                        }, null, 8, ["modelValue", "onUpdate:modelValue", "onChange"])
+                                      ]),
+                                      _: 1
+                                    }),
+                                    createVNode(_component_el_table_column, {
+                                      label: "下班",
+                                      prop: "workTime2"
+                                    }, {
+                                      default: withCtx((scope) => [
+                                        createVNode(_component_el_time_picker, {
+                                          modelValue: scope.row.workTime2,
+                                          "onUpdate:modelValue": ($event) => scope.row.workTime2 = $event,
+                                          style: { "width": "100px" },
+                                          "arrow-control": "",
+                                          "value-format": "HH:mm:ss",
+                                          onChange: ($event) => handleChangeWorkTime(scope.row)
+                                        }, null, 8, ["modelValue", "onUpdate:modelValue", "onChange"])
+                                      ]),
+                                      _: 1
+                                    }),
+                                    createVNode(_component_el_table_column, {
+                                      prop: "soverHours",
+                                      label: "加班时长",
+                                      align: "center"
+                                    }, {
+                                      default: withCtx((scope) => [
+                                        createVNode(_component_el_tag, {
+                                          type: "primary",
+                                          size: "default"
+                                        }, {
+                                          default: withCtx(() => [
+                                            createTextVNode(toDisplayString(
+                                              // formatNanosecondsToHours(scope.row.overHours)
+                                              scope.row.soverHours
+                                            ), 1)
+                                          ]),
+                                          _: 2
+                                        }, 1024)
+                                      ]),
+                                      _: 1
+                                    }),
+                                    createVNode(_component_el_table_column, {
+                                      label: "星期",
+                                      prop: "weekday"
+                                    }, {
+                                      default: withCtx((scope) => [
+                                        createTextVNode(toDisplayString(unref(getWeekDay)(scope.row.weekday)), 1)
+                                      ]),
+                                      _: 1
+                                    }),
+                                    createVNode(_component_el_table_column, {
+                                      label: "类型",
+                                      prop: "isWeekDay"
+                                    }, {
+                                      default: withCtx((scope) => [
+                                        !scope.row.showSelect ? (openBlock(), createBlock(_component_el_tag, {
+                                          key: 0,
+                                          type: getTagType(scope.row.dayType),
+                                          onDblclick: ($event) => handleShowSelect(scope.row)
+                                        }, {
+                                          default: withCtx(() => [
+                                            createTextVNode(toDisplayString(getTagName(scope.row.dayType)), 1)
+                                          ]),
+                                          _: 2
+                                        }, 1032, ["type", "onDblclick"])) : (openBlock(), createBlock(_component_el_select, {
+                                          key: 1,
+                                          modelValue: scope.row.dayType,
+                                          "onUpdate:modelValue": ($event) => scope.row.dayType = $event,
+                                          onChange: ($event) => handleSelectChange(scope.row)
+                                        }, {
+                                          default: withCtx(() => [
+                                            (openBlock(), createElementBlock(Fragment, null, renderList(options, (item) => {
+                                              return createVNode(_component_el_option, {
+                                                label: item.label,
+                                                key: item.label,
+                                                value: item.value
+                                              }, null, 8, ["label", "value"]);
+                                            }), 64))
+                                          ]),
+                                          _: 2
+                                        }, 1032, ["modelValue", "onUpdate:modelValue", "onChange"]))
+                                      ]),
+                                      _: 1
+                                    }),
+                                    createVNode(_component_el_table_column, {
+                                      label: "操作",
+                                      max: "80",
+                                      fixed: "right",
+                                      align: "center"
+                                    }, {
+                                      default: withCtx(({ row }) => [
+                                        createVNode(_component_el_dropdown, {
+                                          size: "small",
+                                          "split-button": "",
+                                          type: "primary"
+                                        }, {
+                                          dropdown: withCtx(() => [
+                                            createVNode(_component_el_dropdown_menu, null, {
+                                              default: withCtx(() => [
+                                                createVNode(_component_el_dropdown_item, {
+                                                  onClick: ($event) => handleDeleteWorkTime(row)
+                                                }, {
+                                                  default: withCtx(() => [
+                                                    createTextVNode("删除 ")
+                                                  ]),
+                                                  _: 2
+                                                }, 1032, ["onClick"])
+                                              ]),
+                                              _: 2
+                                            }, 1024)
+                                          ]),
+                                          default: withCtx(() => [
+                                            createVNode(_component_el_popconfirm, {
+                                              title: "确定修改吗",
+                                              onConfirm: ($event) => handleChangeWorkTime(row)
+                                            }, {
+                                              reference: withCtx(() => [
+                                                createTextVNode(" 修改")
+                                              ]),
+                                              _: 2
+                                            }, 1032, ["onConfirm"])
+                                          ]),
+                                          _: 2
+                                        }, 1024)
+                                      ]),
+                                      _: 1
+                                    })
+                                  ]),
+                                  _: 2
+                                }, 1032, ["data"])
+                              ])
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "month",
+                            label: "月份"
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "stotalOverHours",
+                            label: "总时长",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, {
+                                type: "danger",
+                                size: "large"
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(
+                                    // formatNanosecondsToHours(scope.row.totalOverHours)
+                                    scope.row.stotalOverHours
+                                  ), 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "sworkDayOverHours",
+                            label: "工作日累计",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, { type: "warning" }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(
+                                    // formatNanosecondsToHours(scope.row.workDayOverHours)
+                                    scope.row.sworkDayOverHours
+                                  ), 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "sworkDayAveOverHours",
+                            label: "日平均",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, { type: "primary" }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(
+                                    // formatNanosecondsToHours(
+                                    //   scope.row.workDayAveOverHours,
+                                    // )
+                                    scope.row.sworkDayAveOverHours
+                                  ), 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "dayCount",
+                            label: "工作日次",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, { type: "warning" }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(scope.row.dayCount), 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "ssaturdayOverHours",
+                            label: "周累计",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, { type: "success" }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(
+                                    // formatNanosecondsToHours(scope.row.saturdayOverHours)
+                                    scope.row.ssaturdayOverHours
+                                  ), 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "ssaturdayAveOverHours",
+                            label: "周平均",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, { type: "primary" }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(
+                                    // formatNanosecondsToHours(
+                                    //   scope.row.saturdayAveOverHours,
+                                    // )
+                                    scope.row.ssaturdayAveOverHours
+                                  ), 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_el_table_column, {
+                            prop: "saturdayCount",
+                            label: "周加班次数",
+                            align: "center"
+                          }, {
+                            default: withCtx((scope) => [
+                              createVNode(_component_el_tag, { type: "warning" }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(scope.row.saturdayCount.length) + "次(" + toDisplayString(scope.row.weekCount) + ") ", 1)
+                                ]),
+                                _: 2
+                              }, 1024)
+                            ]),
+                            _: 1
+                          })
+                        ]),
+                        _: 1
+                      }, 8, ["data"]),
+                      createVNode(_component_el_pagination, {
+                        style: { "margin-top": "20px" },
+                        "page-size": pageSize.value,
+                        "onUpdate:pageSize": _cache[9] || (_cache[9] = ($event) => pageSize.value = $event),
+                        "current-page": currentPage.value,
+                        "onUpdate:currentPage": _cache[10] || (_cache[10] = ($event) => currentPage.value = $event),
+                        "page-sizes": [10, 20, 50, 100, 1e3],
+                        layout: "sizes,prev, pager, next",
+                        background: "",
+                        size: size2.value,
+                        total: monthData.value.length,
+                        onSizeChange: handleSizeChange,
+                        onCurrentChange: handlePageChange
+                      }, null, 8, ["page-size", "current-page", "size", "total"])
+                    ])
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true)
+              ]),
+              _: 1
+            }, 8, ["modelValue"]),
+            formData.value.showFooter ? (openBlock(), createElementBlock("div", _hoisted_5$1, [
+              formData.value.hideErrBtn ? (openBlock(), createBlock(_component_el_button, {
+                key: 0,
+                type: "danger",
+                loading: formData.value.deleteloading,
+                "loading-icon": unref(eleme_default),
+                onClick: handleDeleteStaticIp
+              }, {
+                default: withCtx(() => [
+                  createTextVNode(toDisplayString(formData.value.deleteloading ? "删除中..." : "删除"), 1)
+                ]),
+                _: 1
+              }, 8, ["loading", "loading-icon"])) : createCommentVNode("", true),
+              createVNode(_component_el_button, {
+                type: "primary",
+                loading: formData.value.loading,
+                "loading-icon": unref(eleme_default),
+                onClick: handleConfirm
+              }, {
+                default: withCtx(() => [
+                  createTextVNode(toDisplayString(formData.value.loading ? "设置中..." : "确定"), 1)
+                ]),
+                _: 1
+              }, 8, ["loading", "loading-icon"])
+            ])) : createCommentVNode("", true)
+          ]);
+        };
+      }
+    });
+    const SettingAndKaoqQin = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-253285a9"]]);
+    const _hoisted_1$1 = { class: "main" };
+    const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+      __name: "ViewExpand",
+      props: {
+        row: {}
+      },
+      setup(__props) {
+        const props = __props;
+        onMounted(() => {
+          console.log("VVVVVVVVV====>", props.row);
+        });
+        function getClientName(row) {
+          var _a2, _b;
+          if (row.nick) {
+            if (((_a2 = row.nick) == null ? void 0 : _a2.name) === "") {
+              return row.hostname;
+            } else {
+              return (_b = row.nick) == null ? void 0 : _b.name;
+            }
+          } else {
+            return row.hostname;
+          }
+        }
+        return (_ctx, _cache) => {
+          const _component_el_form_item = ElFormItem;
+          const _component_el_tooltip = ElTooltip;
+          const _component_el_form = ElForm;
+          return openBlock(), createElementBlock("div", _hoisted_1$1, [
+            createVNode(_component_el_form, {
+              "label-position": "left",
+              "label-width": "auto"
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_el_form_item, { label: "昵称" }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(getClientName(_ctx.row)), 1)
+                  ]),
+                  _: 1
+                }),
+                createVNode(_component_el_form_item, { label: "名称" }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.hostname), 1)
+                  ]),
+                  _: 1
+                }),
+                createVNode(_component_el_form_item, { label: "品牌" }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.vendor), 1)
+                  ]),
+                  _: 1
+                }),
+                createVNode(_component_el_form_item, { label: "类型" }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.staType), 1)
+                  ]),
+                  _: 1
+                }),
+                createVNode(_component_el_form_item, { label: "wifi名称" }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.ssid), 1)
+                  ]),
+                  _: 1
+                }),
+                createVNode(_component_el_form_item, { label: "信号强度" }, {
+                  default: withCtx(() => [
+                    createVNode(_component_el_tooltip, { content: "信号强度（单位：dBm）：负值（越接近0表示信号越强）。`-44`为优秀信号（通常`-50`以上为良好）" }, {
+                      default: withCtx(() => [
+                        createBaseVNode("span", null, toDisplayString(_ctx.row.signal), 1)
+                      ]),
+                      _: 1
+                    })
+                  ]),
+                  _: 1
+                }),
+                createVNode(_component_el_form_item, { label: "无线频段" }, {
+                  default: withCtx(() => [
+                    createVNode(_component_el_tooltip, { content: "无线频段频率（单位：MHz）：`5180`属于5GHz频段（常见频段：2.4GHz范围为`2400~2483`，5GHz为`5150~5850`）" }, {
+                      default: withCtx(() => [
+                        createBaseVNode("span", null, toDisplayString(_ctx.row.freq), 1)
+                      ]),
+                      _: 1
+                    })
+                  ]),
+                  _: 1
+                }),
+                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
+                  key: 0,
+                  label: "Mac地址"
+                }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.mac), 1)
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true),
+                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
+                  key: 1,
+                  label: "wifi名称"
+                }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.ssid), 1)
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true),
+                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
+                  key: 2,
+                  label: "设备类型"
+                }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.staType), 1)
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true),
+                _ctx.row.phy !== "" ? (openBlock(), createBlock(_component_el_form_item, {
+                  key: 3,
+                  label: "网络接口"
+                }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(_ctx.row.phy), 1)
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true),
+                unref(isMobile)() ? (openBlock(), createBlock(_component_el_form_item, {
+                  key: 4,
+                  label: "连接时间"
+                }, {
+                  default: withCtx(() => [
+                    createBaseVNode("span", null, toDisplayString(unref(formatTimeStamp)(_ctx.row.starTime)), 1)
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true)
+              ]),
+              _: 1
+            })
+          ]);
+        };
+      }
+    });
     const _hoisted_1 = { id: "app" };
     const _hoisted_2 = { class: "grid-content header-color" };
     const _hoisted_3 = { class: "header-content" };
@@ -41084,6 +42019,7 @@ var require_index_001 = __commonJS({
         }
         function getClientName(row) {
           var _a2, _b;
+          console.log("aa------------>", row);
           if (row.nick) {
             if (((_a2 = row.nick) == null ? void 0 : _a2.name) === "") {
               return row.hostname;
@@ -41580,9 +42516,13 @@ var require_index_001 = __commonJS({
                       default: withCtx(() => [
                         createVNode(_component_el_table_column, { type: "expand" }, {
                           default: withCtx((props) => [
-                            createVNode(_sfc_main$5, {
+                            props.row.nick === null || props.row.nick.workType === null || props.row.nick.workType.webhookUrl === "" ? (openBlock(), createBlock(_sfc_main$1, {
+                              key: 0,
                               row: props.row
-                            }, null, 8, ["row"])
+                            }, null, 8, ["row"])) : (openBlock(), createBlock(SettingAndKaoqQin, {
+                              key: 1,
+                              row: props.row
+                            }, null, 8, ["row"]))
                           ]),
                           _: 1
                         }),
@@ -41597,7 +42537,7 @@ var require_index_001 = __commonJS({
                         }, {
                           default: withCtx((props) => [
                             createVNode(_component_el_text, {
-                              tag: props.row.online ? props.row.nick ? props.row.nick.workType ? props.row.nick.workType.webhookUrl !== "" ? "ins" : "p" : "p" : "p" : "p",
+                              tag: props.row.online ? props.row.nick ? props.row.nick.workType ? props.row.nick.workType.webhookUrl !== "" ? "mark" : "p" : "p" : "p" : "p",
                               type: props.row.online ? "success" : "danger"
                             }, {
                               default: withCtx(() => [
@@ -41915,4 +42855,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-rATcymoC.js.map
+//# sourceMappingURL=index-ZEvE1p8V.js.map

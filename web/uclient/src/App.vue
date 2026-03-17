@@ -79,7 +79,15 @@
         >
           <el-table-column type="expand">
             <template #default="props">
-              <ViewExpand :row="props.row" />
+              <ViewExpand
+                v-if="
+                  props.row.nick === null ||
+                  props.row.nick.workType === null ||
+                  props.row.nick.workType.webhookUrl === ''
+                "
+                :row="props.row"
+              />
+              <SettingAndKaoqQin v-else :row="props.row" />
             </template>
           </el-table-column>
           <el-table-column
@@ -98,7 +106,7 @@
                     ? props.row.nick
                       ? props.row.nick.workType
                         ? props.row.nick.workType.webhookUrl !== ''
-                          ? 'ins'
+                          ? 'mark'
                           : 'p'
                         : 'p'
                       : 'p'
@@ -300,14 +308,17 @@ import {
   formatToUTC8,
 } from './utils/utils.ts'
 import { EventAwareSSEClient } from './utils/sseclient.ts'
-import ViewExpand from './components/expand/ViewExpand.vue'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
 import { ComponentSize, ElNotification } from 'element-plus'
 import PushSettingDialog from './components/PushSettingDialog.vue'
+// import * as trace_events from 'node:trace_events'
 // import { testTableData } from './utils/data.ts'
+import SettingAndKaoqQin from './components/expand/SettingAndKaoqQin.vue'
+import ViewExpand from './components/expand/ViewExpand.vue'
 
+// const isTesting = ref<boolean>(true)
 const title = ref<string>('客户端列表')
 const clientTimeLineDialogRef = ref<InstanceType<
   typeof ClientTimeLineDialog
@@ -374,6 +385,7 @@ function getClientName(row: Client): string {
   //   : row.hostname === '*'
   //     ? row.nickName
   //     : `${row.hostname}(${row.nickName})`
+  console.log('aa------------>', row)
   if (row.nick) {
     if (row.nick?.name === '') {
       return row.hostname
@@ -546,7 +558,7 @@ const fetchData = () => {
     .catch((error) => {
       console.error(error)
       showErrorTips(`${JSON.stringify(error)}`)
-      // renderTable(testTableData)
+      // if (isTesting.value) renderTable(testTableData)
     })
 }
 const showVersion = () => {

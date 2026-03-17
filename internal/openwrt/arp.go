@@ -3,7 +3,8 @@ package openwrt
 import (
 	"context"
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/z"
+
 	"net"
 	"os"
 	"strconv"
@@ -55,7 +56,7 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 	}
 
 	content := string(data)
-	//glog.Debugf("\n%s", content)
+	//z.Debugf("\n%s", content)
 	lines := strings.Split(content, "\n")
 	entries := make(map[string]*ARPEntry)
 	for i, line := range lines {
@@ -68,7 +69,7 @@ func getClientsByArp(deviceInterfaceName string) (map[string]*ARPEntry, error) {
 		entry, e := parseARPLine(line)
 		if e != nil {
 			//return nil, err
-			//glog.Error("parseARPLine error", e, line)
+			//z.Error("parseARPLine error", e, line)
 			continue
 		}
 		mac := entry.MAC.String()
@@ -110,7 +111,7 @@ func entriesEqual(a, b *ARPEntry) bool {
 }
 
 func SubscribeArp(interval time.Duration, fn func(entry *ARPEntry)) error {
-	glog.Println("开始监控/proc/net/arp变化...")
+	z.Println("开始监控/proc/net/arp变化...")
 	// 获取初始ARP表
 	prevEntries, err := getClientsByArp(brLanString)
 	if err != nil {
@@ -119,9 +120,9 @@ func SubscribeArp(interval time.Duration, fn func(entry *ARPEntry)) error {
 	}
 	tempMap = prevEntries
 	// 打印初始ARP表
-	glog.Println("初始ARP表:")
+	z.Println("初始ARP表:")
 	for _, entry := range prevEntries {
-		glog.Printf("%-15v %-6v %-6v %-17v %-6v %s\n",
+		z.Printf("%-15v %-6v %-6v %-17v %-6v %s\n",
 			entry.IP.String(), entry.HWType, entry.Flags, entry.MAC.String(), entry.Mask, entry.Interface)
 	}
 	// 持续监控
@@ -130,7 +131,7 @@ func SubscribeArp(interval time.Duration, fn func(entry *ARPEntry)) error {
 		// 获取当前ARP表
 		currentEntries, e1 := getClientsByArp(brLanString)
 		if e1 != nil {
-			glog.Printf("读取ARP表失败: %v\n", err)
+			z.Printf("读取ARP表失败: %v\n", err)
 			continue
 		}
 
@@ -139,18 +140,18 @@ func SubscribeArp(interval time.Duration, fn func(entry *ARPEntry)) error {
 
 		// 输出变化
 		if len(added) > 0 || len(changed) > 0 {
-			glog.Printf("\n[%s] 检测到ARP表变化:\n", time.Now().Format(time.DateTime))
+			z.Printf("\n[%s] 检测到ARP表变化:\n", time.Now().Format(time.DateTime))
 		}
 
 		for _, entry := range added {
-			glog.Printf("± 新增   %-15s MAC: %-17s 设备: %s Flags: %v", entry.IP, entry.MAC, entry.Interface, entry.Flags)
+			z.Printf("± 新增   %-15s MAC: %-17s 设备: %s Flags: %v", entry.IP, entry.MAC, entry.Interface, entry.Flags)
 			if fn != nil {
 				fn(entry)
 			}
 		}
 
 		for _, entry := range changed {
-			glog.Printf("± 修改   %-15s MAC: %-17s 设备: %s Flags: %v", entry.IP, entry.MAC, entry.Interface, entry.Flags)
+			z.Printf("± 修改   %-15s MAC: %-17s 设备: %s Flags: %v", entry.IP, entry.MAC, entry.Interface, entry.Flags)
 			if fn != nil {
 				fn(entry)
 			}
@@ -164,14 +165,14 @@ func SubscribeArpCache(ctx context.Context, interval time.Duration, fn func(entr
 	for {
 		select {
 		case <-ctx.Done():
-			glog.Debug("Arp监听退出...")
+			z.Debug("Arp监听退出...")
 			return
 		default:
 			time.Sleep(interval)
 			// 获取当前ARP表
 			currentEntries, e1 := getClientsByArp(brLanString)
 			if e1 != nil {
-				glog.Errorf("读取ARP表失败: %v\n", e1)
+				z.Errorf("读取ARP表失败: %v\n", e1)
 				continue
 			}
 			if fn != nil {

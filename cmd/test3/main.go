@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/zutil"
+
 	"time"
 )
 
@@ -25,7 +26,7 @@ func IsWorkingTime(time1, time2 string) (int, error) {
 	if e2 != nil {
 		return -1, e2
 	}
-	now := glog.Now()
+	now := zutil.Now()
 	if CompareTime(now, t1) <= 0 {
 		//小于等于上班时间
 		return 0, nil
@@ -41,6 +42,6 @@ func IsWorkingTime(time1, time2 string) (int, error) {
 func main() {
 	timestring := "09:00:00"
 	t, _ := time.Parse(time.TimeOnly, timestring)
-	now := glog.Now()
+	now := zutil.Now()
 	CompareTime(t, now)
 }

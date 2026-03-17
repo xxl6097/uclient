@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/xxl6097/glog/glog"
+	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
 	"math/rand"
@@ -13,7 +13,7 @@ import (
 
 func tee() {
 	timeLines := make([]openwrt.DeviceTimeLine, 0)
-	t := glog.Now()
+	t := zutil.Now()
 	for i := 0; i < 10; i++ {
 		t1 := time.Date(t.Year(), t.Month(), t.Day(), rand.Intn(11), rand.Intn(60), 0, 0, time.Local)
 		timeLines = append(timeLines, openwrt.DeviceTimeLine{
@@ -52,7 +52,7 @@ func tee1() {
 }
 
 func tee2() {
-	t := glog.Now()
+	t := zutil.Now()
 	t1 := time.Date(t.Year(), t.Month(), t.Day(), rand.Intn(11), rand.Intn(60), 0, 0, time.Local)
 	sub := t.Sub(t1)
 	fmt.Println(sub.String())
