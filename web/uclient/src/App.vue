@@ -71,6 +71,7 @@
     <section>
       <el-main>
         <el-table
+          ref="tableRef"
           :data="paginatedTableData"
           style="width: 100%"
           :border="true"
@@ -311,7 +312,7 @@ import { EventAwareSSEClient } from './utils/sseclient.ts'
 import UpgradeDialog from './components/expand/UpgradeDialog.vue'
 import StaticIpListDialog from './components/StaticIpListDialog.vue'
 import ClientSettingDialog from './components/ClientSettingDialog.vue'
-import { ComponentSize, ElNotification } from 'element-plus'
+import { ComponentSize, ElNotification, TableInstance } from 'element-plus'
 import PushSettingDialog from './components/PushSettingDialog.vue'
 // import * as trace_events from 'node:trace_events'
 // import { testTableData } from './utils/data.ts'
@@ -359,6 +360,9 @@ const pageSize = ref<number>(50)
 const currentPage = ref<number>(1)
 const tableData = ref<Client[]>([])
 const version = ref<Version>()
+// 表格实例
+// const tableRef = ref<ElTable<TableRowData> | null>(null);
+const tableRef = ref<TableInstance>()
 // 分页后的表格数
 const paginatedTableData = computed<Client[]>(() => {
   const start = (currentPage.value - 1) * pageSize.value
@@ -369,6 +373,15 @@ const paginatedTableData = computed<Client[]>(() => {
 const filteredTableData = computed<Client[]>(() => {
   return tableData.value.filter(() => !searchKeyword.value)
 })
+
+// 检查某一行是否展开
+const isTableExpand = () => {
+  if (!tableRef.value) return false
+  const expandedRows = tableRef.value.expandRowKeys
+  console.log(`是否展开：`, expandedRows)
+  if (!expandedRows) return false
+  return expandedRows.length > 0
+}
 
 function renderTable(data: Client[]) {
   //tableData.value = data as Client[]
@@ -795,16 +808,21 @@ const connectSSE = () => {
     source.value = new EventAwareSSEClient(sseUrl)
     source.value.addEventListener('updateAll', (data) => {
       console.log('updateAll', data)
-      renderTable(data)
+      if (!isTableExpand()) renderTable(data)
     })
     source.value.addEventListener('showNotify', (data) => {
       console.log('showNotify', data)
-      updateTableByOne(data)
-      showNotifyMessage(data)
+      if (!isTableExpand()) {
+        updateTableByOne(data)
+        showNotifyMessage(data)
+      }
     })
     source.value.addEventListener('updateOne', (data) => {
       console.log('update-status', data)
-      updateTableByOne(data)
+
+      if (!isTableExpand()) {
+        updateTableByOne(data)
+      }
     })
     source.value.connect()
   } catch (e) {

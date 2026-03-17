@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-ZEvE1p8V.js"(exports, module) {
+  "index-YYnLTsu4.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -42005,6 +42005,7 @@ var require_index_001 = __commonJS({
         const currentPage = ref(1);
         const tableData = ref([]);
         const version2 = ref();
+        const tableRef = ref();
         const paginatedTableData = computed(() => {
           const start = (currentPage.value - 1) * pageSize.value;
           const end = start + pageSize.value;
@@ -42013,6 +42014,15 @@ var require_index_001 = __commonJS({
         const filteredTableData = computed(() => {
           return tableData.value.filter(() => !searchKeyword.value);
         });
+        const isTableExpand = () => {
+          if (!tableRef.value)
+            return false;
+          const expandedRows = tableRef.value.expandRowKeys;
+          console.log(`是否展开：`, expandedRows);
+          if (!expandedRows)
+            return false;
+          return expandedRows.length > 0;
+        };
         function renderTable(data) {
           tableData.value.length = 0;
           tableData.value.push(...data);
@@ -42291,16 +42301,21 @@ var require_index_001 = __commonJS({
             source.value = new EventAwareSSEClient(sseUrl);
             source.value.addEventListener("updateAll", (data) => {
               console.log("updateAll", data);
-              renderTable(data);
+              if (!isTableExpand())
+                renderTable(data);
             });
             source.value.addEventListener("showNotify", (data) => {
               console.log("showNotify", data);
-              updateTableByOne(data);
-              showNotifyMessage(data);
+              if (!isTableExpand()) {
+                updateTableByOne(data);
+                showNotifyMessage(data);
+              }
             });
             source.value.addEventListener("updateOne", (data) => {
               console.log("update-status", data);
-              updateTableByOne(data);
+              if (!isTableExpand()) {
+                updateTableByOne(data);
+              }
             });
             source.value.connect();
           } catch (e) {
@@ -42507,6 +42522,8 @@ var require_index_001 = __commonJS({
                 createVNode(_component_el_main, null, {
                   default: withCtx(() => [
                     createVNode(_component_el_table, {
+                      ref_key: "tableRef",
+                      ref: tableRef,
                       data: paginatedTableData.value,
                       style: { "width": "100%" },
                       border: true,
@@ -42855,4 +42872,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-ZEvE1p8V.js.map
+//# sourceMappingURL=index-YYnLTsu4.js.map
