@@ -187,30 +187,30 @@
   display: none;
 }
 
-.upgrade-popup-header h3[data-v-f78b5e44] {
+.upgrade-popup-header h3[data-v-11bd7354] {
   line-height: 2.5;
   margin: 0;
 }
-.upgrade-popup-content[data-v-f78b5e44] {
+.upgrade-popup-content[data-v-11bd7354] {
   height: auto;
   padding: 20px;
 }
-.upgrade-popup-footer button[data-v-f78b5e44] {
+.upgrade-popup-footer button[data-v-11bd7354] {
   margin-left: 10px;
 }
 @media screen and (max-width: 1180px) {
-.main-width[data-v-f78b5e44] {
+.main-width[data-v-11bd7354] {
     width: 30%;
 }
 }
 @media screen and (max-width: 968px) {
-.main-width[data-v-f78b5e44] {
+.main-width[data-v-11bd7354] {
     width: 80%;
 }
 }
 
 /* 深度选择器 + 外层容器 */
-.dialog-wrapper[data-v-f78b5e44] .el-dialog__header {
+.dialog-wrapper[data-v-11bd7354] .el-dialog__header {
   display: none;
 }
 

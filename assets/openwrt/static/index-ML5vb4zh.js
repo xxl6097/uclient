@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-NaSZpuoh.js"(exports, module) {
+  "index-ML5vb4zh.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -39153,7 +39153,7 @@ var require_index_001 = __commonJS({
     const _hoisted_2$4 = { style: { "display": "flex", "margin-bottom": "20px" } };
     const _hoisted_3$3 = { style: { "display": "flex" } };
     const _hoisted_4$3 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "主机名：", -1));
-    const _hoisted_5$3 = { style: { "display": "flex", "margin-left": "20px" } };
+    const _hoisted_5$2 = { style: { "display": "flex", "margin-left": "20px" } };
     const _hoisted_6$1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "Mac地址：", -1));
     const _hoisted_7$1 = { style: { "display": "flex", "margin-left": "20px" } };
     const _hoisted_8$1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { style: { "min-width": "70px", "align-content": "center" } }, "IP地址：", -1));
@@ -39384,7 +39384,7 @@ var require_index_001 = __commonJS({
                             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => valueName.value = $event)
                           }, null, 8, ["modelValue"])
                         ]),
-                        createBaseVNode("div", _hoisted_5$3, [
+                        createBaseVNode("div", _hoisted_5$2, [
                           _hoisted_6$1,
                           createVNode(_component_el_select, {
                             modelValue: valueMac.value,
@@ -39589,7 +39589,7 @@ var require_index_001 = __commonJS({
     const _hoisted_2$3 = { class: "upgrade-popup-content" };
     const _hoisted_3$2 = { style: { "display": "flex", "align-items": "center" } };
     const _hoisted_4$2 = { style: { "margin-bottom": "10px" } };
-    const _hoisted_5$2 = { m: "4" };
+    const _hoisted_5$1 = { m: "4" };
     const _sfc_main$4 = /* @__PURE__ */ defineComponent({
       __name: "ClientSettingDialog",
       setup(__props, { expose: __expose }) {
@@ -40175,7 +40175,7 @@ var require_index_001 = __commonJS({
                               default: withCtx(() => [
                                 createVNode(_component_el_table_column, { type: "expand" }, {
                                   default: withCtx((props) => [
-                                    createBaseVNode("div", _hoisted_5$2, [
+                                    createBaseVNode("div", _hoisted_5$1, [
                                       createVNode(_component_el_table, {
                                         data: props.row.dayDatas,
                                         border: "",
@@ -40894,8 +40894,7 @@ var require_index_001 = __commonJS({
     const _hoisted_1$2 = { class: "upgrade-popup-content" };
     const _hoisted_2$1 = { style: { "display": "flex", "align-items": "center" } };
     const _hoisted_3$1 = { style: { "margin-bottom": "10px" } };
-    const _hoisted_4$1 = { m: "4" };
-    const _hoisted_5$1 = { key: 0 };
+    const _hoisted_4$1 = { key: 0 };
     const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       __name: "SettingAndKaoqQin",
       props: {
@@ -41027,7 +41026,11 @@ var require_index_001 = __commonJS({
               break;
           }
         };
+        const handleExpand = (row, expandedRows) => {
+          console.log("展开状态变化", row, expandedRows);
+        };
         const handleChangeWorkTime = (row) => {
+          console.log("时间选择器", row);
           const loadings = showLoading("修改中...");
           const body = {
             mac: formData.value.client.mac,
@@ -41310,7 +41313,7 @@ var require_index_001 = __commonJS({
           return openBlock(), createElementBlock("div", _hoisted_1$2, [
             createVNode(_component_el_tabs, {
               modelValue: formData.value.activeName,
-              "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => formData.value.activeName = $event),
+              "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => formData.value.activeName = $event),
               onTabClick: handleClick
             }, {
               default: withCtx(() => [
@@ -41470,17 +41473,21 @@ var require_index_001 = __commonJS({
                       ]),
                       createVNode(_component_el_table, {
                         data: paginatedTableData.value,
-                        border: "",
-                        "preserve-expanded-content": false
+                        "row-key": "id",
+                        onExpandChange: handleExpand,
+                        border: ""
                       }, {
                         default: withCtx(() => [
                           createVNode(_component_el_table_column, { type: "expand" }, {
                             default: withCtx((props2) => [
-                              createBaseVNode("div", _hoisted_4$1, [
+                              createBaseVNode("div", {
+                                m: "4",
+                                onClick: _cache[11] || (_cache[11] = withModifiers(() => {
+                                }, ["stop"]))
+                              }, [
                                 createVNode(_component_el_table, {
                                   data: props2.row.dayDatas,
-                                  border: "",
-                                  "preserve-expanded-content": false
+                                  border: ""
                                 }, {
                                   default: withCtx(() => [
                                     createVNode(_component_el_table_column, {
@@ -41493,14 +41500,17 @@ var require_index_001 = __commonJS({
                                       prop: "workTime1"
                                     }, {
                                       default: withCtx((scope) => [
-                                        createVNode(_component_el_time_picker, {
-                                          modelValue: scope.row.workTime1,
-                                          "onUpdate:modelValue": ($event) => scope.row.workTime1 = $event,
-                                          style: { "width": "100px" },
-                                          "arrow-control": "",
-                                          "value-format": "HH:mm:ss",
-                                          onChange: ($event) => handleChangeWorkTime(scope.row)
-                                        }, null, 8, ["modelValue", "onUpdate:modelValue", "onChange"])
+                                        createBaseVNode("div", {
+                                          onClick: _cache[9] || (_cache[9] = withModifiers(() => {
+                                          }, ["stop"]))
+                                        }, [
+                                          createVNode(_component_el_time_picker, {
+                                            modelValue: scope.row.workTime1,
+                                            "onUpdate:modelValue": ($event) => scope.row.workTime1 = $event,
+                                            style: { "width": "100px" },
+                                            "value-format": "HH:mm:ss"
+                                          }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                        ])
                                       ]),
                                       _: 1
                                     }),
@@ -41509,14 +41519,18 @@ var require_index_001 = __commonJS({
                                       prop: "workTime2"
                                     }, {
                                       default: withCtx((scope) => [
-                                        createVNode(_component_el_time_picker, {
-                                          modelValue: scope.row.workTime2,
-                                          "onUpdate:modelValue": ($event) => scope.row.workTime2 = $event,
-                                          style: { "width": "100px" },
-                                          "arrow-control": "",
-                                          "value-format": "HH:mm:ss",
-                                          onChange: ($event) => handleChangeWorkTime(scope.row)
-                                        }, null, 8, ["modelValue", "onUpdate:modelValue", "onChange"])
+                                        createBaseVNode("div", {
+                                          onClick: _cache[10] || (_cache[10] = withModifiers(() => {
+                                          }, ["stop"]))
+                                        }, [
+                                          createVNode(_component_el_time_picker, {
+                                            modelValue: scope.row.workTime2,
+                                            "onUpdate:modelValue": ($event) => scope.row.workTime2 = $event,
+                                            style: { "width": "100px" },
+                                            "value-format": "HH:mm:ss",
+                                            "append-to-body": ""
+                                          }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                        ])
                                       ]),
                                       _: 1
                                     }),
@@ -41771,9 +41785,9 @@ var require_index_001 = __commonJS({
                       createVNode(_component_el_pagination, {
                         style: { "margin-top": "20px" },
                         "page-size": pageSize.value,
-                        "onUpdate:pageSize": _cache[9] || (_cache[9] = ($event) => pageSize.value = $event),
+                        "onUpdate:pageSize": _cache[12] || (_cache[12] = ($event) => pageSize.value = $event),
                         "current-page": currentPage.value,
-                        "onUpdate:currentPage": _cache[10] || (_cache[10] = ($event) => currentPage.value = $event),
+                        "onUpdate:currentPage": _cache[13] || (_cache[13] = ($event) => currentPage.value = $event),
                         "page-sizes": [10, 20, 50, 100, 1e3],
                         layout: "sizes,prev, pager, next",
                         background: "",
@@ -41789,7 +41803,7 @@ var require_index_001 = __commonJS({
               ]),
               _: 1
             }, 8, ["modelValue"]),
-            formData.value.showFooter ? (openBlock(), createElementBlock("div", _hoisted_5$1, [
+            formData.value.showFooter ? (openBlock(), createElementBlock("div", _hoisted_4$1, [
               formData.value.hideErrBtn ? (openBlock(), createBlock(_component_el_button, {
                 key: 0,
                 type: "danger",
@@ -41818,7 +41832,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const SettingAndKaoqQin = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-f78b5e44"]]);
+    const SettingAndKaoqQin = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-11bd7354"]]);
     const _hoisted_1$1 = { class: "main" };
     const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       __name: "ViewExpand",
@@ -42868,4 +42882,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-NaSZpuoh.js.map
+//# sourceMappingURL=index-ML5vb4zh.js.map

@@ -122,40 +122,40 @@
               >触发统计
             </el-button>
           </div>
+          <!--月度表格-->
           <el-table
             :data="paginatedTableData"
+            row-key="id"
+            @expand-change="handleExpand"
             border
-            :preserve-expanded-content="false"
           >
             <el-table-column type="expand">
               <template #default="props">
-                <div m="4">
-                  <el-table
-                    :data="props.row.dayDatas"
-                    border
-                    :preserve-expanded-content="false"
-                  >
+                <div m="4" @click.stop>
+                  <!--日度表格-->
+                  <el-table :data="props.row.dayDatas" border>
                     <el-table-column label="日期" prop="date" sortable />
                     <el-table-column label="上班" prop="workTime1">
                       <template #default="scope">
-                        <el-time-picker
-                          v-model="scope.row.workTime1"
-                          style="width: 100px"
-                          arrow-control
-                          value-format="HH:mm:ss"
-                          @change="handleChangeWorkTime(scope.row)"
-                        />
+                        <div @click.stop>
+                          <el-time-picker
+                            v-model="scope.row.workTime1"
+                            style="width: 100px"
+                            value-format="HH:mm:ss"
+                          />
+                        </div>
                       </template>
                     </el-table-column>
                     <el-table-column label="下班" prop="workTime2">
                       <template #default="scope">
-                        <el-time-picker
-                          v-model="scope.row.workTime2"
-                          style="width: 100px"
-                          arrow-control
-                          value-format="HH:mm:ss"
-                          @change="handleChangeWorkTime(scope.row)"
-                        />
+                        <div @click.stop>
+                          <el-time-picker
+                            v-model="scope.row.workTime2"
+                            style="width: 100px"
+                            value-format="HH:mm:ss"
+                            append-to-body
+                          />
+                        </div>
                       </template>
                     </el-table-column>
                     <el-table-column
@@ -531,8 +531,22 @@ const handleClick = (tab: TabsPaneContext) => {
       break
   }
 }
+// 模拟父表格数据
+// const expandedRowKeys = ref([]) // 控制展开行
+// // 处理父表格展开/收起
+// const handleExpandChange = (row: any, expandedRows: any) => {
+//   console.log(row)
+//   expandedRowKeys.value = expandedRows.map((item: any) => item.month)
+// }
 
+const handleExpand = (row: any, expandedRows: any) => {
+  console.log('展开状态变化', row, expandedRows)
+}
+// const handleTimeVisibleChange = (visible: any) => {
+//   console.log('时间选择器状态', visible)
+// }
 const handleChangeWorkTime = (row: DayData) => {
+  console.log('时间选择器', row)
   const loadings = showLoading('修改中...')
   const body = {
     mac: formData.value.client.mac,
