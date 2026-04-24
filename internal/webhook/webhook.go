@@ -5,15 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xxl6097/glog/pkg/z"
-	"github.com/xxl6097/glog/pkg/zutil"
-	"github.com/xxl6097/uclient/internal/ntfy"
-	"github.com/xxl6097/uclient/internal/u"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
+	"github.com/xxl6097/uclient/internal/ntfy"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 type WebHookMessage struct {
@@ -81,8 +82,16 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 	z.Debug("webhook", msg.Title, msg.Timestamp, u.TimestampToMilliTime(msg.Timestamp), msg.Signal, msg.EventName)
 
 	go func() {
-		e := ntfy.GetInstance().Publish(&u.NtfyEventData{
-			Id:       msg.MacAddress,
+		//e := ntfy.GetInstance().Publish(&u.NtfyEventData{
+		//	Id:       msg.MacAddress,
+		//	Topic:    "work",
+		//	Title:    strings.ReplaceAll(msg.Title, "#", ""),
+		//	Message:  text.String(),
+		//	Markdown: true,
+		//})
+
+		e := ntfy.GetInstance().Publish(&ntfy.Message{
+			ID:       msg.MacAddress,
 			Topic:    "work",
 			Title:    strings.ReplaceAll(msg.Title, "#", ""),
 			Message:  text.String(),
