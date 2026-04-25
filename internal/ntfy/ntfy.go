@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/uclient/internal/u"
 )
 
@@ -14,14 +15,14 @@ var (
 )
 
 type Ntfy struct {
-	client  *Client
-	fnArray []func(string)
+	client *Client
+	fn     func(string) string
 }
 
 // GetInstance 返回单例实例
 func GetInstance() *Ntfy {
 	once.Do(func() {
-		instance = &Ntfy{client: nil, fnArray: make([]func(string), 0)}
+		instance = &Ntfy{client: nil, fn: nil}
 	})
 	return instance
 }
@@ -39,20 +40,20 @@ func (this *Ntfy) Stop() {
 		this.client.Stop()
 	}
 }
-func (this *Ntfy) AddFunc(fn func(string)) {
-	this.fnArray = append(this.fnArray, fn)
+func (this *Ntfy) SetFunc(fn func(string) string) {
+	this.fn = fn
 }
 func (this *Ntfy) subscribe(topic string) {
 	this.client.ListenWithRetry(topic, func(msg *Message) string {
-		fmt.Printf("\n[服务端] 收到请求：ID=%s | 内容=%s\n", msg.ID, msg.Message)
+		//fmt.Printf("\n[服务端] 收到请求：ID=%s | 内容=%s\n", msg.ID, msg.Message)
+		z.L().Debug(fmt.Sprintf("[服务端] 收到请求：ID=%s | 内容=%s\n", msg.ID, msg.Message))
 		//this.client.DispatchResponse(msg)
 		// 返回结果
-		if this.fnArray != nil && len(this.fnArray) > 0 {
-			for _, fn := range this.fnArray {
-				fn(msg.Message)
-			}
+		var res string
+		if this.fn != nil {
+			res = this.fn(msg.Message)
 		}
-		return fmt.Sprintf("处理成功：%s", msg.Message)
+		return res
 	})
 }
 
@@ -64,6 +65,6 @@ func (this *Ntfy) Publish(data *Message) error {
 	return nil
 }
 
-func (this *Ntfy) PublishSync(data *Message) (*Message, error) {
-	return this.client.SendSync(data)
+func (this *Ntfy) PublishSync(title string, data *SyncMessage) (*Message, error) {
+	return this.client.SendSync(title, data)
 }

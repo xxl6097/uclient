@@ -15,6 +15,7 @@ import (
 	"github.com/xxl6097/uclient/internal/auth"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
+	"go.uber.org/zap"
 )
 
 type Api struct {
@@ -221,13 +222,13 @@ func (this *Api) SetNtfy(w http.ResponseWriter, r *http.Request) {
 	defer f(w)
 	body, err := u.GetDataByJson[u.NtfyInfo](r)
 	if err != nil {
-		z.Error(err)
+		z.L().Error(err.Error())
 		res.Err(err)
 		return
 	}
 	err = openwrt.GetInstance().SetNtfy(body)
 	if err != nil {
-		z.Error(err)
+		z.L().Warn("失败", zap.Error(err))
 		res.Err(err)
 		return
 	} else {
@@ -521,7 +522,7 @@ func (this *Api) TiggerSignCardEvent(w http.ResponseWriter, r *http.Request) {
 		res.Err(fmt.Errorf("mac is empty"))
 		return
 	}
-	err = openwrt.GetInstance().TiggerSignCardEvent(body.Mac)
+	_, err = openwrt.GetInstance().TiggerSignCardEvent(body.Mac)
 	if err != nil {
 		res.Err(err)
 		return

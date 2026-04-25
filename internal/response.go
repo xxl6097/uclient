@@ -2,9 +2,11 @@ package internal
 
 import (
 	"encoding/json"
-	"github.com/xxl6097/glog/pkg/z"
+	"fmt"
 
 	"net/http"
+
+	"github.com/xxl6097/glog/pkg/z"
 )
 
 type GeneralResponse struct {
@@ -30,7 +32,6 @@ func (g *GeneralResponse) StatusCode(code int) *GeneralResponse {
 	return g.response(code, "", nil)
 }
 func (g *GeneralResponse) Err(err error) *GeneralResponse {
-	z.Error(err)
 	return g.Response(-1, err.Error())
 }
 func (g *GeneralResponse) Error(msg string) *GeneralResponse {
@@ -55,7 +56,7 @@ func Response(r *http.Request) (*GeneralResponse, func(w http.ResponseWriter)) {
 	return res, func(w http.ResponseWriter) {
 		defer func() {
 			if res.Code != 0 {
-				z.Errorf("Http response [%s]: res: %+v", r.URL.Path, res)
+				z.L().Warn(fmt.Sprintf("Http response [%s]: res: %+v", r.URL.Path, res))
 			}
 		}()
 
@@ -66,12 +67,12 @@ func Response(r *http.Request) (*GeneralResponse, func(w http.ResponseWriter)) {
 		}
 		if res.Raw != nil {
 			data = res.Raw
-			z.Infof("Http response [%s %s]: raw: %s", r.Method, r.URL.Path, string(res.Raw))
+			z.L().Debug(fmt.Sprintf("Http response [%s %s]: raw: %s", r.Method, r.URL.Path, string(res.Raw)))
 		} else {
 			//z.Infof("Http response [%s %s]: res: %v", r.Method, r.URL.Path, res)
 			bb, err := json.Marshal(res)
 			if err != nil {
-				z.Errorf("marshal result error: %v", err)
+				z.L().Error(fmt.Sprintf("marshal result error: %v", err))
 				w.WriteHeader(400)
 				return
 			}

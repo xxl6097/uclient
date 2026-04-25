@@ -1,10 +1,11 @@
 package openwrt
 
 import (
+	"time"
+
 	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/u"
-	"time"
 )
 
 type SignData struct {
@@ -17,7 +18,7 @@ type SignData struct {
 func (this *openWRT) ding(eveName string, tempData *DHCPLease) {
 	if this.hasNotifyCondition(tempData) {
 		go func() {
-			err := this.notifyWebhookMessage(eveName, tempData)
+			_, err := this.notifyWebhookMessage(eveName, tempData)
 			if err != nil {
 				z.Errorf("钉钉通知失败 %v %+v", err, tempData)
 			}
@@ -106,7 +107,7 @@ func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 			z.Errorf("打卡更新失败 %v %+v", e, tempData)
 		} else {
 			z.Errorf("打卡更新成功  %+v", tempData)
-			e1 := this.NotifyDingSign(tempData, eveName, now, todaySignData)
+			_, e1 := this.NotifyDingSign(tempData, eveName, now, todaySignData)
 			if e1 != nil {
 				z.Errorf("钉钉打卡失败 %v %+v", e1, tempData)
 			}

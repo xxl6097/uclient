@@ -32,12 +32,12 @@ type WebHookMessage struct {
 	//MonthOverTime string `json:"monthOverTime"`
 }
 
-func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
+func Notify(msg WebHookMessage, fn func(*strings.Builder)) (string, error) {
 	if msg.Url == "" {
-		return fmt.Errorf("webhook url is empty")
+		return "", fmt.Errorf("webhook url is empty")
 	}
 	if msg.Title == "" {
-		return fmt.Errorf("title is empty")
+		return "", fmt.Errorf("title is empty")
 	}
 	text := strings.Builder{}
 	text.WriteString(fmt.Sprintf("#### %s \n ", msg.Title))
@@ -102,7 +102,7 @@ func Notify(msg WebHookMessage, fn func(*strings.Builder)) error {
 		}
 	}()
 
-	return WebHook(msg.Url, payload)
+	return text.String(), WebHook(msg.Url, payload)
 }
 func WebHook(webhookUrl string, payload any) error {
 	//jsonData, err := json.Marshal(payload)

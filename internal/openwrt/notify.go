@@ -2,46 +2,47 @@ package openwrt
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/internal/webhook"
-	"strings"
-	"time"
 )
 
-func (this *openWRT) TiggerSignCardEvent(macAddress string) error {
+func (this *openWRT) TiggerSignCardEvent(macAddress string) (string, error) {
 	if v, ok := this.clients[macAddress]; ok {
 		if v.Nick != nil && v.Nick.WorkType != nil {
 			//return this.NotifyDingSign(0, macAddress, "测试", zutil.Now(), GetTodaySignData(macAddress), v.Nick.WorkType)
 			return this.NotifyDingSign(v, "测试", zutil.Now(), GetTodaySignData(macAddress))
 		}
 	}
-	return nil
+	return "", nil
 }
 
-func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now time.Time, wrk *WorkEntry) error {
+func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now time.Time, wrk *WorkEntry) (string, error) {
 	if tempData == nil {
-		return fmt.Errorf("tempData is nil")
+		return "", fmt.Errorf("tempData is nil")
 	}
 	macAddress := tempData.MAC
 	signal := tempData.Signal
 	if macAddress == "" {
-		return fmt.Errorf("mac is nil")
+		return "", fmt.Errorf("mac is nil")
 	}
 	if tempData.Nick == nil {
-		return fmt.Errorf("tempData nick is nil")
+		return "", fmt.Errorf("tempData nick is nil")
 	}
 	if tempData.Nick.WorkType == nil {
-		return fmt.Errorf("tempData nick WorkType is nil")
+		return "", fmt.Errorf("tempData nick WorkType is nil")
 	}
 	settings := tempData.Nick.WorkType
 	if settings == nil {
-		return fmt.Errorf("设备【%s】未设置打卡时间", macAddress)
+		return "", fmt.Errorf("设备【%s】未设置打卡时间", macAddress)
 	}
 	webhookUrl := settings.WebhookUrl
 	if webhookUrl == "" {
-		return fmt.Errorf("设备【%s】未设置webhook", macAddress)
+		return "", fmt.Errorf("设备【%s】未设置webhook", macAddress)
 	}
 	month := fmt.Sprintf("%d-%02d", now.Year(), int(now.Month()))
 	day := now.Format(time.DateOnly)
@@ -130,18 +131,18 @@ func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now tim
 	})
 }
 
-func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) error {
+func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) (string, error) {
 	if this.webhookUrl == "" {
-		return fmt.Errorf("webhookUrl is empty")
+		return "", fmt.Errorf("webhookUrl is empty")
 	}
 	if client == nil {
-		return fmt.Errorf("client is nil")
+		return "", fmt.Errorf("client is nil")
 	}
 	if client.Nick == nil {
-		return fmt.Errorf("client.Nick is empty")
+		return "", fmt.Errorf("client.Nick is empty")
 	}
 	if !client.Nick.IsPush {
-		return fmt.Errorf("client.Nick is not push")
+		return "", fmt.Errorf("client.Nick is not push")
 	}
 
 	//t := u.UTC8ToTime(client.StartTime)

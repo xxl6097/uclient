@@ -13,13 +13,15 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"go.uber.org/zap"
 )
 
 const (
-	DefaultNtfyHost        = "https://ntfy.sh"
-	DefaultTimeout         = 10 * time.Second
-	maxRetryBackoff        = 30 * time.Second
-	requestHeaderRespTopic = "X-Response-Topic"
+	DefaultNtfyHost = "https://ntfy.sh"
+	DefaultTimeout  = 10 * time.Second
+	maxRetryBackoff = 30 * time.Second
 )
 
 // Client 支持：同步消息、停止、重试、BasicAuth
@@ -34,6 +36,7 @@ type Client struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	closed bool
+	topic  string
 }
 
 // Message ntfy 消息结构
@@ -47,6 +50,13 @@ type Message struct {
 	Expires  int64             `json:"expires,omitempty"`
 	Event    string            `json:"event,omitempty"`
 	Markdown bool              `json:"markdown,omitempty"`
+}
+
+type SyncMessage struct {
+	ID            string `json:"id"`
+	TargetTopic   string `json:"targetTopic"`
+	ResponseTopic string `json:"responseTopic"`
+	Data          string `json:"data"`
 }
 
 // NewClientWithAuth 创建带 BasicAuth 认证的客户端（生产用）
@@ -95,14 +105,25 @@ func (c *Client) Stop() {
 }
 
 // SendSync 同步发送（带认证 + respTopic） reqTopic, content string
-func (c *Client) SendSync(data *Message) (*Message, error) {
+func (c *Client) SendSync(title string, data *SyncMessage) (*Message, error) {
 	c.mu.Lock()
 	if c.closed {
 		c.mu.Unlock()
 		return nil, errors.New("client stopped")
 	}
+	if c.topic != "" && data.ResponseTopic == "" {
+		data.ResponseTopic = c.topic
+	}
+	body, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
 	// 发送：携带响应主题头
-	msgID, err := c.publish(data)
+	msgID, err := c.Send(&Message{
+		Title:   title,
+		Topic:   data.TargetTopic,
+		Message: string(body),
+	})
 	if err != nil {
 		c.cleanupCallback(msgID)
 		return nil, err
@@ -160,6 +181,7 @@ func (c *Client) ListenWithRetry(topic string, handler func(*Message) string) {
 
 // listen 单次监听（带认证）
 func (c *Client) listen(topic string, handler func(*Message) string) error {
+	c.topic = topic
 	url := fmt.Sprintf("%s/%s/json", c.host, topic)
 	req, _ := http.NewRequestWithContext(c.ctx, "GET", url, nil)
 	c.setAuthHeader(req)
@@ -188,15 +210,30 @@ func (c *Client) listen(topic string, handler func(*Message) string) error {
 			continue
 		}
 
+		if msg.Message != "" {
+			z.L().Debug("aaaa", zap.Any("msg", msg))
+		}
 		go func(m Message) {
-			respTopic := m.Headers[requestHeaderRespTopic]
 			result := handler(&m)
-			if respTopic != "" {
-				//_, _ = c.publish(respTopic, result)
-				_, _ = c.publish(&Message{
-					Topic:   respTopic,
-					Message: result,
-				})
+			if result != "" {
+				var syncMsg SyncMessage
+				err = json.Unmarshal([]byte(m.Message), &syncMsg)
+				if err == nil && syncMsg.ResponseTopic != "" {
+					tempData := SyncMessage{
+						ID:   m.ID,
+						Data: result,
+					}
+					jsonBytes, e := json.Marshal(tempData)
+					if e != nil {
+						return
+					}
+					_, _ = c.Send(&Message{
+						Topic:   syncMsg.ResponseTopic,
+						Message: string(jsonBytes),
+					})
+
+				}
+				//z.L().Warn(result)
 			}
 		}(msg)
 	}
@@ -204,19 +241,17 @@ func (c *Client) listen(topic string, handler func(*Message) string) error {
 }
 
 func (c *Client) Send(data *Message) (string, error) {
-	return c.publish(data)
-}
-
-// publish 发布消息（带认证）
-func (c *Client) publish(data *Message) (string, error) {
 	body, err := json.Marshal(data)
 	if err != nil {
 		return "", err
 	}
+	return c.publish(body)
+}
 
-	topic := data.Topic
-	url := fmt.Sprintf("%s/%s", c.host, topic)
-	req, _ := http.NewRequestWithContext(c.ctx, "POST", url, bytes.NewReader(body))
+// publish 发布消息（带认证）
+func (c *Client) publish(payload []byte) (string, error) {
+	url := fmt.Sprintf("%s", c.host)
+	req, _ := http.NewRequestWithContext(c.ctx, "POST", url, bytes.NewReader(payload))
 	c.setAuthHeader(req)
 
 	client := http.Client{Timeout: 5 * time.Second}
@@ -229,7 +264,7 @@ func (c *Client) publish(data *Message) (string, error) {
 	// 6. 读取并解析响应
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("[ntfy err][%s] %s\n", topic, err.Error())
+		fmt.Printf("[ntfy err] %s\n", err.Error())
 		return "", err
 	}
 	var result Message
@@ -237,7 +272,7 @@ func (c *Client) publish(data *Message) (string, error) {
 		return "", fmt.Errorf("解析响应失败: %w, 响应: %s", err, string(respBody))
 	}
 
-	fmt.Printf("[ntfy publish][%s] %s\n", topic, result.ID)
+	fmt.Printf("[ntfy publish] %s\n", result.ID)
 	return result.ID, nil
 }
 

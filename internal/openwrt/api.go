@@ -312,6 +312,9 @@ func (this *openWRT) SetNtfy(info *u.NtfyInfo) error {
 		return fmt.Errorf("NtfyInfo is nil")
 	}
 	go ntfy.GetInstance().Start(info)
+	if u.IsMacOs() {
+		ntfyFilePath = "./ntfy"
+	}
 	return utils.SaveWithGob[u.NtfyInfo](*info, ntfyFilePath)
 }
 

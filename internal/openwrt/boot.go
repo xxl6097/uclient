@@ -15,6 +15,7 @@ import (
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
+	"go.uber.org/zap"
 )
 
 var (
@@ -53,6 +54,7 @@ func GetInstance() *openWRT {
 }
 
 func (this *openWRT) init() {
+	this.initNtfy()
 	if u.IsMacOs() {
 		return
 	}
@@ -61,7 +63,6 @@ func (this *openWRT) init() {
 	this.initClients()
 	this.LoadAuth()
 	this.subscribe()
-	this.initNtfy()
 }
 
 func (this *openWRT) Close() {
@@ -92,37 +93,42 @@ func (this *openWRT) initClients() {
 	}
 }
 
-func (this *openWRT) ntfyMessage(message string) {
+func (this *openWRT) ntfyMessage(message string) string {
 	if message == "" {
-		return
+		return ""
 	}
 	var res u.NtfyEventData
 	err := json.Unmarshal([]byte(message), &res)
 	if err != nil {
-		z.Errorf("ntfyMessage Error:%v", err)
-		return
+		z.L().Warn(fmt.Sprintf("ntfyMessage Error:%v", err))
+		return ""
 	}
 	if res.Topic == "uclient" && res.Title == "sign" {
-		z.Info("ntfyMessage sign", res)
+		z.L().Info("ntfyMessage", zap.Any("res", res))
 		mac := res.Message
 		cls := this.getClient(mac)
-		z.Info("ntfyMessage cls", cls)
+		z.L().Info("ntfyMessage", zap.Any("cls", cls))
 		if cls != nil {
 			cls.StartTime = zutil.Now().UnixMilli()
 			this.dingSign("ntfyMessage", cls)
-			_ = this.TiggerSignCardEvent(mac)
+			msg, _ := this.TiggerSignCardEvent(mac)
+			return msg
 		}
 	}
+	return ""
 }
 
 func (this *openWRT) initNtfy() {
+	if u.IsMacOs() {
+		ntfyFilePath = "./ntfy"
+	}
 	if u.IsFileExist(ntfyFilePath) {
 		info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
 		if err != nil {
 			z.Errorf("initNtfy Error:%v", err)
 		} else {
 			go ntfy.GetInstance().Start(info)
-			ntfy.GetInstance().AddFunc(this.ntfyMessage)
+			ntfy.GetInstance().SetFunc(this.ntfyMessage)
 		}
 	}
 }
