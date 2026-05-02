@@ -94,27 +94,64 @@ func (this *openWRT) initClients() {
 	}
 }
 
-func (this *openWRT) ntfyMessage(message string) string {
-	if message == "" {
+func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
+	if m == nil || m.Message == "" {
 		return ""
 	}
-	var res u.NtfyEventData
-	err := json.Unmarshal([]byte(message), &res)
+	var res u.BaseMessage
+	err := json.Unmarshal([]byte(m.Message), &res)
 	if err != nil {
-		z.L().Warn("json错误", zap.String("message", message), zap.Error(err))
+		z.L().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
 		return err.Error()
 	}
-	if res.Topic == this.settingsData.PushMsgData.ResTopic {
-		z.L().Info("ntfyMessage", zap.Any("res", res))
-		mac := res.Message
-		cls := this.getClient(mac)
-		z.L().Info("ntfyMessage", zap.Any("cls", cls))
-		if cls != nil {
-			cls.StartTime = zutil.Now().UnixMilli()
-			this.dingSign("ntfyMessage", cls)
-			msg, _ := this.TiggerSignCardEvent(mac)
-			return msg
+	z.L().Info("ntfyMessage", zap.Any("res", res))
+	if m.Topic == this.settingsData.PushMsgData.ResTopic {
+		switch res.MsgType {
+		case "getData":
+			cls := this.getClientByName(res.Target)
+			z.L().Info("ntfyMessage", zap.Any("cls", cls))
+			if cls != nil {
+				cls.StartTime = zutil.Now().UnixMilli()
+				this.dingSign("ntfyMessage", cls)
+				msg, _ := this.TiggerSignCardEvent(cls.MAC)
+				return msg
+			}
+			break
+
+		case "sign":
+			cls := this.getClientByName(res.Target)
+			z.L().Info("ntfyMessage", zap.Any("cls", cls))
+			if cls != nil {
+				cls.StartTime = zutil.Now().UnixMilli()
+				this.dingSign("ntfyMessage", cls)
+				msg, _ := this.TiggerSignCardEvent(cls.MAC)
+				return msg
+			}
+			break
+
+		case "getList":
+			cls := this.GetClients()
+			if cls != nil {
+				z.L().Info("ntfyMessage", zap.Any("cls", cls))
+				str := strings.Builder{}
+				for _, cl := range cls {
+					name := cl.Hostname
+					if cl.Nick != nil {
+						name = cl.Nick.Name
+					}
+					status := "在线"
+					if !cl.Online {
+						status = "离线"
+					}
+					str.WriteString(fmt.Sprintf("%s %s %s\n", name, cl.IP, status))
+				}
+				return str.String()
+			}
+			break
+		default:
+			return fmt.Errorf("not found ntfyMessage %+v", res).Error()
 		}
+
 	} else {
 		return fmt.Errorf("not found ntfyMessage %+v", res).Error()
 	}
@@ -148,7 +185,7 @@ func (this *openWRT) initNtfy() {
 			go func() {
 				err := client.Serve(this.ctx, this.settingsData.PushMsgData.ReqTopic, func(_ context.Context, m *ntfy.Message) (string, string, bool, error) {
 					z.L().Info("[responder] 收到", zap.Any("msg", m), zap.Any("tags", m.Tags))
-					msg := this.ntfyMessage(m.Message)
+					msg := this.ntfyMessage(m)
 					reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
 					return "reply", reply, false, nil
 				})

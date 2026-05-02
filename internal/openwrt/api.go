@@ -156,6 +156,14 @@ func (this *openWRT) getClient(macAddr string) *DHCPLease {
 	}
 	return nil
 }
+func (this *openWRT) getClientByName(name string) *DHCPLease {
+	for _, cls := range this.clients {
+		if cls != nil && cls.Nick != nil && cls.Nick.Name == name {
+			return cls
+		}
+	}
+	return nil
+}
 func (this *openWRT) getName(macAddr string) string {
 	temp := this.clients[macAddr]
 	if temp != nil {
