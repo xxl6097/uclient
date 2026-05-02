@@ -127,7 +127,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 			msg, _ := this.TiggerSignCardEvent(cls.MAC)
 			return msg
 		}
-		break
+		return fmt.Sprintf("%s 未找到，可能不存在", res.Target)
 
 	case "sign":
 		cls := this.getClientByName(res.Target)
@@ -138,7 +138,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 			msg, _ := this.TiggerSignCardEvent(cls.MAC)
 			return msg
 		}
-		break
+		return fmt.Sprintf("%s 未找到，可能不存在", res.Target)
 
 	case "getList":
 		cls := this.GetClients()
@@ -195,7 +195,8 @@ func (this *openWRT) initNtfy() {
 					z.L().Info("[responder] 收到", zap.Any("msg", m), zap.Any("tags", m.Tags))
 					msg := this.ntfyMessage(m)
 					//reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
-					return "reply", msg, false, nil
+					z.L().Debug("回复", zap.String("msg", msg))
+					return fmt.Sprintf("响应【%s】", this.settingsData.PushMsgData.ReqTopic), msg, false, nil
 				})
 				if err != nil {
 					fmt.Println("异常退出", err)
