@@ -101,8 +101,8 @@ func (this *openWRT) ntfyMessage(message string) string {
 	var res u.NtfyEventData
 	err := json.Unmarshal([]byte(message), &res)
 	if err != nil {
-		z.L().Warn(fmt.Sprintf("ntfyMessage Error:%v", err))
-		return ""
+		z.L().Warn("json错误", zap.String("message", message), zap.Error(err))
+		return err.Error()
 	}
 	if res.Topic == "uclient" && res.Title == "sign" {
 		z.L().Info("ntfyMessage", zap.Any("res", res))
@@ -115,6 +115,8 @@ func (this *openWRT) ntfyMessage(message string) string {
 			msg, _ := this.TiggerSignCardEvent(mac)
 			return msg
 		}
+	} else {
+		return fmt.Errorf("not found ntfyMessage %+v", res).Error()
 	}
 	return ""
 }
