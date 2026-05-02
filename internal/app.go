@@ -33,6 +33,6 @@ func Bootstrap(cfg *u.Config, service igs.Service) {
 		}).
 		Done(cfg.ServerPort)
 	defer server.Stop()
-	z.L().Sugar().Debugf("服务器启动 %d", cfg.ServerPort)
+	z.L().Sugar().Debugf("服务器启动:%d", cfg.ServerPort)
 	server.Wait()
 }
