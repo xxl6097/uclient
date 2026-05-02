@@ -140,6 +140,7 @@ func (this *openWRT) initNtfy() {
 			Multiplier:     2.0,
 		}))
 
+		z.L().Info("ntfy loading", zap.Any("ops", ops))
 		client := ntfy.GetClient(ops...)
 		if client != nil && this.settingsData.PushMsgData.ReqTopic != "" {
 			go func() {
@@ -154,6 +155,8 @@ func (this *openWRT) initNtfy() {
 				}
 			}()
 		}
+	} else {
+		z.L().Warn("ntfy load failed", zap.Any("settings", this.settingsData))
 	}
 }
 

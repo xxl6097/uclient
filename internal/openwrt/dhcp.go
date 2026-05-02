@@ -2,6 +2,7 @@ package openwrt
 
 import (
 	"fmt"
+
 	"github.com/xxl6097/glog/pkg/z"
 
 	"log"
@@ -211,7 +212,7 @@ func GetUCIOutput() ([]*DHCPHost, error) {
 		return nil, err
 	}
 	hosts := parseUciShowDHCP(string(output))
-	z.Println("✅ 静态IP：", len(hosts))
+	//z.Println("✅ 静态IP：", len(hosts))
 	//for _, host := range hosts {
 	//	z.Printf("索引: %v | MAC: %s | IP: %s | 设备名: %s\n",
 	//		host.Index, host.MAC, host.IP, host.Hostname)
@@ -230,6 +231,6 @@ func getStaticIpMap() (map[string]*DHCPHost, error) {
 		dataMap[entry.MAC] = entry
 	}
 
-	z.Println("静态IPMAP：", len(dataMap))
+	//z.Println("静态IPMAP：", len(dataMap))
 	return dataMap, nil
 }

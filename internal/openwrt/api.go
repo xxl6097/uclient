@@ -11,6 +11,7 @@ import (
 	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/uclient/internal/u"
+	"go.uber.org/zap"
 )
 
 func (this *openWRT) initData() error {
@@ -21,19 +22,19 @@ func (this *openWRT) initData() error {
 	}
 	arpList, e1 := getClientsByArp(brLanString)
 	if e1 == nil {
-		z.Debug("\n✅ arpList：")
-		for _, temp := range arpList {
-			z.Debugf("%+v", temp)
-		}
+		//z.L().Debug("\n✅ arpList：")
+		//for _, temp := range arpList {
+		//	z.L().Debug("arp", zap.Any("temp", temp))
+		//}
 	}
 	if e1 == nil {
 		dhcpMap, e2 := getClientsByDhcp()
 		if e2 == nil {
 			this.leases = dhcpMap
-			z.Debug("\n✅ dhcpMap：")
-			for _, temp := range dhcpMap {
-				z.Debugf("%+v", temp)
-			}
+			//z.L().Debug("\n✅ dhcpMap：")
+			//for _, temp := range dhcpMap {
+			//	z.L().Debug("dhcp", zap.Any("temp", temp))
+			//}
 		}
 		var sysLogMap map[string][]*Status
 		if strings.Contains(this.ulistString, "hostapd") {
@@ -42,12 +43,13 @@ func (this *openWRT) initData() error {
 		nickMap, e4 := getNickData()
 		if e4 == nil {
 			this.nicks = nickMap
-			z.Debug("\n✅ nickMap：")
-			for _, temp := range nickMap {
-				if temp != nil {
-					z.Debugf("%+v %+v", temp, temp.WorkType)
-				}
-			}
+			//z.L().Debug("\n✅ nickMap：")
+			//for _, temp := range nickMap {
+			//	if temp != nil {
+			//		//z.Debugf("%+v %+v", temp, temp.WorkType)
+			//		z.L().Debug("nick", zap.Any("temp", temp))
+			//	}
+			//}
 		}
 
 		stcMap, e5 := getStaticIpMap()
@@ -135,14 +137,14 @@ func (this *openWRT) initData() error {
 		if e4 != nil {
 			err := updateNicksData(nickMap)
 			if err != nil {
-				z.Errorf("NickData Save Error:%v", err)
+				z.L().Error("NickData Save Error:", zap.Any("err", err))
 			}
 		}
 
-		z.Debug("\n✅ dataMap：")
-		for _, temp := range this.clients {
-			z.Debugf("%+v", temp)
-		}
+		//z.L().Debug("\n✅ dataMap：")
+		//for _, temp := range this.clients {
+		//	z.L().Debug("dataMap", zap.Any("temp", temp))
+		//}
 		return nil
 	}
 	return e1

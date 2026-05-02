@@ -27,9 +27,10 @@ import (
 func init() {
 	//go func() { log.Println(http.ListenAndServe("localhost:6060", nil)) }()
 	//gs.InitLog(0)
-
 	z.LoadLogger(func(conf *z.LogConfig) {
+		conf.MaxSize = 1
 		conf.Path = "./logs"
+		conf.TagName = "uclient"
 	})
 	if u.IsMacOs() {
 		pkg.AppVersion = "v0.0.3"

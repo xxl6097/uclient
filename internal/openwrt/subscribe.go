@@ -56,7 +56,7 @@ func (this *openWRT) GetSettings() (*u.SettingsData, error) {
 func (this *openWRT) loadSettings() *u.SettingsData {
 	info, err := this.GetSettings()
 	if err == nil && info != nil {
-		z.L().Debug("读取默认系统配置", zap.Any("info", info))
+		z.L().Debug("读取配置", zap.String("settingPath", settingPath), zap.Any("info", info))
 		return info
 	}
 
@@ -73,35 +73,40 @@ func (this *openWRT) loadSettings() *u.SettingsData {
 }
 
 func (this *openWRT) subscribe() {
-	settings := this.loadSettings()
+	settings := this.settingsData
 	if settings == nil {
-		z.Warnf("系统设置孔：%+v", settings)
+		z.L().Error("系统配置空nil")
 		return
 	}
-	z.Warnf("系统设置：%+v", settings)
-	if settings.ListenData.IsSysLogListen {
-		z.Warn("启动 SysLog")
-		go this.subscribeSysLog()
-	}
-	if settings.ListenData.IsArpListen {
-		z.Warn("启动 ArpEvent")
-		go this.subscribeArpEvent()
-	}
+	z.L().Debug("系统设置", zap.Any("settings", settings))
 	go this.subscribeArpPing()
 	go this.subscribeFsnotify()
 	//读取状态，显示网速等信息
 	go this.subscribeStatus()
-	if settings.ListenData.IsHostApdListen {
-		z.Warn("启动 hostapd")
-		if strings.Contains(this.ulistString, "hostapd") {
-			go this.subscribeHostapd()
+	if settings.ListenData != nil {
+		listenData := settings.ListenData
+		if listenData.IsSysLogListen {
+			z.L().Info("启动 SysLog")
+			go this.subscribeSysLog()
 		}
-	}
-	if settings.ListenData.IsDnsmasqListen {
-		z.Warn("启动 dnsmasq")
-		if strings.Contains(this.ulistString, "dnsmasq") {
-			go this.subscribeDnsmasq()
+		if listenData.IsArpListen {
+			z.L().Info("启动 ArpEvent")
+			go this.subscribeArpEvent()
 		}
+		if listenData.IsHostApdListen {
+			z.L().Info("启动 hostapd")
+			if strings.Contains(this.ulistString, "hostapd") {
+				go this.subscribeHostapd()
+			}
+		}
+		if listenData.IsDnsmasqListen {
+			z.L().Info("启动 dnsmasq")
+			if strings.Contains(this.ulistString, "dnsmasq") {
+				go this.subscribeDnsmasq()
+			}
+		}
+	} else {
+		z.L().Warn("listenData启动失败。。。")
 	}
 
 	//if strings.Contains(this.ulistString, "ahsapd.sta") {

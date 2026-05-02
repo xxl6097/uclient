@@ -4,11 +4,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/go-http/pkg/httpserver"
 	"github.com/xxl6097/go-service/pkg/gs/igs"
 	assets "github.com/xxl6097/uclient/assets/openwrt"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
+	"go.uber.org/zap"
 )
 
 func Bootstrap(cfg *u.Config, service igs.Service) {
@@ -32,5 +34,6 @@ func Bootstrap(cfg *u.Config, service igs.Service) {
 		}).
 		Done(cfg.ServerPort)
 	defer server.Stop()
+	z.L().Debug("服务器启动", zap.Int("端口", cfg.ServerPort))
 	server.Wait()
 }

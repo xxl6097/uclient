@@ -16,6 +16,7 @@ import (
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/pkg"
+	"go.uber.org/zap"
 )
 
 type Service struct {
@@ -43,7 +44,7 @@ func load() (*u.Config, error) {
 	err = ukey.GobToStruct(byteArray, &cfg)
 	//err = json.Unmarshal(byteArray, &cfg)
 	if err != nil {
-		z.Println("ClientConfig解析错误", err)
+		z.L().Error("ClientConfig解析错误", zap.Error(err))
 		return nil, err
 	}
 	pkg.Version()
@@ -81,7 +82,7 @@ func (this *Service) OnRun(service igs.Service) error {
 	if err != nil {
 		return err
 	}
-	z.Debug("程序运行", os.Args)
+	z.L().Debug("程序运行", zap.Any("cfg", cfg), zap.Any("Args", os.Args))
 	//server := httpserver.New().
 	//	CORSMethodMiddleware().
 	//	AddRoute(internal.NewRoute(internal.NewApi(service, cfg.Username, cfg.Password))).
@@ -96,7 +97,7 @@ func (this *Service) OnRun(service igs.Service) error {
 }
 
 func (this *Service) GetAny(binDir string) ([]byte, []string) {
-	z.Debug("运行目录：", binDir)
+	z.L().Debug("运行目录", zap.String("binDir", binDir))
 	return this.menu(), nil
 }
 

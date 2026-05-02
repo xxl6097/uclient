@@ -1,6 +1,7 @@
 .gradle
 /local.properties
 /.idea
+cfg
 dist
 dist-frps
 dist-frpc
