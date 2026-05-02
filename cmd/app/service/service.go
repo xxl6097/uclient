@@ -62,10 +62,10 @@ func (this *Service) OnConfig() *service.Config {
 
 func (this *Service) OnVersion() string {
 	pkg.Version()
-	//cfg, err := load()
-	//if err == nil {
-	//	z.Debugf("cfg:%+v", cfg)
-	//}
+	cfg, err := load()
+	if err == nil {
+		z.L().Debug("cfg", zap.Any("cfg", cfg))
+	}
 	return pkg.AppVersion
 }
 
