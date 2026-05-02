@@ -23,6 +23,7 @@ var (
 )
 
 type openWRT struct {
+	mac          string
 	clients      map[string]*DHCPLease
 	nicks        map[string]*NickEntry
 	leases       map[string]*DHCPLease
@@ -47,6 +48,7 @@ func GetInstance() *openWRT {
 			leases:       make(map[string]*DHCPLease),
 			task:         make(map[string]*u.CountdownTask[*SignData]),
 			statusRuning: false,
+			mac:          u.GetEth0Mac(),
 		}
 		instance.init()
 	})
@@ -114,7 +116,16 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 			z.L().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
 			return err.Error()
 		}
-		caseType = eventData.EventKey
+		mac, cmd, e := u.ParseDeviceStr(eventData.EventKey)
+		if e != nil {
+			z.L().Warn(e.Error())
+			return ""
+		}
+		if mac != this.mac {
+			z.L().Warn("不是本设备消息")
+			return ""
+		}
+		caseType = cmd
 		break
 	}
 	switch caseType {
@@ -196,6 +207,9 @@ func (this *openWRT) initNtfy() {
 					msg := this.ntfyMessage(m)
 					//reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
 					z.L().Debug("回复", zap.String("msg", msg))
+					if msg == "" {
+						return "", "", true, nil
+					}
 					return fmt.Sprintf("响应【%s】", this.settingsData.PushMsgData.ReqTopic), msg, false, nil
 				})
 				if err != nil {
