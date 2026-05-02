@@ -97,7 +97,7 @@ func (this *Service) OnRun(service igs.Service) error {
 }
 
 func (this *Service) GetAny(binDir string) ([]byte, []string) {
-	//z.L().Debug("运行目录 ", zap.String("binDir", binDir))
+	//z.L().Debug("运行目录", zap.String("binDir", binDir))
 	return this.menu(), nil
 }
 
