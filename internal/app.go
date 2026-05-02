@@ -10,7 +10,6 @@ import (
 	assets "github.com/xxl6097/uclient/assets/openwrt"
 	"github.com/xxl6097/uclient/internal/openwrt"
 	"github.com/xxl6097/uclient/internal/u"
-	"go.uber.org/zap"
 )
 
 func Bootstrap(cfg *u.Config, service igs.Service) {
@@ -34,6 +33,6 @@ func Bootstrap(cfg *u.Config, service igs.Service) {
 		}).
 		Done(cfg.ServerPort)
 	defer server.Stop()
-	z.L().Debug("服务器启动", zap.Int("端口", cfg.ServerPort))
+	z.L().Sugar().Debugf("服务器启动 %d", cfg.ServerPort)
 	server.Wait()
 }
