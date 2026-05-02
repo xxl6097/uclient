@@ -9,7 +9,7 @@ require (
 	github.com/xxl6097/glog v0.1.94
 	github.com/xxl6097/go-http v0.0.63
 	github.com/xxl6097/go-ntfy v0.0.3
-	github.com/xxl6097/go-service v0.7.38
+	github.com/xxl6097/go-service v0.7.39
 	github.com/xxl6097/go-sse v0.0.23
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap v1.27.1
