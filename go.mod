@@ -6,10 +6,10 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gorilla/mux v1.8.1
 	github.com/kardianos/service v1.2.4
-	github.com/xxl6097/glog v0.1.94
+	github.com/xxl6097/glog v0.1.95
 	github.com/xxl6097/go-http v0.0.63
 	github.com/xxl6097/go-ntfy v0.0.3
-	github.com/xxl6097/go-service v0.7.39
+	github.com/xxl6097/go-service v0.7.41
 	github.com/xxl6097/go-sse v0.0.23
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap v1.27.1

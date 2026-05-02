@@ -35,7 +35,7 @@ func init() {
 	if u.IsMacOs() {
 		pkg.AppVersion = "v0.0.3"
 		pkg.BinName = "uclient_v0.2.2_linux_arm64"
-		fmt.Println("Hello World", os.Getpid())
+		fmt.Println("Hello World1", os.Getpid())
 		internal.Bootstrap(&u.Config{
 			Username:   "admin",
 			Password:   "admin",
