@@ -1,8 +1,0 @@
-{
-  "listenData": {
-    "isSysLogListen": true,
-    "isArpListen": true,
-    "isHostApdListen": true,
-    "isDnsmasqListen": true
-  }
-}
