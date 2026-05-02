@@ -190,10 +190,10 @@ func (this *Api) Clear(w http.ResponseWriter, r *http.Request) {
 func (this *Api) Reboot(w http.ResponseWriter, r *http.Request) {
 	//req := utils.GetReqMapData(w, r)
 	//z.Warn(req)
-	z.Warn("Reboot---->", r.URL)
+	z.L().Info("Reboot---->", zap.String("url", r.URL.String()))
 	err := this.igs.Restart()
 	if err != nil {
-		z.Error("Reboot err:", err)
+		z.L().Info("Reboot err:", zap.String("url", r.URL.String()), zap.Error(err))
 		u.Respond(w, u.Error(-1, err.Error()))
 	} else {
 		u.OKK(w)
@@ -302,10 +302,12 @@ func (this *Api) SetSettings(w http.ResponseWriter, r *http.Request) {
 		res.Err(err)
 		return
 	}
-	res.Ok("设置成功，准备重启...")
 	z.L().Warn("准备重启...")
 	if this.igs != nil {
+		res.Ok("设置成功，准备重启...")
 		_ = this.igs.Restart()
+	} else {
+		res.Error("重启失败")
 	}
 }
 

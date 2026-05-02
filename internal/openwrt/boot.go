@@ -147,7 +147,7 @@ func (this *openWRT) initNtfy() {
 		if client != nil && this.settingsData.PushMsgData.ReqTopic != "" {
 			go func() {
 				err := client.Serve(this.ctx, this.settingsData.PushMsgData.ReqTopic, func(_ context.Context, m *ntfy.Message) (string, string, bool, error) {
-					z.L().Info("[responder] 收到", zap.String("msg", m.Message), zap.Any("tags", m.Tags))
+					z.L().Info("[responder] 收到", zap.Any("msg", m), zap.Any("tags", m.Tags))
 					msg := this.ntfyMessage(m.Message)
 					reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
 					return "reply", reply, false, nil
