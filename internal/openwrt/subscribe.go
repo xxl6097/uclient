@@ -119,7 +119,7 @@ func (this *openWRT) subscribeSysLog() {
 	for {
 		select {
 		case <-this.ctx.Done():
-			z.Debug("logread 监听退出...")
+			z.L().Debug("logread 监听退出...")
 			return
 		default:
 			err := subscribeSysLogs(this.ctx, func(s string) {
