@@ -104,7 +104,7 @@ func (this *openWRT) ntfyMessage(message string) string {
 		z.L().Warn("json错误", zap.String("message", message), zap.Error(err))
 		return err.Error()
 	}
-	if res.Topic == "uclient" && res.Title == "sign" {
+	if res.Topic == this.settingsData.PushMsgData.ResTopic {
 		z.L().Info("ntfyMessage", zap.Any("res", res))
 		mac := res.Message
 		cls := this.getClient(mac)
@@ -147,7 +147,7 @@ func (this *openWRT) initNtfy() {
 		if client != nil && this.settingsData.PushMsgData.ReqTopic != "" {
 			go func() {
 				err := client.Serve(this.ctx, this.settingsData.PushMsgData.ReqTopic, func(_ context.Context, m *ntfy.Message) (string, string, bool, error) {
-					fmt.Printf("[responder] 收到: %s tags=%v\n", m.Message, m.Tags)
+					z.L().Info("[responder] 收到", zap.String("msg", m.Message), zap.Any("tags", m.Tags))
 					msg := this.ntfyMessage(m.Message)
 					reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
 					return "reply", reply, false, nil
