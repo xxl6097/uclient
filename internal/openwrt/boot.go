@@ -106,7 +106,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 		z.L().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
 		return err.Error()
 	}
-	z.L().Info("ntfyMessage", zap.Any("res", res))
+	z.L().Info("BaseMessage", zap.Any("res", res))
 	caseType := ""
 	switch res.MsgType {
 	case "event":
@@ -116,7 +116,10 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 			z.L().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
 			return err.Error()
 		}
+
+		z.L().Info("EventMessage", zap.Any("eventData", eventData))
 		mac, cmd, e := u.ParseDeviceStr(eventData.EventKey)
+		z.L().Info("ParseDeviceStr", zap.String("mac", mac), zap.String("cmd", cmd))
 		if e != nil {
 			z.L().Warn(e.Error())
 			return ""
@@ -131,7 +134,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 	switch caseType {
 	case "getData":
 		cls := this.getClientByName(res.Target)
-		z.L().Info("ntfyMessage", zap.Any("cls", cls))
+		z.L().Info("getData", zap.Any("cls", cls))
 		if cls != nil {
 			cls.StartTime = zutil.Now().UnixMilli()
 			this.dingSign("ntfyMessage", cls)
@@ -171,7 +174,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 		}
 		break
 	default:
-		return fmt.Errorf("not found ntfyMessage %+v", res).Error()
+		return ""
 	}
 
 	return ""
