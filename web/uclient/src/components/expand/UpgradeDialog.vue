@@ -11,11 +11,11 @@
           <el-button @click="handleClose">稍后提醒</el-button>
           <el-button
             type="warning"
-            @click="handleConfirm"
+            @click="handleConfirm(false)"
             v-if="patchUrl !== ''"
             >差量升级
           </el-button>
-          <el-button type="primary" @click="handleConfirm"
+          <el-button type="primary" @click="handleConfirm(true)"
             >{{ patchUrl === '' ? '升级' : '全量升级' }}
           </el-button>
         </div>
@@ -28,6 +28,7 @@
 import { ref, defineExpose } from 'vue'
 import {
   markdownToHtml,
+  showErrorTips,
   showLoading,
   showSucessTips,
   showTips,
@@ -114,14 +115,18 @@ defineExpose({
   updateDialogWidth: updateDialogWidth,
 })
 
-const handleConfirm = () => {
+const handleConfirm = (allUpdate: boolean) => {
   showUpgradeDialog.value = false
-  if (patchUrl.value !== '') {
+  if (patchUrl.value !== '' && !allUpdate) {
     console.log('差量升级', patchUrl.value)
     upgradeByUrl(patchUrl.value as string)
   } else {
     console.log('全量升级', binUrl.value)
-    upgradeByUrl(binUrl.value as string)
+    if (binUrl.value === '') {
+      showErrorTips('升级URL空')
+    } else {
+      upgradeByUrl(binUrl.value as string)
+    }
   }
 }
 
