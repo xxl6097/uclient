@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 var require_index_001 = __commonJS({
-  "index-ML5vb4zh.js"(exports, module) {
+  "index-a8sP1DlS.js"(exports, module) {
     (function polyfill() {
       const relList = document.createElement("link").relList;
       if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -40532,60 +40532,61 @@ var require_index_001 = __commonJS({
     const _sfc_main$3 = /* @__PURE__ */ defineComponent({
       __name: "PushSettingDialog",
       setup(__props, { expose: __expose }) {
+        const defaultSettings = {
+          wechatData: {
+            openid: "",
+            userid: "",
+            template_id: ""
+          },
+          webHookData: {
+            address: ""
+          },
+          pushMsgData: {
+            address: "",
+            username: "",
+            password: "",
+            reqtopic: "",
+            restopic: ""
+          },
+          listenData: {
+            isSysLogListen: false,
+            isArpListen: false,
+            isHostApdListen: false,
+            isDnsmasqListen: false
+          }
+        };
+        const settings = ref({ ...defaultSettings });
         const formData = ref({
           show: false,
           loading: false,
-          activeName: "1",
-          webhookUrl: "",
-          openid: "",
-          ntfy: {
-            address: "",
-            topic: "",
-            username: "",
-            password: ""
-          },
           title: "",
-          settings: {
-            isSysLogListen: true,
-            isArpListen: true,
-            isHostApdListen: true,
-            isDnsmasqListen: true
-          }
+          activeName: "1"
+          // webhookUrl: '',
+          // openid: '',
+          // ntfy: {
+          //   address: '',
+          //   topic: '',
+          //   username: '',
+          //   password: '',
+          // },
+          // settings: {
+          //   isSysLogListen: true,
+          //   isArpListen: true,
+          //   isHostApdListen: true,
+          //   isDnsmasqListen: true,
+          // },
         });
         const handleClick = (tab) => {
           console.log("handleClick", tab.paneName);
           switch (tab.paneName) {
           }
         };
-        const handleOpenIDSetting = () => {
-          if (formData.value.openid === "") {
-            showErrorTips("请正确输入openid");
-            return;
-          }
-          console.log("handleOpenIDSetting", formData.value.openid);
-          const body = {
-            authcode: formData.value.openid
-          };
-          fetch("../api/auth/add", {
-            credentials: "include",
-            method: "POST",
-            body: JSON.stringify(body)
-          }).then((res) => {
-            return res.json();
-          }).then((json) => {
-            if (json) {
-              showTips(json.code, json.msg);
-            }
-          }).catch((error) => {
-            showErrorTips(`失败:${JSON.stringify(error)}`);
-          });
-        };
-        const handleSetting = () => {
-          console.log("handleSetting", formData.value.settings);
+        const handleSettingSave = () => {
+          console.log("handleSetting", settings.value);
           fetch("../api/setting/set", {
             credentials: "include",
             method: "POST",
-            body: JSON.stringify(formData.value.settings)
+            body: JSON.stringify(settings.value)
           }).then((res) => {
             return res.json();
           }).then((json) => {
@@ -40597,7 +40598,7 @@ var require_index_001 = __commonJS({
             showErrorTips(`失败:${JSON.stringify(error)}`);
           });
         };
-        const getListenData = () => {
+        const getSettingsData = () => {
           fetch(`../api/setting/get`, {
             credentials: "include",
             method: "GET"
@@ -40605,55 +40606,39 @@ var require_index_001 = __commonJS({
             console.log("fetchData", json);
             if (json && json.code === 0 && json.data) {
               console.log("api/setting/get", json);
-              formData.value.settings = json.data;
+              const data = json.data;
+              settings.value = {
+                ...defaultSettings,
+                // 先保留默认结构
+                ...data,
+                // 再用后端数据覆盖有值的部分
+                listenData: {
+                  // 嵌套对象也要合并！
+                  ...defaultSettings.listenData,
+                  ...data.listenData
+                },
+                webHookData: {
+                  ...defaultSettings.webHookData,
+                  ...data.webHookData
+                },
+                wechatData: {
+                  ...defaultSettings.wechatData,
+                  ...data.wechatData
+                },
+                pushMsgData: {
+                  ...defaultSettings.pushMsgData,
+                  ...data.pushMsgData
+                }
+              };
             }
           }).catch((error) => {
             console.error(error);
             showErrorTips(`${JSON.stringify(error)}`);
           });
         };
-        const handleWebhookSetting = () => {
-          if (formData.value.webhookUrl === "") {
-            showErrorTips("请正确输入webhook地址");
-            return;
-          }
-          console.log("handleWebhookSetting", formData.value.webhookUrl);
-          const body = {
-            webhookUrl: formData.value.webhookUrl
-          };
-          fetch("../api/webhook/set", {
-            credentials: "include",
-            method: "POST",
-            body: JSON.stringify(body)
-          }).then((res) => {
-            return res.json();
-          }).then((json) => {
-            if (json) {
-              showTips(json.code, json.msg);
-            }
-          }).catch((error) => {
-            showErrorTips(`失败:${JSON.stringify(error)}`);
-          });
-        };
-        const handleNtfySetting = () => {
-          console.log("handleNtfySetting", formData.value.ntfy);
-          fetch("../api/ntfy/set", {
-            credentials: "include",
-            method: "POST",
-            body: JSON.stringify(formData.value.ntfy)
-          }).then((res) => {
-            return res.json();
-          }).then((json) => {
-            if (json) {
-              showTips(json.code, json.msg);
-            }
-          }).catch((error) => {
-            showErrorTips(`失败:${JSON.stringify(error)}`);
-          });
-        };
         const showDialogForm = () => {
           console.log("打开对话框，row:");
-          getListenData();
+          getSettingsData();
           formData.value.title = `设备设置`;
           formData.value.show = true;
         };
@@ -40664,9 +40649,9 @@ var require_index_001 = __commonJS({
           const _component_el_input = ElInput;
           const _component_el_form_item = ElFormItem;
           const _component_el_form = ElForm;
-          const _component_el_button = ElButton;
           const _component_el_tab_pane = ElTabPane;
           const _component_el_checkbox = ElCheckbox;
+          const _component_el_button = ElButton;
           const _component_el_tabs = ElTabs;
           const _component_el_dialog = ElDialog;
           return openBlock(), createElementBlock("div", _hoisted_1$3, [
@@ -40674,16 +40659,16 @@ var require_index_001 = __commonJS({
               modal: true,
               "close-on-click-modal": true,
               "close-on-press-escape": true,
-              width: unref(isMobile)() ? "80%" : "30%",
+              width: unref(isMobile)() ? "80%" : "fit-content",
               modelValue: formData.value.show,
-              "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => formData.value.show = $event),
+              "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => formData.value.show = $event),
               title: formData.value.title
             }, {
               default: withCtx(() => [
                 createBaseVNode("div", _hoisted_2$2, [
                   createVNode(_component_el_tabs, {
                     modelValue: formData.value.activeName,
-                    "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => formData.value.activeName = $event),
+                    "onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => formData.value.activeName = $event),
                     onTabClick: handleClick
                   }, {
                     default: withCtx(() => [
@@ -40697,22 +40682,13 @@ var require_index_001 = __commonJS({
                               createVNode(_component_el_form_item, { label: "webhook地址：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_input, {
-                                    modelValue: formData.value.webhookUrl,
-                                    "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => formData.value.webhookUrl = $event),
+                                    modelValue: settings.value.webHookData.address,
+                                    "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => settings.value.webHookData.address = $event),
                                     placeholder: "请输入设备名称"
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
                               })
-                            ]),
-                            _: 1
-                          }),
-                          createVNode(_component_el_button, {
-                            type: "primary",
-                            onClick: handleWebhookSetting
-                          }, {
-                            default: withCtx(() => [
-                              createTextVNode("提交 ")
                             ]),
                             _: 1
                           })
@@ -40733,52 +40709,53 @@ var require_index_001 = __commonJS({
                               createVNode(_component_el_form_item, { label: "ntfy地址：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_input, {
-                                    modelValue: formData.value.ntfy.address,
-                                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => formData.value.ntfy.address = $event),
+                                    modelValue: settings.value.pushMsgData.address,
+                                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => settings.value.pushMsgData.address = $event),
                                     placeholder: "请输入ntfy地址"
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
                               }),
-                              createVNode(_component_el_form_item, { label: "ntfy订阅主题：" }, {
+                              createVNode(_component_el_form_item, { label: "req主题：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_input, {
-                                    modelValue: formData.value.ntfy.topic,
-                                    "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => formData.value.ntfy.topic = $event),
-                                    placeholder: "请输入ntfy订阅主题"
+                                    modelValue: settings.value.pushMsgData.reqtopic,
+                                    "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => settings.value.pushMsgData.reqtopic = $event),
+                                    placeholder: "请输入ntfy订阅req主题"
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
                               }),
-                              createVNode(_component_el_form_item, { label: "ntfy用户名称：" }, {
+                              createVNode(_component_el_form_item, { label: "res主题：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_input, {
-                                    modelValue: formData.value.ntfy.username,
-                                    "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => formData.value.ntfy.username = $event),
+                                    modelValue: settings.value.pushMsgData.restopic,
+                                    "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => settings.value.pushMsgData.restopic = $event),
+                                    placeholder: "请输入ntfy订阅res主题"
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_el_form_item, { label: "用户名：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_input, {
+                                    modelValue: settings.value.pushMsgData.username,
+                                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => settings.value.pushMsgData.username = $event),
                                     placeholder: "请输入ntfy用户名"
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
                               }),
-                              createVNode(_component_el_form_item, { label: "ntfy用户密码：" }, {
+                              createVNode(_component_el_form_item, { label: "用户密码：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_input, {
-                                    modelValue: formData.value.ntfy.password,
-                                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => formData.value.ntfy.password = $event),
+                                    modelValue: settings.value.pushMsgData.password,
+                                    "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => settings.value.pushMsgData.password = $event),
                                     placeholder: "请输入ntfy用户密码"
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
                               })
-                            ]),
-                            _: 1
-                          }),
-                          createVNode(_component_el_button, {
-                            type: "danger",
-                            onClick: handleNtfySetting
-                          }, {
-                            default: withCtx(() => [
-                              createTextVNode("提交")
                             ]),
                             _: 1
                           })
@@ -40790,27 +40767,42 @@ var require_index_001 = __commonJS({
                         name: "3"
                       }, {
                         default: withCtx(() => [
-                          createVNode(_component_el_form, null, {
+                          createVNode(_component_el_form, {
+                            "label-position": "left",
+                            "label-width": "auto",
+                            style: { "max-width": "600px" }
+                          }, {
                             default: withCtx(() => [
                               createVNode(_component_el_form_item, { label: "OpenID：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_input, {
-                                    modelValue: formData.value.openid,
-                                    "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => formData.value.openid = $event),
+                                    modelValue: settings.value.wechatData.openid,
+                                    "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => settings.value.wechatData.openid = $event),
                                     placeholder: "请输入微信的openid"
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
+                              }),
+                              createVNode(_component_el_form_item, { label: "UserId：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_input, {
+                                    modelValue: settings.value.wechatData.userid,
+                                    "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => settings.value.wechatData.userid = $event),
+                                    placeholder: "请输入公众号userid"
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_el_form_item, { label: "template_id：" }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_el_input, {
+                                    modelValue: settings.value.wechatData.template_id,
+                                    "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => settings.value.wechatData.template_id = $event),
+                                    placeholder: "请输入公众号template_id"
+                                  }, null, 8, ["modelValue"])
+                                ]),
+                                _: 1
                               })
-                            ]),
-                            _: 1
-                          }),
-                          createVNode(_component_el_button, {
-                            type: "primary",
-                            onClick: handleOpenIDSetting
-                          }, {
-                            default: withCtx(() => [
-                              createTextVNode("提交 ")
                             ]),
                             _: 1
                           })
@@ -40831,8 +40823,8 @@ var require_index_001 = __commonJS({
                               createVNode(_component_el_form_item, { label: "SysLog监听：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_checkbox, {
-                                    modelValue: formData.value.settings.isSysLogListen,
-                                    "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => formData.value.settings.isSysLogListen = $event)
+                                    modelValue: settings.value.listenData.isSysLogListen,
+                                    "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => settings.value.listenData.isSysLogListen = $event)
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
@@ -40840,8 +40832,8 @@ var require_index_001 = __commonJS({
                               createVNode(_component_el_form_item, { label: "ARP监听：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_checkbox, {
-                                    modelValue: formData.value.settings.isArpListen,
-                                    "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => formData.value.settings.isArpListen = $event)
+                                    modelValue: settings.value.listenData.isArpListen,
+                                    "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => settings.value.listenData.isArpListen = $event)
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
@@ -40849,8 +40841,8 @@ var require_index_001 = __commonJS({
                               createVNode(_component_el_form_item, { label: "Hostapd监听：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_checkbox, {
-                                    modelValue: formData.value.settings.isHostApdListen,
-                                    "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => formData.value.settings.isHostApdListen = $event)
+                                    modelValue: settings.value.listenData.isHostApdListen,
+                                    "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => settings.value.listenData.isHostApdListen = $event)
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
@@ -40858,24 +40850,24 @@ var require_index_001 = __commonJS({
                               createVNode(_component_el_form_item, { label: "Dnsmasq监听：" }, {
                                 default: withCtx(() => [
                                   createVNode(_component_el_checkbox, {
-                                    modelValue: formData.value.settings.isDnsmasqListen,
-                                    "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => formData.value.settings.isDnsmasqListen = $event)
+                                    modelValue: settings.value.listenData.isDnsmasqListen,
+                                    "onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => settings.value.listenData.isDnsmasqListen = $event)
                                   }, null, 8, ["modelValue"])
                                 ]),
                                 _: 1
                               })
                             ]),
                             _: 1
-                          }),
-                          createVNode(_component_el_button, {
-                            type: "primary",
-                            onClick: handleSetting
-                          }, {
-                            default: withCtx(() => [
-                              createTextVNode("提交 ")
-                            ]),
-                            _: 1
                           })
+                        ]),
+                        _: 1
+                      }),
+                      createVNode(_component_el_button, {
+                        type: "primary",
+                        onClick: handleSettingSave
+                      }, {
+                        default: withCtx(() => [
+                          createTextVNode("提交 ")
                         ]),
                         _: 1
                       })
@@ -40890,7 +40882,7 @@ var require_index_001 = __commonJS({
         };
       }
     });
-    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-d5b804ff"]]);
+    const PushSettingDialog = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-1d4faac1"]]);
     const _hoisted_1$2 = { class: "upgrade-popup-content" };
     const _hoisted_2$1 = { style: { "display": "flex", "align-items": "center" } };
     const _hoisted_3$1 = { style: { "margin-bottom": "10px" } };
@@ -42431,7 +42423,10 @@ var require_index_001 = __commonJS({
               createBaseVNode("header", _hoisted_2, [
                 createBaseVNode("div", _hoisted_3, [
                   createBaseVNode("div", _hoisted_4, [
-                    createVNode(_component_el_dropdown, { trigger: "click" }, {
+                    createVNode(_component_el_dropdown, {
+                      trigger: "click",
+                      placement: "bottom-start"
+                    }, {
                       dropdown: withCtx(() => [
                         createVNode(_component_el_dropdown_menu, null, {
                           default: withCtx(() => [
@@ -42882,4 +42877,4 @@ var require_index_001 = __commonJS({
   }
 });
 export default require_index_001();
-//# sourceMappingURL=index-ML5vb4zh.js.map
+//# sourceMappingURL=index-a8sP1DlS.js.map

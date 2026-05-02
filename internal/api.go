@@ -217,24 +217,24 @@ func (this *Api) AddStaticIp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (this *Api) SetNtfy(w http.ResponseWriter, r *http.Request) {
-	res, f := Response(r)
-	defer f(w)
-	body, err := u.GetDataByJson[u.NtfyInfo](r)
-	if err != nil {
-		z.L().Error(err.Error())
-		res.Err(err)
-		return
-	}
-	err = openwrt.GetInstance().SetNtfy(body)
-	if err != nil {
-		z.L().Warn("失败", zap.Error(err))
-		res.Err(err)
-		return
-	} else {
-		res.Ok("设置成功")
-	}
-}
+//func (this *Api) SetNtfy(w http.ResponseWriter, r *http.Request) {
+//	res, f := Response(r)
+//	defer f(w)
+//	body, err := u.GetDataByJson[u.NtfyInfo](r)
+//	if err != nil {
+//		z.L().Error(err.Error())
+//		res.Err(err)
+//		return
+//	}
+//	err = openwrt.GetInstance().SetNtfy(body)
+//	if err != nil {
+//		z.L().Warn("失败", zap.Error(err))
+//		res.Err(err)
+//		return
+//	} else {
+//		res.Ok("设置成功")
+//	}
+//}
 
 func (this *Api) AddAuthCode(w http.ResponseWriter, r *http.Request) {
 	res, f := Response(r)
@@ -264,47 +264,49 @@ func (this *Api) AddAuthCode(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (this *Api) SetWebhook(w http.ResponseWriter, r *http.Request) {
-	res, f := Response(r)
-	defer f(w)
-	body, err := u.GetDataByJson[struct {
-		WebHookUrl string `json:"webhookUrl"`
-	}](r)
-	if err != nil {
-		z.Error(err)
-		res.Err(err)
-		return
-	}
-	err = openwrt.GetInstance().SetWebHook(body.WebHookUrl)
-	if err != nil {
-		z.Error(err)
-		res.Err(err)
-		return
-	} else {
-		res.Ok("设置成功")
-	}
-}
+//func (this *Api) SetWebhook(w http.ResponseWriter, r *http.Request) {
+//	res, f := Response(r)
+//	defer f(w)
+//	body, err := u.GetDataByJson[struct {
+//		WebHookUrl string `json:"webhookUrl"`
+//	}](r)
+//	if err != nil {
+//		z.Error(err)
+//		res.Err(err)
+//		return
+//	}
+//	err = openwrt.GetInstance().SetWebHook(body.WebHookUrl)
+//	if err != nil {
+//		z.Error(err)
+//		res.Err(err)
+//		return
+//	} else {
+//		res.Ok("设置成功")
+//	}
+//}
 
 func (this *Api) SetSettings(w http.ResponseWriter, r *http.Request) {
 	res, ff := Response(r)
 	defer ff(w)
-	body, err := u.GetDataByJson[u.Settings](r)
+	body, err := u.GetDataByJson[u.SettingsData](r)
 	if err != nil {
-		z.Error(err)
+		z.L().Error("err", zap.Error(err))
 		res.Err(err)
 		return
 	}
-	z.Debug("设置系统设置:", body)
+	z.L().Debug("设置系统设置", zap.Any("body", body))
 	err = openwrt.GetInstance().SetSettings(body)
+
 	if err != nil {
-		z.Error(err)
+		z.L().Error("保存失败", zap.Error(err))
 		res.Err(err)
 		return
 	}
-
 	res.Ok("设置成功，准备重启...")
-	z.Warn("准备重启...")
-	_ = this.igs.Restart()
+	z.L().Warn("准备重启...")
+	if this.igs != nil {
+		_ = this.igs.Restart()
+	}
 }
 
 func (this *Api) GetSettings(w http.ResponseWriter, r *http.Request) {
@@ -312,11 +314,36 @@ func (this *Api) GetSettings(w http.ResponseWriter, r *http.Request) {
 	defer f(w)
 	settings, err := openwrt.GetInstance().GetSettings()
 	if err != nil {
-		z.Error(err)
+		z.L().Error(err.Error())
 		res.Err(err)
 		return
 	}
-	z.Debug("获取系统设置:", settings)
+	if settings == nil {
+		settings = &u.SettingsData{
+			ListenData: &u.ListenData{
+				IsSysLogListen:  true,
+				IsArpListen:     true,
+				IsDnsmasqListen: true,
+				IsHostApdListen: true,
+			},
+			//WebHookData: u.WebHookData{
+			//	Address: "",
+			//},
+			//WechatData: u.WechatData{
+			//	OpenID:     "",
+			//	Userid:     "",
+			//	TemplateId: "",
+			//},
+			//PushMsgData: u.PushMessageData{
+			//	Address:  "",
+			//	Username: "",
+			//	Password: "",
+			//	ReqTopic: "",
+			//	ResTopic: "",
+			//},
+		}
+	}
+	z.L().Debug("获取系统设置", zap.Any("settings", settings))
 	res.Sucess("获取成功", settings)
 }
 func (this *Api) DeleteStaticIp(w http.ResponseWriter, r *http.Request) {

@@ -12,8 +12,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/glog/pkg/zutil"
-	"github.com/xxl6097/go-service/pkg/utils"
-	"github.com/xxl6097/uclient/internal/ntfy"
+	"github.com/xxl6097/go-ntfy/pkg/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
 	"go.uber.org/zap"
 )
@@ -36,6 +35,7 @@ type openWRT struct {
 	cancel       context.CancelFunc
 	statusRuning bool
 	authcode     []string
+	settingsData *u.SettingsData
 }
 
 // GetInstance 返回单例实例
@@ -54,11 +54,12 @@ func GetInstance() *openWRT {
 }
 
 func (this *openWRT) init() {
+	this.ctx, this.cancel = context.WithCancel(context.Background())
+	this.settingsData = this.loadSettings()
 	this.initNtfy()
 	if u.IsMacOs() {
 		return
 	}
-	this.ctx, this.cancel = context.WithCancel(context.Background())
 	this.ulistString = UbusList()
 	this.initClients()
 	this.LoadAuth()
@@ -70,7 +71,7 @@ func (this *openWRT) Close() {
 		z.Debug("close openWRT")
 		this.cancel()
 	}
-	ntfy.GetInstance().Stop()
+	//ntfy.GetInstance().Stop()
 	//_ = z.Flush()
 }
 
@@ -119,16 +120,39 @@ func (this *openWRT) ntfyMessage(message string) string {
 }
 
 func (this *openWRT) initNtfy() {
-	if u.IsMacOs() {
-		ntfyFilePath = "./ntfy"
-	}
-	if u.IsFileExist(ntfyFilePath) {
-		info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
-		if err != nil {
-			z.Errorf("initNtfy Error:%v", err)
-		} else {
-			go ntfy.GetInstance().Start(info)
-			ntfy.GetInstance().SetFunc(this.ntfyMessage)
+	if this.settingsData != nil && this.settingsData.PushMsgData != nil && this.settingsData.PushMsgData.Address != "" {
+		//info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
+		//if err != nil {
+		//	z.Errorf("initNtfy Error:%v", err)
+		//} else {
+		//	go ntfy.GetInstance().Start(info)
+		//	ntfy.GetInstance().SetFunc(this.ntfyMessage)
+		//}
+		var ops []ntfy.Option
+		ops = append(ops, ntfy.WithServer(this.settingsData.PushMsgData.Address))
+		if admin, password := this.settingsData.PushMsgData.Username, this.settingsData.PushMsgData.Password; admin != "" && password != "" {
+			ops = append(ops, ntfy.WithBasicAuth(admin, password))
+		}
+		ops = append(ops, ntfy.WithRetry(ntfy.RetryConfig{
+			MaxAttempts:    5,
+			InitialBackoff: 500 * time.Millisecond,
+			MaxBackoff:     10 * time.Second,
+			Multiplier:     2.0,
+		}))
+
+		client := ntfy.GetClient(ops...)
+		if client != nil && this.settingsData.PushMsgData.ReqTopic != "" {
+			go func() {
+				err := client.Serve(this.ctx, this.settingsData.PushMsgData.ReqTopic, func(_ context.Context, m *ntfy.Message) (string, string, bool, error) {
+					fmt.Printf("[responder] 收到: %s tags=%v\n", m.Message, m.Tags)
+					msg := this.ntfyMessage(m.Message)
+					reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
+					return "reply", reply, false, nil
+				})
+				if err != nil {
+					fmt.Println("异常退出", err)
+				}
+			}()
 		}
 	}
 }

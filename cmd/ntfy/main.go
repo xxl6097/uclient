@@ -1,10 +1,5 @@
 package main
 
-import (
-	"github.com/xxl6097/uclient/internal/ntfy"
-	"github.com/xxl6097/uclient/internal/u"
-)
-
 func main() {
 	//resp, err := http.Get("http://uuxia.cn:90/uclient/json")
 	//if err != nil {
@@ -40,11 +35,11 @@ func main() {
 	//	fmt.Println("--->", s)
 	//})
 
-	ntfy.GetInstance().Start(&u.NtfyInfo{
-		Address:  "http://uuxia.cn:90",
-		Topic:    "uclient",
-		Username: "admin",
-		Password: "het002402",
-	})
+	//ntfy.GetInstance().Start(&u.NtfyInfo{
+	//	Address:  "http://uuxia.cn:90",
+	//	Topic:    "uclient",
+	//	Username: "admin",
+	//	Password: "het002402",
+	//})
 
 }

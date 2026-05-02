@@ -1,3 +1,34 @@
+export interface ListenData {
+  isSysLogListen: boolean
+  isArpListen: boolean
+  isHostApdListen: boolean
+  isDnsmasqListen: boolean
+}
+export interface WebHookData {
+  address: string
+}
+
+export interface PushMessageData {
+  address: string
+  username: string
+  password: string
+  reqtopic: string
+  restopic: string
+}
+
+export interface WechatData {
+  openid: string
+  userid: string
+  template_id: string
+}
+
+export interface SettingsData {
+  listenData: ListenData
+  webHookData: WebHookData
+  pushMsgData: PushMessageData
+  wechatData: WechatData
+}
+
 export interface WorkType {
   onWorkTime: string
   offWorkTime: string

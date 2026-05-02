@@ -1,25 +1,76 @@
 package u
 
-type NtfyInfo struct {
-	Address  string `json:"address"`
-	Topic    string `json:"topic"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+type Value[T any] struct {
+	Value T `json:"value"`
 }
 
-type Settings struct {
-	IsSysLogListen  bool `json:"isSysLogListen"`
-	IsArpListen     bool `json:"isArpListen"`
-	IsHostApdListen bool `json:"isHostApdListen"`
-	IsDnsmasqListen bool `json:"isDnsmasqListen"`
+type Official struct {
+	Title          Value[string] `json:"title"`
+	Today          Value[string] `json:"today"`
+	Device         Value[string] `json:"device"`
+	TypeName       Value[string] `json:"typeName"`
+	Signal         Value[int]    `json:"signal"`
+	Vendor         Value[string] `json:"vendor"`
+	Ip             Value[string] `json:"ip"`
+	Mac            Value[string] `json:"mac"`
+	OnWork         Value[string] `json:"onWork"`
+	OffWork        Value[string] `json:"offWork"`
+	OnWorkTime     Value[string] `json:"onWorkTime"`
+	MonthOverTimes Value[string] `json:"monthOverTimes"`
+	Time           Value[string] `json:"time"`
 }
 
-//	type NtfyEventData struct {
-//		Id    string `json:"id,omitempty"`
-//		Time  int    `json:"time,omitempty"`
-//		Event string `json:"event,omitempty"`
-//		Topic string `json:"topic,omitempty"`
-//	}
+type OfficialData struct {
+	Title      string   `json:"title"`
+	Userid     string   `json:"userid"`
+	TemplateId string   `json:"template_id"`
+	Data       Official `json:"data"`
+}
+
+//type NtfyInfo struct {
+//	Address  string `json:"address"`
+//	Topic    string `json:"topic"`
+//	Username string `json:"username"`
+//	Password string `json:"password"`
+//}
+
+type ListenData struct {
+	IsSysLogListen  bool `json:"isSysLogListen,omitempty"`
+	IsArpListen     bool `json:"isArpListen,omitempty"`
+	IsHostApdListen bool `json:"isHostApdListen,omitempty"`
+	IsDnsmasqListen bool `json:"isDnsmasqListen,omitempty"`
+}
+type WebHookData struct {
+	Address string `json:"address,omitempty"`
+}
+
+type PushMessageData struct {
+	Address  string `yaml:"address" json:"address,omitempty"`
+	Username string `yaml:"username" json:"username,omitempty"`
+	Password string `yaml:"password" json:"password,omitempty"`
+	ReqTopic string `yaml:"reqtopic" json:"reqtopic,omitempty"`
+	ResTopic string `yaml:"restopic" json:"restopic,omitempty"`
+}
+
+type WechatData struct {
+	OpenID     string `json:"openid,omitempty"`
+	Userid     string `json:"userid,omitempty"`
+	TemplateId string `json:"template_id,omitempty"`
+}
+
+type SettingsData struct {
+	ListenData  *ListenData      `yaml:"listenData" json:"listenData,omitempty"`
+	WebHookData *WebHookData     `yaml:"webHookData" json:"webHookData,omitempty"`
+	PushMsgData *PushMessageData `yaml:"pushMsgData" json:"pushMsgData,omitempty"`
+	WechatData  *WechatData      `yaml:"wechatData" json:"wechatData,omitempty"`
+}
+
+//type Settings struct {
+//	IsSysLogListen  bool `json:"isSysLogListen"`
+//	IsArpListen     bool `json:"isArpListen"`
+//	IsHostApdListen bool `json:"isHostApdListen"`
+//	IsDnsmasqListen bool `json:"isDnsmasqListen"`
+//}
 
 const (
 	OPEN      = "open"      // 0

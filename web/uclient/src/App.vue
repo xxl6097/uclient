@@ -11,7 +11,7 @@
     <header class="grid-content header-color">
       <div class="header-content">
         <div class="brand">
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click" placement="bottom-start">
             <a href="#">{{ title }}</a>
             <template #dropdown>
               <el-dropdown-menu>

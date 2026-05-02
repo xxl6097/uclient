@@ -7,8 +7,10 @@ import (
 
 	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/glog/pkg/zutil"
+	"github.com/xxl6097/go-ntfy/pkg/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
 	"github.com/xxl6097/uclient/internal/webhook"
+	"go.uber.org/zap"
 )
 
 func (this *openWRT) TiggerSignCardEvent(macAddress string) (string, error) {
@@ -102,33 +104,45 @@ func (this *openWRT) NotifyDingSign(tempData *DHCPLease, eveName string, now tim
 	//}
 	//msg.TodayOverTime = todayOverTimes
 	//msg.MonthOverTime = monthOverTimes
-	return webhook.Notify(msg, func(builder *strings.Builder) {
+	res, err := webhook.Notify(msg, func(builder *strings.Builder, official *u.Official) {
 		if builder == nil {
 			return
 		}
 		if wrk != nil {
 			if wrk.OnWorkTime > 0 {
 				if wrk.OnWorkSignal != 0 {
-					builder.WriteString(fmt.Sprintf("- 上班时间：%s(%d)\n ", u.TimestampToSecondTime(wrk.OnWorkTime), wrk.OnWorkSignal))
+					v := fmt.Sprintf("- 上班时间：%s(%d)\n ", u.TimestampToSecondTime(wrk.OnWorkTime), wrk.OnWorkSignal)
+					builder.WriteString(v)
+					official.OnWork.Value = fmt.Sprintf("%s(%d)", u.TimestampToSecondTime(wrk.OnWorkTime), wrk.OnWorkSignal)
 				} else {
 					builder.WriteString(fmt.Sprintf("- 上班时间：%s\n ", u.TimestampToSecondTime(wrk.OnWorkTime)))
+					official.OnWork.Value = u.TimestampToSecondTime(wrk.OnWorkTime)
 				}
 			}
 			if wrk.OffWorkTime > 0 {
 				if wrk.OffWorkSignal != 0 {
 					builder.WriteString(fmt.Sprintf("- 下班时间：%s(%d)\n ", u.TimestampToSecondTime(wrk.OffWorkTime), wrk.OffWorkSignal))
+					official.OffWork.Value = fmt.Sprintf("%s(%d)", u.TimestampToSecondTime(wrk.OffWorkTime), wrk.OffWorkSignal)
 				} else {
 					builder.WriteString(fmt.Sprintf("- 下班时间：%s\n ", u.TimestampToSecondTime(wrk.OffWorkTime)))
+					official.OnWork.Value = u.TimestampToSecondTime(wrk.OffWorkTime)
 				}
 			}
 		}
 		if signData != nil && signData.OverHours.String() != "" {
 			builder.WriteString(fmt.Sprintf("- 今日加班时长：%s\n ", signData.OverHours.String()))
+			official.OnWorkTime.Value = signData.OverHours.String()
 		}
 		if monthOverTimes != "" {
 			builder.WriteString(fmt.Sprintf("- 本月加班时长：%s\n ", monthOverTimes))
+			official.MonthOverTimes.Value = monthOverTimes
 		}
 	})
+	if err == nil && res != "" && this.settingsData.PushMsgData.ResTopic != "" {
+		title := strings.ReplaceAll(msg.Title, "#", "")
+		_ = ntfy.GetClient().Publish(this.ctx, this.settingsData.PushMsgData.ResTopic, title, res, nil)
+	}
+	return res, err
 }
 
 func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) (string, error) {
@@ -166,6 +180,12 @@ func (this *openWRT) notifyWebhookMessage(eveName string, client *DHCPLease) (st
 	} else {
 		msg.Title = fmt.Sprintf("【%s】离线了", msg.DeviceName)
 	}
-	z.Debug("ding通知", eveName, client.Hostname, client.IP, client.MAC, client.Signal, client.Online, client.StartTime, u.TimestampToSecondTime(client.StartTime))
-	return webhook.Notify(msg, nil)
+	z.L().Debug("ding通知", zap.String("eveName", eveName), zap.Any("client", client))
+	res, err := webhook.Notify(msg, nil)
+
+	if err == nil && res != "" && this.settingsData.PushMsgData.ResTopic != "" {
+		title := strings.ReplaceAll(msg.Title, "#", "")
+		_ = ntfy.GetClient().Publish(this.ctx, this.settingsData.PushMsgData.ResTopic, title, res, nil)
+	}
+	return res, err
 }

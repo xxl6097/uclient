@@ -27,6 +27,7 @@ import (
 func init() {
 	//go func() { log.Println(http.ListenAndServe("localhost:6060", nil)) }()
 	//gs.InitLog(0)
+
 	z.LoadLogger(func(conf *z.LogConfig) {
 		conf.Path = "./logs"
 	})

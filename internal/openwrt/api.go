@@ -3,7 +3,6 @@ package openwrt
 import (
 	"errors"
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -11,14 +10,15 @@ import (
 
 	"github.com/xxl6097/glog/pkg/z"
 	"github.com/xxl6097/glog/pkg/zutil"
-	"github.com/xxl6097/go-service/pkg/utils"
-	"github.com/xxl6097/uclient/internal/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
 )
 
 func (this *openWRT) initData() error {
 	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
-	this.webhookUrl = this.GetWebHook()
+	data, err := this.GetSettings()
+	if err == nil && data != nil && data.WebHookData != nil {
+		this.webhookUrl = data.WebHookData.Address
+	}
 	arpList, e1 := getClientsByArp(brLanString)
 	if e1 == nil {
 		z.Debug("\n✅ arpList：")
@@ -290,41 +290,41 @@ func (this *openWRT) DeleteStaticIp(mac string) error {
 	return err
 }
 
-func (this *openWRT) SetWebHook(webhookUrl string) error {
-	if webhookUrl == "" {
-		return fmt.Errorf("webhook is empty")
-	}
-	file, err := os.Create(webhookFilePath) // 文件不存在则创建，存在则截断
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	// 写入内容
-	_, err = file.Write([]byte(webhookUrl))
-	if err == nil {
-		this.webhookUrl = webhookUrl
-	}
-	return err
-}
+//func (this *openWRT) SetWebHook(webhookUrl string) error {
+//	if webhookUrl == "" {
+//		return fmt.Errorf("webhook is empty")
+//	}
+//	file, err := os.Create(webhookFilePath) // 文件不存在则创建，存在则截断
+//	if err != nil {
+//		return err
+//	}
+//	defer file.Close()
+//	// 写入内容
+//	_, err = file.Write([]byte(webhookUrl))
+//	if err == nil {
+//		this.webhookUrl = webhookUrl
+//	}
+//	return err
+//}
 
-func (this *openWRT) SetNtfy(info *u.NtfyInfo) error {
-	if info == nil {
-		return fmt.Errorf("NtfyInfo is nil")
-	}
-	go ntfy.GetInstance().Start(info)
-	if u.IsMacOs() {
-		ntfyFilePath = "./ntfy"
-	}
-	return utils.SaveWithGob[u.NtfyInfo](*info, ntfyFilePath)
-}
-
-func (this *openWRT) GetWebHook() string {
-	data, err := os.ReadFile(webhookFilePath)
-	if err != nil {
-		return ""
-	}
-	return string(data)
-}
+//func (this *openWRT) SetNtfy(info *u.NtfyInfo) error {
+//	if info == nil {
+//		return fmt.Errorf("NtfyInfo is nil")
+//	}
+//	go ntfy.GetInstance().Start(info)
+//	if u.IsMacOs() {
+//		ntfyFilePath = "./ntfy"
+//	}
+//	return utils.SaveWithGob[u.NtfyInfo](*info, ntfyFilePath)
+//}
+//
+//func (this *openWRT) GetWebHook() string {
+//	data, err := os.ReadFile(webhookFilePath)
+//	if err != nil {
+//		return ""
+//	}
+//	return string(data)
+//}
 
 func (this *openWRT) GetWorkTimeAndCaculate(mac string) ([]*MonthData, error) {
 	if mac == "" {

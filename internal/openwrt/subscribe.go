@@ -12,6 +12,7 @@ import (
 	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/u"
+	"go.uber.org/zap"
 )
 
 type subData struct {
@@ -20,35 +21,55 @@ type subData struct {
 	cancel       context.CancelFunc
 }
 
-func (this *openWRT) SetSettings(settings *u.Settings) error {
-	z.Debug("setting file path:", settingPath)
-	z.Debug("settings:", settings)
-	return utils.SaveToFile[*u.Settings](settings, settingPath)
+//func (this *openWRT) SetSettings(settings *u.Settings) error {
+//	z.Debug("setting file path:", settingPath)
+//	z.Debug("settings:", settings)
+//	return utils.SaveToFile[*u.Settings](settings, settingPath)
+//}
+//
+//func (this *openWRT) GetSettings() (*u.Settings, error) {
+//	if u.IsFileExist(settingPath) {
+//		return utils.LoadFromFile[*u.Settings](settingPath)
+//	}
+//	return nil, nil
+//}
+
+func (this *openWRT) SetSettings(settings *u.SettingsData) error {
+	z.L().Debug(settingPath, zap.Any("settings", settings))
+	if settings != nil {
+		this.settingsData = settings
+	}
+	return utils.SaveToFile[*u.SettingsData](settings, settingPath)
 }
 
-func (this *openWRT) GetSettings() (*u.Settings, error) {
+func (this *openWRT) GetSettings() (*u.SettingsData, error) {
 	if u.IsFileExist(settingPath) {
-		return utils.LoadFromFile[*u.Settings](settingPath)
+		temp, err := utils.LoadFromFile[*u.SettingsData](settingPath)
+		if err == nil && temp != nil {
+			this.settingsData = temp
+		}
+		return temp, err
 	}
 	return nil, nil
 }
 
-func (this *openWRT) loadSettings() *u.Settings {
+func (this *openWRT) loadSettings() *u.SettingsData {
 	info, err := this.GetSettings()
 	if err == nil && info != nil {
-		z.Debugf("读取默认系统配置：%v", info)
+		z.L().Debug("读取默认系统配置", zap.Any("info", info))
 		return info
 	}
 
-	z.Errorf("读取默认系统配置 Error:%v  info:%v", err, info)
-	setting := &u.Settings{
-		IsSysLogListen:  true,
-		IsArpListen:     true,
-		IsDnsmasqListen: true,
-		IsHostApdListen: true,
+	settingData := &u.SettingsData{
+		ListenData: &u.ListenData{
+			IsSysLogListen:  true,
+			IsArpListen:     true,
+			IsDnsmasqListen: true,
+			IsHostApdListen: true,
+		},
 	}
-	_ = this.SetSettings(setting)
-	return setting
+	_ = this.SetSettings(settingData)
+	return settingData
 }
 
 func (this *openWRT) subscribe() {
@@ -58,11 +79,11 @@ func (this *openWRT) subscribe() {
 		return
 	}
 	z.Warnf("系统设置：%+v", settings)
-	if settings.IsSysLogListen {
+	if settings.ListenData.IsSysLogListen {
 		z.Warn("启动 SysLog")
 		go this.subscribeSysLog()
 	}
-	if settings.IsArpListen {
+	if settings.ListenData.IsArpListen {
 		z.Warn("启动 ArpEvent")
 		go this.subscribeArpEvent()
 	}
@@ -70,13 +91,13 @@ func (this *openWRT) subscribe() {
 	go this.subscribeFsnotify()
 	//读取状态，显示网速等信息
 	go this.subscribeStatus()
-	if settings.IsHostApdListen {
+	if settings.ListenData.IsHostApdListen {
 		z.Warn("启动 hostapd")
 		if strings.Contains(this.ulistString, "hostapd") {
 			go this.subscribeHostapd()
 		}
 	}
-	if settings.IsDnsmasqListen {
+	if settings.ListenData.IsDnsmasqListen {
 		z.Warn("启动 dnsmasq")
 		if strings.Contains(this.ulistString, "dnsmasq") {
 			go this.subscribeDnsmasq()

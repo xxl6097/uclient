@@ -32,14 +32,6 @@ var (
 	MAX_WORK_SIZE         = 3600
 	RE_REY_MAX_COUNT      = 5
 )
-var (
-	StatusDir       = "/etc/config/uclient/status"
-	workDir         = "/etc/config/uclient/work"
-	nickFilePath    = "/etc/config/uclient/nick"
-	webhookFilePath = "/etc/config/uclient/webhook"
-	ntfyFilePath    = "/etc/config/uclient/ntfy"
-	settingPath     = "/etc/config/uclient/setting"
-)
 
 type SysLogEvent struct {
 	Online    bool      `json:"online"`
