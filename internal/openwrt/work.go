@@ -2,14 +2,15 @@ package openwrt
 
 import (
 	"fmt"
-	"github.com/xxl6097/glog/pkg/z"
-	"github.com/xxl6097/glog/pkg/zutil"
-	"github.com/xxl6097/go-service/pkg/ukey"
-	"github.com/xxl6097/uclient/internal/u"
 	"os"
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/xxl6097/glog/pkg/z"
+	"github.com/xxl6097/glog/pkg/zutil"
+	"github.com/xxl6097/go-service/pkg/ukey"
+	"github.com/xxl6097/uclient/internal/u"
 )
 
 type WorkEntry struct {
@@ -257,7 +258,7 @@ func caculetePMWorkDay(pmSignTime, workTime2 time.Time) time.Duration {
 //		}
 //		work.WorkTime = append(work.WorkTime, wrokTimeTemp)
 //		months[month] = work
-//		z.Debugf("%s %+v", day, *w)
+//		z.L().Sugar().Debugf("%s %+v", day, *w)
 //	}
 //
 //	//sort.Slice(result, func(i, j int) bool {
@@ -378,7 +379,7 @@ func getWorkRawData(mac, tempFilePath string, workType *WorkTypeSetting) ([]*Mon
 		}
 		work.DayDatas = append(work.DayDatas, dayDataTemp)
 		months[month] = work
-		z.Debugf("%s %+v", day, *w)
+		//z.L().Sugar().Debugf("%s %+v", day, *w)
 	}
 	return result, nil
 }
@@ -431,7 +432,7 @@ func GetWorkTimeAndCaculate(mac, tempFilePath string, workType *WorkTypeSetting)
 }
 func getWorkTimeAndCaculate(mac string, workType *WorkTypeSetting) ([]*MonthData, error) {
 	tempFilePath := filepath.Join(workDir, mac)
-	//z.Debug("GetWorkTime", mac)
+	//z.L().Sugar().Debug("GetWorkTime", mac)
 	return GetWorkTimeAndCaculate(mac, tempFilePath, workType)
 }
 
@@ -454,7 +455,7 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) (*Wo
 	//	return fmt.Errorf("fn is nil")
 	//}
 	tempFilePath := filepath.Join(workDir, mac)
-	//z.Debug("updatetWorkTime", mac)
+	//z.L().Sugar().Debug("updatetWorkTime", mac)
 	works := ReadWorkTimeByMac(tempFilePath)
 	if works == nil {
 		works = make(map[string]*WorkEntry)
@@ -467,13 +468,13 @@ func setWorkTime(isDel bool, mac, workDir, day string, fn func(*WorkEntry)) (*Wo
 		fn(tempEntry)
 	}
 	works[day] = tempEntry
-	z.Debugf("1 更新打卡 %v %v %+v", isDel, mac, tempEntry)
+	z.L().Sugar().Debugf("1 更新打卡 %v %v %+v", isDel, mac, tempEntry)
 	if isDel {
 		delete(works, day)
 	}
-	//z.Debugf("2 更新打卡 %v %+v", mac, tempEntry)
+	//z.L().Sugar().Debugf("2 更新打卡 %v %+v", mac, tempEntry)
 	//for k, status := range works {
-	//	z.Printf("%v %+v", k, status)
+	//	z.L().Sugar().Printf("%v %+v", k, status)
 	//}
 	content, err := ukey.StructToGob(works)
 	if err != nil {
@@ -524,13 +525,13 @@ func ApiUpdateWorkTime(mac, day string, data map[string]interface{}) error {
 			intVal := int(floatVal) // 显式转换为 int
 			tempEntry.Weekday = intVal
 		} else {
-			z.Println("值非数字类型 weekday", data["weekday"])
+			z.L().Sugar().Debug("值非数字类型 weekday", data["weekday"])
 		}
 		if floatVal, ok := data["dayType"].(float64); ok {
 			intVal := int(floatVal) // 显式转换为 int
 			tempEntry.DayType = intVal
 		} else {
-			z.Println("值非数字类型 dayType", data["dayType"])
+			z.L().Sugar().Debug("值非数字类型 dayType", data["dayType"])
 		}
 	})
 	return err
@@ -579,7 +580,7 @@ func SetSignData(mac string, signs map[string]*WorkEntry) error {
 	defer file.Close()
 	// 写入内容
 	_, err = file.Write(content)
-	z.Errorf(" %v %+v", mac, tempFilePath)
+	z.L().Sugar().Errorf(" %v %+v", mac, tempFilePath)
 	return err
 }
 func GetTodaySignData(mac string) *WorkEntry {
@@ -644,7 +645,7 @@ func sysLogUpdateWorkTime(tempData *DHCPLease) (*WorkEntry, error) {
 	}
 	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
-	z.Debugf("sysLogUpdateWorkTime %d %v %+v", workingTime, t1.Format(time.DateTime), tempData)
+	z.L().Sugar().Debugf("sysLogUpdateWorkTime %d %v %+v", workingTime, t1.Format(time.DateTime), tempData)
 	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
 		t.Weekday = int(t1.Weekday())
 		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {
@@ -692,7 +693,7 @@ func sysLogUpdateWorkTime1(mac string, timestamp int64, workType *WorkTypeSettin
 	}
 	t1 := u.UTC8ToTime(timestamp)
 	day := t1.Format(time.DateOnly)
-	//z.Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
+	//z.L().Sugar().Debug("系统监听更新", mac, workingTime, u.UTC8ToString(timestamp, time.DateTime))
 	return setWorkTime(false, mac, workDir, day, func(t *WorkEntry) {
 		t.Weekday = int(t1.Weekday())
 		if workType.IsSaturdayWork && t1.Weekday() == time.Saturday {

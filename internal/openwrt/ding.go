@@ -104,12 +104,12 @@ func (this *openWRT) dingSign(eveName string, tempData *DHCPLease) {
 		signDatas[now.Format(time.DateOnly)] = todaySignData
 		e := SetSignData(mac, signDatas)
 		if e != nil {
-			z.Errorf("打卡更新失败 %v %+v", e, tempData)
+			z.L().Sugar().Errorf("打卡更新失败 %v %+v", e, tempData)
 		} else {
-			z.Errorf("打卡更新成功  %+v", tempData)
+			z.L().Sugar().Debugf("打卡更新成功  %+v", tempData)
 			_, e1 := this.NotifyDingSign(tempData, eveName, now, todaySignData)
 			if e1 != nil {
-				z.Errorf("钉钉打卡失败 %v %+v", e1, tempData)
+				z.L().Sugar().Errorf("钉钉打卡失败 %v %+v", e1, tempData)
 			}
 		}
 	}

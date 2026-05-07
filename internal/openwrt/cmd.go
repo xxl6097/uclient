@@ -60,11 +60,11 @@ func killPid(pid int) {
 	if runtime.GOOS == "windows" {
 		killCmd := exec.Command("taskkill", "/F", "/PID", strconv.Itoa(pid))
 		if err := killCmd.Run(); err != nil {
-			z.Error("终止失败:", err)
+			z.L().Sugar().Error("终止失败:", err)
 		}
 	} else {
 		if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
-			z.Error("终止失败:", err)
+			z.L().Sugar().Error("终止失败:", err)
 		}
 	}
 }
