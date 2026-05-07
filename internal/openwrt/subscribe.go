@@ -125,21 +125,23 @@ func (this *openWRT) subscribeSysLog() {
 		default:
 			err := subscribeSysLogs(this.ctx, func(s string) {
 				subscribeHostapdLog(s, func(event *SysLogEvent) {
-					if event != nil && event.Mac != "" {
-						z.Infof("Hostapd事件:%+v", event)
-						eve := &DHCPLease{
-							MAC:       event.Mac,
-							Online:    event.Online,
-							StartTime: event.Timestamp.UnixMilli(),
-							Phy:       event.Phy,
-						}
-						if v, ok := this.leases[eve.MAC]; ok {
-							if v.Hostname != "" {
-								eve.Hostname = v.Hostname
+					pkg.DedupDo(event.Mac, func() {
+						if event != nil && event.Mac != "" {
+							z.Infof("Hostapd事件:%+v", event)
+							eve := &DHCPLease{
+								MAC:       event.Mac,
+								Online:    event.Online,
+								StartTime: event.Timestamp.UnixMilli(),
+								Phy:       event.Phy,
 							}
+							if v, ok := this.leases[eve.MAC]; ok {
+								if v.Hostname != "" {
+									eve.Hostname = v.Hostname
+								}
+							}
+							go this.updateDeviceStatus("Hostapd事件", eve)
 						}
-						go this.updateDeviceStatus("Hostapd事件", eve)
-					}
+					})
 				})
 				subscribeHetSysLog(s, func(event *KernelLog) {
 					if event != nil {
@@ -290,18 +292,20 @@ func (this *openWRT) subscribeDnsmasq() {
 			return
 		default:
 			err := SubscribeDnsmasq(this.ctx, func(device *DnsmasqDevice) {
-				if device != nil && device.Mac != "" {
-					z.Infof("Dnsmasq事件:%+v", device)
-					dhcp := &DHCPLease{
-						MAC:       device.Mac,
-						IP:        device.Ip,
-						Hostname:  device.Name,
-						StartTime: device.Timestamp.UnixMilli(),
-						Phy:       device.Interface,
-						Online:    true,
+				pkg.DedupDo(device.Mac, func() {
+					if device != nil && device.Mac != "" {
+						z.Infof("Dnsmasq事件:%+v", device)
+						dhcp := &DHCPLease{
+							MAC:       device.Mac,
+							IP:        device.Ip,
+							Hostname:  device.Name,
+							StartTime: device.Timestamp.UnixMilli(),
+							Phy:       device.Interface,
+							Online:    true,
+						}
+						go this.updateDeviceStatus("Dnsmasq事件", dhcp)
 					}
-					go this.updateDeviceStatus("Dnsmasq事件", dhcp)
-				}
+				})
 			})
 			if err != nil {
 				z.Errorf("Dnsmasq订阅失败 %v", err)
