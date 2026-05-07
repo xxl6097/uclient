@@ -12,6 +12,7 @@ import (
 	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-service/pkg/utils"
 	"github.com/xxl6097/uclient/internal/u"
+	"github.com/xxl6097/uclient/pkg"
 	"go.uber.org/zap"
 )
 
@@ -141,21 +142,26 @@ func (this *openWRT) subscribeSysLog() {
 					}
 				})
 				subscribeHetSysLog(s, func(event *KernelLog) {
-					z.Debug("HetSysLog", s)
-					if event != nil && event.MACAddress != "" {
-						z.Infof("HetSysLog事件:%+v", event)
-						eve := &DHCPLease{
-							MAC:       event.MACAddress,
-							Online:    event.Online,
-							StartTime: event.Timestamp,
-						}
-						if v, ok := this.leases[eve.MAC]; ok {
-							if v.Hostname != "" {
-								eve.Hostname = v.Hostname
+					if event != nil {
+						pkg.DedupDo(event.MACAddress, func() {
+							z.Debug("HetSysLog", s)
+							if event != nil && event.MACAddress != "" {
+								z.Infof("HetSysLog事件:%+v", event)
+								eve := &DHCPLease{
+									MAC:       event.MACAddress,
+									Online:    event.Online,
+									StartTime: event.Timestamp,
+								}
+								if v, ok := this.leases[eve.MAC]; ok {
+									if v.Hostname != "" {
+										eve.Hostname = v.Hostname
+									}
+								}
+								go this.updateDeviceStatus("HetSysLog事件", eve)
 							}
-						}
-						go this.updateDeviceStatus("HetSysLog事件", eve)
+						})
 					}
+
 				})
 				subscribeLedLog(s)
 			})
