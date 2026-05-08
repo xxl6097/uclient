@@ -99,3 +99,20 @@ func ParseDeviceStr(s string) (string, string, error) {
 
 	return mac, cmd, nil
 }
+
+// ParseDeviceSnStr 解析 0a5e697602d5-getList 格式字符串
+// 返回: deviceSn地址, 指令, 错误
+func ParseDeviceSnStr(s string) (string, string, error) {
+	// 按 "-" 分割成两部分
+	parts := strings.Split(s, "-")
+
+	// 校验格式必须是 [mac]-[cmd]
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("格式错误，必须是 无冒号MAC-指令 格式")
+	}
+
+	mac := parts[0]
+	cmd := parts[1]
+
+	return mac, cmd, nil
+}

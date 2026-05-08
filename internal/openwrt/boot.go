@@ -119,8 +119,8 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 		}
 
 		z.L().Sugar().Info("EventMessage", zap.Any("eventData", eventData))
-		mac, cmd, e := u.ParseDeviceStr(eventData.EventKey)
-		z.L().Sugar().Info("ParseDeviceStr", zap.String("mac", mac), zap.String("cmd", cmd))
+		mac, cmd, e := u.ParseDeviceSnStr(eventData.EventKey)
+		z.L().Sugar().Info("ParseDeviceSnStr", zap.String("mac", mac), zap.String("cmd", cmd))
 		if e != nil {
 			z.L().Sugar().Warn(e.Error())
 			return ""
