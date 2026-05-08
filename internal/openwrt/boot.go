@@ -70,11 +70,11 @@ func (this *openWRT) init() {
 
 func (this *openWRT) Close() {
 	if this.cancel != nil {
-		z.Debug("close openWRT")
+		z.L().Sugar().Debug("close openWRT")
 		this.cancel()
 	}
 	//ntfy.GetInstance().Stop()
-	//_ = z.Flush()
+	//_ = z.L().Sugar().Flush()
 }
 
 func (this *openWRT) ResetClients() {
@@ -84,13 +84,13 @@ func (this *openWRT) ResetClients() {
 func (this *openWRT) initClients() {
 	err := this.initData()
 	if err != nil {
-		z.Errorf("initClients Error:%v", err)
+		z.L().Sugar().Errorf("initClients Error:%v", err)
 		time.Sleep(5 * time.Second)
-		z.Error("5 seconds later and try...")
+		z.L().Sugar().Error("5 seconds later and try...")
 		this.initClients()
 	}
 	if this.clients == nil || len(this.clients) == 0 {
-		z.Error("dataMap is empty, 1 seconds later and try...")
+		z.L().Sugar().Error("dataMap is empty, 1 seconds later and try...")
 		time.Sleep(16 * time.Second)
 		this.initClients()
 	}
@@ -103,29 +103,29 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 	var res u.BaseMessage
 	err := json.Unmarshal([]byte(m.Message), &res)
 	if err != nil {
-		z.L().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
+		z.L().Sugar().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
 		return err.Error()
 	}
-	z.L().Info("BaseMessage", zap.Any("res", res))
+	z.L().Sugar().Info("BaseMessage", zap.Any("res", res))
 	caseType := ""
 	switch res.MsgType {
 	case "event":
 		var eventData u.EventMessage
 		err = json.Unmarshal([]byte(m.Message), &eventData)
 		if err != nil {
-			z.L().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
+			z.L().Sugar().Warn("json错误", zap.String("message", m.Message), zap.Error(err))
 			return err.Error()
 		}
 
-		z.L().Info("EventMessage", zap.Any("eventData", eventData))
+		z.L().Sugar().Info("EventMessage", zap.Any("eventData", eventData))
 		mac, cmd, e := u.ParseDeviceStr(eventData.EventKey)
-		z.L().Info("ParseDeviceStr", zap.String("mac", mac), zap.String("cmd", cmd))
+		z.L().Sugar().Info("ParseDeviceStr", zap.String("mac", mac), zap.String("cmd", cmd))
 		if e != nil {
-			z.L().Warn(e.Error())
+			z.L().Sugar().Warn(e.Error())
 			return ""
 		}
 		if mac != this.mac {
-			z.L().Warn("不是本设备消息")
+			z.L().Sugar().Warn("不是本设备消息")
 			return ""
 		}
 		caseType = cmd
@@ -134,7 +134,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 	switch caseType {
 	case "getData":
 		cls := this.getClientByName(res.Target)
-		z.L().Info("getData", zap.Any("cls", cls))
+		z.L().Sugar().Info("getData", zap.Any("cls", cls))
 		if cls != nil {
 			cls.StartTime = zutil.Now().UnixMilli()
 			this.dingSign("ntfyMessage", cls)
@@ -145,7 +145,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 
 	case "sign":
 		cls := this.getClientByName(res.Target)
-		z.L().Info("ntfyMessage", zap.Any("cls", cls))
+		z.L().Sugar().Info("ntfyMessage", zap.Any("cls", cls))
 		if cls != nil {
 			cls.StartTime = zutil.Now().UnixMilli()
 			this.dingSign("ntfyMessage", cls)
@@ -157,7 +157,7 @@ func (this *openWRT) ntfyMessage(m *ntfy.Message) string {
 	case "getList":
 		cls := this.GetClients()
 		if cls != nil {
-			z.L().Info("ntfyMessage", zap.Any("cls", cls))
+			z.L().Sugar().Info("ntfyMessage", zap.Any("cls", cls))
 			str := strings.Builder{}
 			for _, cl := range cls {
 				name := cl.Hostname
@@ -184,7 +184,7 @@ func (this *openWRT) initNtfy() {
 	if this.settingsData != nil && this.settingsData.PushMsgData != nil && this.settingsData.PushMsgData.Address != "" {
 		//info, err := utils.LoadWithGob[*u.NtfyInfo](ntfyFilePath)
 		//if err != nil {
-		//	z.Errorf("initNtfy Error:%v", err)
+		//	z.L().Sugar().Errorf("initNtfy Error:%v", err)
 		//} else {
 		//	go ntfy.GetInstance().Start(info)
 		//	ntfy.GetInstance().SetFunc(this.ntfyMessage)
@@ -201,15 +201,15 @@ func (this *openWRT) initNtfy() {
 			Multiplier:     2.0,
 		}))
 
-		z.L().Info("ntfy loading", zap.Any("ops", ops))
+		z.L().Sugar().Info("ntfy loading", zap.Any("ops", ops))
 		client := ntfy.GetClient(ops...)
 		if client != nil && this.settingsData.PushMsgData.ReqTopic != "" {
 			go func() {
 				err := client.Serve(this.ctx, this.settingsData.PushMsgData.ReqTopic, func(_ context.Context, m *ntfy.Message) (string, string, bool, error) {
-					z.L().Info("[responder] 收到", zap.Any("msg", m), zap.Any("tags", m.Tags))
+					z.L().Sugar().Info("[responder] 收到", zap.Any("msg", m), zap.Any("tags", m.Tags))
 					msg := this.ntfyMessage(m)
 					//reply := fmt.Sprintf("ack: %s (at %s)", msg, time.Now().Format(time.DateTime))
-					z.L().Debug("回复", zap.String("msg", msg))
+					z.L().Sugar().Debug("回复", zap.String("msg", msg))
 					if msg == "" {
 						return "", "", true, nil
 					}
@@ -221,7 +221,7 @@ func (this *openWRT) initNtfy() {
 			}()
 		}
 	} else {
-		z.L().Warn("ntfy load failed", zap.Any("settings", this.settingsData))
+		z.L().Sugar().Warn("ntfy load failed", zap.Any("settings", this.settingsData))
 	}
 }
 
@@ -255,7 +255,7 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			//z.Debug("listenFsnotify:", event)
+			//z.L().Sugar().Debug("listenFsnotify:", event)
 			if event.Has(fsnotify.Write) {
 				//filePath := event.Name
 				//switch event.Name {
@@ -272,9 +272,9 @@ func (this *openWRT) listenFsnotify(watcher *fsnotify.Watcher) {
 			if !ok {
 				return
 			}
-			z.Error("error:", err)
+			z.L().Sugar().Error("error:", err)
 		case <-this.ctx.Done():
-			z.Debug("Fsnotify 监听退出...")
+			z.L().Sugar().Debug("Fsnotify 监听退出...")
 			return
 		}
 	}
@@ -287,9 +287,9 @@ func (p *openWRT) updateClientsByDHCP() {
 		p.nicks = nickMap
 	}
 	if err != nil {
-		z.Println(fmt.Errorf("getClientsByDhcp Error:%v", err))
+		z.L().Sugar().Debug(fmt.Errorf("getClientsByDhcp Error:%v", err))
 	} else {
-		z.Printf("DHCP变化，客户端数量 %+v\n", len(dhcpArray))
+		z.L().Sugar().Debugf("DHCP变化，客户端数量 %+v\n", len(dhcpArray))
 		arpMap, e1 := getClientsByArp(brLanString)
 		staInfo := GetStaInfo(strings.Contains(p.ulistString, "ahsapd.sta"))
 		for _, client := range dhcpArray {
@@ -358,7 +358,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		return nil, nil
 	}
 	staInfo := GetStaInfo(strings.Contains(this.ulistString, "ahsapd.sta"))
-	z.Infof("1-----refreshClients typeEvent:%v new:%+v", new, staInfo)
+	//z.L().Sugar().Infof("1-----refreshClients typeEvent:%v new:%+v", new, staInfo)
 	if staInfo != nil {
 		sta := staInfo[new.MAC]
 		if sta != nil {
@@ -378,7 +378,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		}
 	}
 	old := this.getClient(new.MAC)
-	z.Infof("2-----refreshClients old:%v sta:%+v", old, staInfo)
+	//z.L().Sugar().Infof("2-----refreshClients old:%v sta:%+v", old, staInfo)
 	if old != nil {
 		if new.IP != "" {
 			old.IP = new.IP
@@ -425,7 +425,7 @@ func (this *openWRT) refreshClients(new *DHCPLease) (*DHCPLease, map[string]*u.S
 		old.Flags = new.Flags
 		old.Signal = new.Signal
 	} else {
-		z.Debugf("新设备：%+v", new)
+		z.L().Sugar().Debugf("新设备：%+v", new)
 		if this.nicks == nil {
 			nickMap, e2 := getNickData()
 			if e2 == nil {

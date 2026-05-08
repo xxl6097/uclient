@@ -8,20 +8,20 @@ import (
 //	defer this.signMutex.Unlock()
 //	this.signMutex.Lock()
 //	if macAddress == "" {
-//		z.Error("openWRT checkMessage - macAddress is empty")
+//		z.L().Sugar().Error("openWRT checkMessage - macAddress is empty")
 //		return false
 //	}
 //	if v, okk := this.clientStatus[macAddress]; okk {
 //		if v == nil {
 //			this.clientStatus[macAddress] = s
-//			z.Error("v is nil", macAddress)
+//			z.L().Sugar().Error("v is nil", macAddress)
 //			return false
 //		} else {
 //			//t1 := zutil.Now()
 //			//t2 := u.UTC8ToTime(v.Timestamp)
 //			//du := t1.Sub(t2)
 //			this.clientStatus[macAddress] = s
-//			z.Debugf("checkMessage:%v %v %v %v", s.Connected, v.Connected) //, du.String(), du.Milliseconds()
+//			z.L().Sugar().Debugf("checkMessage:%v %v %v %v", s.Connected, v.Connected) //, du.String(), du.Milliseconds()
 //			if s.Connected == v.Connected {                                   // && du.Milliseconds() < 1000
 //				return true
 //			}
@@ -29,41 +29,41 @@ import (
 //		}
 //	} else {
 //		this.clientStatus[macAddress] = s
-//		z.Error("macAddress not in clientStatus", macAddress)
+//		z.L().Sugar().Error("macAddress not in clientStatus", macAddress)
 //		return false
 //	}
 //}
 
 func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
-	z.Infof("updateDeviceStatus %s new:%+v", typeEvent, new)
+	z.L().Sugar().Infof("updateDeviceStatus %s new:%+v", typeEvent, new)
 	defer this.signMutex.Unlock()
 	this.signMutex.Lock()
-	//z.Infof("1------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
+	//z.L().Sugar().Infof("1------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	if new == nil {
-		z.Debugf("new == nil %s 状态变化 %+v", typeEvent, new)
+		z.L().Sugar().Debugf("new == nil %s 状态变化 %+v", typeEvent, new)
 		return
 	}
-	//z.Infof("2------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
+	//z.L().Sugar().Infof("2------updateDeviceStatus typeEvent:%s new:%+v", typeEvent, new)
 	macAddress := new.MAC
 	if macAddress == "" {
-		z.Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, new)
+		z.L().Sugar().Debugf("macAddress == \"\" %s 状态变化 %+v", typeEvent, new)
 		return
 	}
-	//z.Infof("3------%s new:%+v", typeEvent, new)
+	//z.L().Sugar().Infof("3------%s new:%+v", typeEvent, new)
 	oldStatus, sta := this.refreshClients(new)
-	z.Infof("4------%s old:%+v", typeEvent, oldStatus)
+	//z.L().Sugar().Infof("4------%s old:%+v", typeEvent, oldStatus)
 	if oldStatus == nil {
 		oldStatus = new
 	} else {
 		if new.Online == oldStatus.Online {
-			z.Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, new.Hostname, new.MAC, new.Online, new.Online)
+			z.L().Sugar().Warnf("[%s]状态相同，不更新，%s[%s] 旧：%v,新：%v", typeEvent, new.Hostname, new.MAC, new.Online, new.Online)
 			return
 		}
 		oldStatus.Online = new.Online
 	}
-	z.Debugf("状态更新[%s] %+v", typeEvent, oldStatus)
+	z.L().Sugar().Debugf("状态更新[%s] %+v", typeEvent, oldStatus)
 	if sta != nil {
-		z.Debugf("sta信息[%s] %+v", new.Hostname, sta[macAddress])
+		z.L().Sugar().Debugf("sta信息[%s] %+v", new.Hostname, sta[macAddress])
 	}
 	go func() {
 		s := Status{Timestamp: new.StartTime, Connected: new.Online}
@@ -95,11 +95,11 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 //		s.Timestamp = device.Timestamp.UnixMilli()
 //		s.Connected = device.DataType == 0
 //
-//		z.Infof("【监听hostapd-1】:%v %v %+v ", s.Connected, u.TimestampToDateTime(s.Timestamp), device.Address)
+//		z.L().Sugar().Infof("【监听hostapd-1】:%v %v %+v ", s.Connected, u.TimestampToDateTime(s.Timestamp), device.Address)
 //		if this.checkMessage(macAddr, &s) {
 //			return
 //		}
-//		z.Infof("【监听hostapd-2】:%v %v %+v", s.Connected, u.TimestampToDateTime(s.Timestamp), device.Address)
+//		z.L().Sugar().Infof("【监听hostapd-2】:%v %v %+v", s.Connected, u.TimestampToDateTime(s.Timestamp), device.Address)
 //		//在线、离线事件
 //		if cls != nil {
 //			cls.Signal = device.Signal
@@ -134,11 +134,11 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 //	s.Connected = sysEvent.Online
 //	macAddr = sysEvent.Mac
 //
-//	z.Infof("【监听日志1】:%v %v %+v", s.Connected, u.TimestampToDateTime(s.Timestamp), sysEvent)
+//	z.L().Sugar().Infof("【监听日志1】:%v %v %+v", s.Connected, u.TimestampToDateTime(s.Timestamp), sysEvent)
 //	if this.checkMessage(macAddr, &s) {
 //		return
 //	}
-//	z.Infof("【监听日志2】:%v %v %+v", s.Connected, u.TimestampToDateTime(s.Timestamp), sysEvent)
+//	z.L().Sugar().Infof("【监听日志2】:%v %v %+v", s.Connected, u.TimestampToDateTime(s.Timestamp), sysEvent)
 //	cls := this.getClient(macAddr)
 //	if cls != nil {
 //		cls.Online = s.Connected
@@ -174,7 +174,7 @@ func (this *openWRT) updateDeviceStatus(typeEvent string, new *DHCPLease) {
 //	macAddr = dnsData.Mac
 //	cls := this.getClient(macAddr)
 //	//需要web上notify通知、webhook通知
-//	z.Infof("DNS监听:%v %+v", u.TimestampToDateTime(s.Timestamp), dnsData)
+//	z.L().Sugar().Infof("DNS监听:%v %+v", u.TimestampToDateTime(s.Timestamp), dnsData)
 //	if cls != nil {
 //		cls.Hostname = dnsData.Name
 //		cls.Phy = dnsData.Interface
