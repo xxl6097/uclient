@@ -14,6 +14,7 @@ import (
 	"github.com/xxl6097/glog/pkg/zutil"
 	"github.com/xxl6097/go-ntfy/pkg/ntfy"
 	"github.com/xxl6097/uclient/internal/u"
+	"github.com/xxl6097/uclient/pkg"
 	"go.uber.org/zap"
 )
 
@@ -48,7 +49,7 @@ func GetInstance() *openWRT {
 			leases:       make(map[string]*DHCPLease),
 			task:         make(map[string]*u.CountdownTask[*SignData]),
 			statusRuning: false,
-			mac:          u.GetEth0Mac(),
+			mac:          pkg.GetDeviceSn(),
 		}
 		instance.init()
 	})

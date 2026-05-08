@@ -68,7 +68,7 @@ func GetMacAddress(iface string) (string, error) {
 	return "", fmt.Errorf("读取MAC失败")
 }
 
-func GetEth0Mac() string {
+func GetEth0Mac1() string {
 	iface := "eth0"
 	mac, err := GetMacAddress(iface)
 	if err != nil {
